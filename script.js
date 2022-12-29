@@ -92,7 +92,7 @@ class Ball {
                 this.size = size; // Przechowuje wielkość piłki
 
                 this.prevPos = new Vector2D(null, null) //Poprzednia pozycja piłki
-                this.speed = 25; //Szybkość z jaką porusza się piłka
+                this.speed = 15; //Szybkość z jaką porusza się piłka
                 this.texture = new Image(); // Tekstura piłki
                 this.texture.src = "img/ball.png";
 
@@ -129,7 +129,7 @@ let originalBall = new Ball(
                 null    // y
         ),
         new Vector2D(0, 0), // Kierunek
-        250 // Size
+        180 // Size
 );
 
 // Na początku piłka pojawia się nad platformą
@@ -164,8 +164,7 @@ document.addEventListener("keydown", e => {
 
 
         // Wyrzucenie piłki gdy ją trzymamy
-        if (platform.holdBall && e.key == " ")
-        {
+        if (platform.holdBall && e.key == " ") {
                 platform.holdBall = false;
 
                 originalBall.setDir(0, -1)
@@ -178,15 +177,65 @@ document.addEventListener("keydown", e => {
 class Brick {
         static list = [];
 
-        constructor(pos, size) {
+        static playerPoints = 0
+
+        constructor(pos, size, type) {
                 this.pos = pos;
                 this.size = size;
 
-                this.texture = new Image();
-                this.texture.src = "img/greenBrick.jpg";
+                this.health = 1
 
-                this.type = null
-                this.health = null
+                this.texture = new Image();
+
+                this.type = type // Rodzaj cegły
+
+                // Ustawia na podstawie typu:
+                // - teksturę
+                // - wartość punktową
+                // - opcjonalnie życie
+                if (this.type == 0) {
+                        this.texture.src = "img/bricks/whiteBrick.jpg"
+                        this.value = 50
+                }
+                else if (this.type == 1) {
+                        this.texture.src = "img/bricks/orangeBrick.jpg"
+                        this.value = 60
+                }
+                else if (this.type == 2) {
+                        this.texture.src = "img/bricks/cyanBrick.jpg";
+                        this.value = 70
+                }
+                else if (this.type == 3) {
+                        this.texture.src = "img/bricks/greenBrick.jpg"
+                        this.value = 80
+                }
+                else if (this.type == 4) {
+                        this.texture.src = "img/bricks/redBrick.jpg"
+                        this.value = 90
+                }
+                else if (this.type == 5) {
+                        this.texture.src = "img/bricks/blueBrick.jpg"
+                        this.value = 100
+                }
+                else if (this.type == 6) {
+                        this.texture.src = "img/bricks/pinkBrick.jpg"
+                        this.value = 110
+                }
+                else if (this.type == 7) {
+                        this.texture.src = "img/bricks/yellowBrick.jpg"
+                        this.value = 120
+                }
+                else if (this.type == 8) {
+                        this.texture.src = "img/bricks/silverBrick.jpg"
+                        this.value = 50 * 1 // 50 * [nr etapu]
+                        this.health = 2
+                }
+                else if (this.type == 9) {
+                        this.texture.src = "img/bricks/goldBrick.jpg"
+                        this.health = -1
+                }
+
+
 
                 Brick.list.push(this);
         }
@@ -198,11 +247,14 @@ class Brick {
 
         // Usuwa cegłe
         remove() {
-                Brick.list.forEach((el, index) => {
-                        if (el == this) {
-                                Brick.list.splice(index, 1);
-                        }
-                })
+                this.health-- // Odejmuje życie cegły
+                if (this.health == 0)
+                        Brick.list.forEach((el, index) => {
+                                if (el == this) {
+                                        Brick.playerPoints += this.value // Dodaje pkt po rozbiciu cegły
+                                        Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
+                                }
+                        })
         }
 }
 
@@ -217,7 +269,11 @@ for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // G
         let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
         for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
                 bricksV.push(
-                        new Brick(new Vector2D(forX, forY), new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1))
+                        new Brick(
+                                new Vector2D(forX, forY),
+                                new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1),
+                                Math.floor(Math.random() * (9 - 0 + 1)) // Losuje rodzaj cegły
+                        )
                 )
         }
         allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
@@ -293,7 +349,7 @@ for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // G
 
 // Funkcja game loop działa co chwilę, wywołując funkcje które będą nam potrzebne
 function gameLoop(cTime) {
-        think(cTime); 
+        think(cTime);
         draw();
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
@@ -317,13 +373,12 @@ function think(cTime) {
 
                 Brick.list.forEach((brick) => {
                         if
-                        (
+                                (
                                 brick.pos.x < el.pos.x + el.size &&
                                 brick.pos.x + brick.size.x > el.pos.x &&
                                 brick.pos.y < el.pos.y + el.size &&
                                 brick.pos.y + brick.size.y > el.pos.y
-                        ) 
-                        {
+                        ) {
                                 side = 2; // Na razie dajemy 2
 
                                 brick.remove(); // Usuwamy cegłe
@@ -332,8 +387,7 @@ function think(cTime) {
                 })
 
                 // Odwracamy kierunek względem dotkniętej cegły
-                switch(side)
-                {
+                switch (side) {
                         case 1:
                                 el.invertDirX();
                                 break;
@@ -345,15 +399,14 @@ function think(cTime) {
                 }
 
                 //Kolizja z platformą
-                if 
-                (
+                if
+                        (
                         !platform.holdBall &&
                         platform.pos.x < el.pos.x + el.size &&
                         platform.pos.x + platform.size.x > el.pos.x &&
                         platform.pos.y < el.pos.y + el.size &&
                         platform.pos.y + platform.size.y > el.pos.y
-                ) 
-                {
+                ) {
                         let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / platform.size.x // W którą strone piłka ma polecieć
 
                         el.dir.x = hitFactor;
@@ -362,8 +415,7 @@ function think(cTime) {
 
 
                 //Ruch piłek
-                if (!platform.holdBall)
-                {
+                if (!platform.holdBall) {
                         el.prevPos = el.pos;
 
                         el.pos.x += el.dir.x * el.speed
@@ -389,6 +441,9 @@ function draw() {
                 el.draw();
         })
 
+        // Wypisuje punkty
+        context.font = `bold 270px Arial`;
+        context.fillText(Brick.playerPoints, 100, 320)
 
 
         context.stroke(); //Kończy rysować nową klatke

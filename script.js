@@ -26,6 +26,7 @@ function resetAfterLostHealth() {
 }
 function resetGame() {
         // ---------------------[ Generuje pozycje cegieł ]---------------------- //
+        Brick.list = []
 
         let allBricks = [] // Tablica wszystkich cegieł
         const brick = new Image() // Obiekt tworzący cegłe
@@ -47,6 +48,7 @@ function resetGame() {
         playerPoints = 0
         playerHealth = 3
         playerLevel = 1
+        
         resetAfterLostHealth()
 
 

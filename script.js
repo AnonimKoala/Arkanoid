@@ -13,13 +13,43 @@ let playerLevel = 1
 let playerHealth = 3
 let playerPoints = 0
 
-function resetAfterDead() {
+function resetAfterLostHealth() {
         platform.holdBall = true
         platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
 
         // Na początku piłka pojawia się nad platformą
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
         originalBall.pos.y = platform.pos.y - 0 - originalBall.size
+
+
+
+}
+function resetGame() {
+        // ---------------------[ Generuje pozycje cegieł ]---------------------- //
+
+        let allBricks = [] // Tablica wszystkich cegieł
+        const brick = new Image() // Obiekt tworzący cegłe
+        for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // Generuje cegły w poziomie [poz. początkowa, poz. końcowa. długość cegły]
+                let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
+                for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
+                        bricksV.push(
+                                new Brick(
+                                        new Vector2D(forX, forY),
+                                        new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1),
+                                        Math.floor(Math.random() * (9 - 0 + 1)) // Losuje rodzaj cegły
+                                )
+                        )
+                }
+                allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
+        }
+
+        // ---------------------------------------------------------------------- //
+        playerPoints = 0
+        playerHealth = 3
+        playerLevel = 1
+        resetAfterLostHealth()
+
+
 }
 
 
@@ -278,34 +308,7 @@ class Brick {
 
 
 
-
-// ---------------------[ Generuje pozycje cegieł ]---------------------- //
-
-let allBricks = [] // Tablica wszystkich cegieł
-const brick = new Image() // Obiekt tworzący cegłe
-for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // Generuje cegły w poziomie [poz. początkowa, poz. końcowa. długość cegły]
-        let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
-        for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
-                bricksV.push(
-                        new Brick(
-                                new Vector2D(forX, forY),
-                                new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1),
-                                Math.floor(Math.random() * (9 - 0 + 1)) // Losuje rodzaj cegły
-                        )
-                )
-        }
-        allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
-}
-
-// ---------------------------------------------------------------------- //
-
-// ----------------------[ Generowanie na planszy ]---------------------- //
-// allBricks.forEach((bricksV) => {
-//         bricksV.forEach((el) => {
-//                 el.create()
-//         })
-// })
-// ---------------------------------------------------------------------- //
+resetGame() // Resetuje / Startuje grę
 
 // ==================================================================================================== //
 
@@ -445,7 +448,7 @@ function think(cTime) {
                 // Sprawdza czy piłka wypadła
                 if (el.pos.y > canvas.height / 100 * 96.4) {
                         playerHealth--
-                        resetAfterDead()
+                        resetAfterLostHealth()
                 }
 
         })
@@ -479,10 +482,9 @@ function draw() {
                 context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
         }
         else {
-                playerPoints = 0
-                playerHealth = 3
-
-                resetAfterDead()
+                
+                resetGame()
+                
         }
 
         context.stroke(); //Kończy rysować nową klatke

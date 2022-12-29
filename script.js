@@ -8,6 +8,24 @@ canvas.width = 5000
 canvas.height = 5000
 // ==================================================================================================== //
 
+// ========================================[ Dotyczące gracza ]======================================== //
+let playerLevel = 1
+let playerHealth = 3
+let playerPoints = 0
+
+function resetAfterDead() {
+        platform.holdBall = true
+        platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
+
+        // Na początku piłka pojawia się nad platformą
+        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
+        originalBall.pos.y = platform.pos.y - 0 - originalBall.size
+}
+
+
+
+// ==================================================================================================== //
+
 // ================================[ Klasa wektorów ]========================= //
 // Pomogą nam w lepszej organizacji dwunumerycznych list                       //
 
@@ -56,7 +74,7 @@ class Vector2D {
 
 // ================================[ Odpowiada za działanie platformy ]================================ //
 let platform = {
-        size: new Vector2D(1100, canvas.height / 100 * 2.5), // Długość i szerokość platformy
+        size: new Vector2D(canvas.width / 4.54, canvas.height / 100 * 2.5), // Długość i szerokość platformy
         pos: null, // Pozycja platformy
         move: canvas.width / 100 * 2,
         holdBall: true, //Czy nasza platforma trzyma piłke
@@ -177,7 +195,7 @@ document.addEventListener("keydown", e => {
 class Brick {
         static list = [];
 
-        static playerPoints = 0
+        // static playerPoints = 0
 
         constructor(pos, size, type) {
                 this.pos = pos;
@@ -227,7 +245,7 @@ class Brick {
                 }
                 else if (this.type == 8) {
                         this.texture.src = "img/bricks/silverBrick.jpg"
-                        this.value = 50 * 1 // 50 * [nr etapu]
+                        this.value = 50 * playerLevel
                         this.health = 2
                 }
                 else if (this.type == 9) {
@@ -251,7 +269,7 @@ class Brick {
                 if (this.health == 0)
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
-                                        Brick.playerPoints += this.value // Dodaje pkt po rozbiciu cegły
+                                        playerPoints += this.value // Dodaje pkt po rozbiciu cegły
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }
                         })
@@ -349,10 +367,12 @@ for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // G
 
 // Funkcja game loop działa co chwilę, wywołując funkcje które będą nam potrzebne
 function gameLoop(cTime) {
+
         think(cTime);
         draw();
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
+
 }
 
 // Funkcja mająca na celu zająć się logiką gry
@@ -421,30 +441,49 @@ function think(cTime) {
                         el.pos.x += el.dir.x * el.speed
                         el.pos.y += el.dir.y * el.speed
                 }
+
+                // Sprawdza czy piłka wypadła
+                if (el.pos.y > canvas.height / 100 * 96.4) {
+                        playerHealth--
+                        resetAfterDead()
+                }
+
         })
 }
 
 function draw() {
         context.clearRect(0, 0, canvas.width, canvas.height) //Usuwa poprzednią klatke
 
+        if (playerHealth > 0) {
+                platform.draw(); // Rysuje platformę
+
+                // Rysuje każdą piłke
+                Ball.list.forEach((el) => {
+                        el.draw();
+                })
+
+                // Rysuje każdą cegłe
+                Brick.list.forEach((el) => {
+                        el.draw();
+                })
 
 
-        platform.draw(); // Rysuje platformę
 
-        // Rysuje każdą piłke
-        Ball.list.forEach((el) => {
-                el.draw();
-        })
+                // Wyświetla statystyki
+                context.font = `bold ${canvas.height / 18.5}px Arial`;
+                context.fillStyle = '#0090e1';
 
-        // Rysuje każdą cegłe
-        Brick.list.forEach((el) => {
-                el.draw();
-        })
+                context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
 
-        // Wypisuje punkty
-        context.font = `bold 270px Arial`;
-        context.fillText(Brick.playerPoints, 100, 320)
+                context.fillStyle = '#f8312f';
+                context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
+        }
+        else {
+                playerPoints = 0
+                playerHealth = 3
 
+                resetAfterDead()
+        }
 
         context.stroke(); //Kończy rysować nową klatke
 }

@@ -3,10 +3,46 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 // ==================================================================================================== //
 
+
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
 canvas.width = 5000
 canvas.height = 5000
 // ==================================================================================================== //
+
+
+// ===================================[ Dotyczy ekranu startowego ]==================================== //
+let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
+let mouseOnCanvas = false // Czy mysz jest nad polem gry
+
+function startScreen() {
+        gameStarted = false
+        resetGame() // Resetuje stan cegieł, uruchami funkcję resetAfterLostHealth()
+
+        // ============[ Wczytuje obraz ekranu startowego ]============ //
+        const introImg = new Image();
+        introImg.addEventListener("load", e => {
+                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
+                context.stroke();
+        });
+        introImg.src = "img/startScreen.svg";
+        // ============================================================ //
+
+
+
+        canvas.addEventListener("click", e => {
+                gameStarted = true // Uruchamia grę po kliknięciu w obszarze pola canvas
+        })
+        canvas.addEventListener("mouseenter", e => {
+                mouseOnCanvas = true
+                // console.log(mouseOnCanvas);
+        })
+        canvas.addEventListener("mouseleave", e => {
+                mouseOnCanvas = false
+                // console.log(mouseOnCanvas);
+        })
+}
+// ==================================================================================================== //
+
 
 // ========================================[ Dotyczące gracza ]======================================== //
 let playerLevel = 1
@@ -19,11 +55,13 @@ function resetAfterLostHealth() {
 
         // Na początku piłka pojawia się nad platformą
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
-        originalBall.pos.y = platform.pos.y - 0 - originalBall.size
+        originalBall.pos.y = platform.pos.y - 10 - originalBall.size
 
 
 
 }
+// ==================================================================================================== //
+
 function resetGame() {
         // ---------------------[ Generuje pozycje cegieł ]---------------------- //
         Brick.list = []
@@ -48,19 +86,16 @@ function resetGame() {
         playerPoints = 0
         playerHealth = 3
         playerLevel = 1
-        
+
         resetAfterLostHealth()
 
 
 }
-
-
-
 // ==================================================================================================== //
+
 
 // ================================[ Klasa wektorów ]========================= //
 // Pomogą nam w lepszej organizacji dwunumerycznych list                       //
-
 class Vector2D {
         constructor(x, y) {
                 this.x = x;
@@ -103,36 +138,84 @@ class Vector2D {
                 this.y = norm.y;
         }
 }
+// =========================================================================== //
+
 
 // ================================[ Odpowiada za działanie platformy ]================================ //
 let platform = {
         size: new Vector2D(canvas.width / 4.54, canvas.height / 100 * 2.5), // Długość i szerokość platformy
         pos: null, // Pozycja platformy
-        move: canvas.width / 100 * 2,
+        move: canvas.width / 100 * 5,
         holdBall: true, //Czy nasza platforma trzyma piłke
 
         // Funkcja do rysowania platformy
         draw() {
                 context.fillStyle = 'blue';
                 context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y)
-        },
-
-        // Funkcja wywoływana do zmieniania pozycji platformy
-        // updatePlatformPos(direction) {
-        //         if (direction == 'l')
-        //                 context.clearRect(platform.pos.x + platform.move, platform.pos.y - 1, platform.size.x, platform.size.y + 1)
-        //         else
-        //                 context.clearRect(platform.pos.x - platform.move, platform.pos.y - 1, platform.size.x, platform.size.y + 1)
-        //         context.fillRect(platform.pos.x, platform.pos.y, platform.size.x, platform.size.y)
-        // }
-
+        }
 
 }
 
 platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
+// Naciskanie klawiszy
+document.addEventListener("keydown", e => {
+        // Ruch platformą strzałkami
+                if (e.key == "ArrowLeft") {
+                        if (platform.pos.x > 0) {
+                                platform.pos.x -= platform.move;
 
-// ================================[ Klasa piłek ]============================ //
+                                if (platform.holdBall) {
+                                        originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+                                }
+                        }
+                } else if (e.key == "ArrowRight") {
+                        if (platform.pos.x + platform.size.x < canvas.width) {
+                                platform.pos.x += platform.move;
 
+                                if (platform.holdBall) {
+                                        originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+                                }
+                        }
+                }
+
+
+
+                // Wyrzucenie piłki gdy ją trzymamy
+                if (platform.holdBall && e.key == " ") {
+                        platform.holdBall = false;
+
+                        originalBall.setDir(0, -1)
+                }
+                
+})
+
+// Odpowiada za ruch platformy za pomocą myszki
+canvas.addEventListener("mousemove", e=>{
+        platform.pos.x = platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.1
+        if (platform.holdBall) {
+                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+        }
+
+})
+canvas.addEventListener("mousedown", e=>{
+                // Wyrzucenie piłki gdy ją trzymamy LPM
+                if (platform.holdBall && e.button == 0) {
+                        platform.holdBall = false;
+
+                        originalBall.setDir(0, -1)
+                }
+})
+
+
+
+
+
+
+
+// ==================================================================================================== //
+
+
+// ==========================================[ Klasa piłek ]=========================================== //
 class Ball {
         static list = []; // Lista wszystkich piłek
 
@@ -185,41 +268,6 @@ let originalBall = new Ball(
 // Na początku piłka pojawia się nad platformą
 originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
 originalBall.pos.y = platform.pos.y - 0 - originalBall.size
-
-
-
-// Naciskanie klawiszy
-document.addEventListener("keydown", e => {
-        // Ruch platformą
-        if (e.key == "ArrowLeft") {
-                if (platform.pos.x > 0) {
-                        platform.pos.x -= platform.move;
-                        // platform.updatePlatformPos('l');
-
-                        if (platform.holdBall) {
-                                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
-                        }
-                }
-        } else if (e.key == "ArrowRight") {
-                if (platform.pos.x + platform.size.x < canvas.width) {
-                        platform.pos.x += platform.move;
-                        // platform.updatePlatformPos('r');
-
-                        if (platform.holdBall) {
-                                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
-                        }
-                }
-        }
-
-
-
-        // Wyrzucenie piłki gdy ją trzymamy
-        if (platform.holdBall && e.key == " ") {
-                platform.holdBall = false;
-
-                originalBall.setDir(0, -1)
-        }
-})
 // ==================================================================================================== //
 
 
@@ -307,12 +355,8 @@ class Brick {
                         })
         }
 }
-
-
-
-resetGame() // Resetuje / Startuje grę
-
 // ==================================================================================================== //
+
 
 // ===============[ Funckja ray castingu, czyli sprawdzania czy jest coś w danym kierunku ]============= //
 // Startpos to nasz punkt A, a endpos punkt B                                                            //
@@ -371,10 +415,15 @@ resetGame() // Resetuje / Startuje grę
 // }
 
 // Funkcja game loop działa co chwilę, wywołując funkcje które będą nam potrzebne
+
+// =======================================[ Funkcje cykliczne ]======================================== //
 function gameLoop(cTime) {
 
         think(cTime);
-        draw();
+        if (gameStarted)
+                draw();
+        else
+                startScreen();
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
 
@@ -482,14 +531,14 @@ function draw() {
 
                 context.fillStyle = '#f8312f';
                 context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
+
+
         }
         else {
-                
-                resetGame()
-                
+                startScreen()
         }
 
         context.stroke(); //Kończy rysować nową klatke
 }
-
+// ==================================================================================================== //
 gameLoop(0) //Zaczyna nasz game loop

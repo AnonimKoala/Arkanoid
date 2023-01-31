@@ -224,8 +224,7 @@ class Ball {
                 this.dir = dir; // Przechowuje kierunek piłki
                 this.size = size; // Przechowuje wielkość piłki
 
-                this.prevPos = new Vector2D(null, null) //Poprzednia pozycja piłki
-                this.speed = 15; //Szybkość z jaką porusza się piłka
+                this.speed = 30; //Szybkość z jaką porusza się piłka
                 this.texture = new Image(); // Tekstura piłki
                 this.texture.src = "img/ball.png";
 
@@ -357,65 +356,6 @@ class Brick {
 }
 // ==================================================================================================== //
 
-
-// ===============[ Funckja ray castingu, czyli sprawdzania czy jest coś w danym kierunku ]============= //
-// Startpos to nasz punkt A, a endpos punkt B                                                            //
-// Sprawdzamy czy pomiędzy odcinkiem AB znajduje się jakiś obiekt                                        //                                                                                        //
-// function raycast(startpos, endpos)
-// {
-//         let hit = false; //Czy nasza linia dotkła czegokolwiek
-//         let hitpos = new Vector2D(null, null) //Pozycja w której linia dotkneła obiekt 
-//         let hitobj = null; //Obiekt który dotkneła (jeśli dotkneła)
-//         let increment = new Vector2D(endpos.x - startpos.x, endpos.y - startpos.x) //Inkrementacja naszej linii
-
-//         for (let x = startpos.x, y = startpos.y; x < endpos.x && y < endpos.y; x += increment.x, y += increment.y)
-//         {
-//                 Brick.list.forEach((brick) => {
-//                         if 
-//                         (
-//                                 brick.pos.x < x &&
-//                                 brick.pos.x + brick.size.x > x &&
-//                                 brick.pos.y < y &&
-//                                 brick.pos.y + brick.size.y > y
-//                         )
-//                         {
-//                                 hit = true;
-//                                 hitobj = brick;
-//                                 return;
-//                         }
-//                 })
-
-//                 if 
-//                 (
-//                         platform.pos.x < x &&
-//                         platform.pos.x + platform.size.x > x &&
-//                         platform.pos.y < y &&
-//                         platform.pos.y + platform.size.y > y
-//                 )
-//                 {
-//                         hit = true;
-//                         hitobj = platform;
-//                 }
-
-//                 if (hit)
-//                         hitpos.x = x;
-//                         hitpos.y = y;
-//                         break;
-//         }
-
-//         hitData = {
-//                 hit: hit,
-//                 hitObj: hitobj,
-//                 hitPos: hitpos,
-//                 startPos: startpos,
-//                 endPos: endpos,
-//         };
-
-//         return hitData;
-// }
-
-// Funkcja game loop działa co chwilę, wywołując funkcje które będą nam potrzebne
-
 // =======================================[ Funkcje cykliczne ]======================================== //
 function gameLoop(cTime) {
 
@@ -433,65 +373,99 @@ function gameLoop(cTime) {
 function think(cTime) {
         // System kolizji piłki
         Ball.list.forEach((el) => {
+                let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
+
                 //Kolizja z ścianami
                 if (el.pos.x <= 0 || el.pos.x + el.size >= canvas.width) // Kolizja z lewą i prawą ścianą
+                {
+                        hit = true;
                         el.invertDirX();
-                if (el.pos.y <= 0 || el.pos.y + el.size >= canvas.height) // Kolizja z górną i dolną ścianą
+                        el.lastTouchedObj = null;
+                }
+
+                if (el.pos.y <= 0 || el.pos.y + el.size >= canvas.height && !hit) // Kolizja z górną i dolną ścianą
+                {
+                        hit = true;
                         el.invertDirY();
+                        el.lastTouchedObj = null;
+                }
 
 
 
                 //Kolizja z cegłami
+                if (!hit)
+                {
+                        let side = 0 // Strona cegły z którą piłka skolidowała, 0 - brak, 1 - boczna, 2 - górna lub dolna
 
-                let side = 0 // Strona cegły z którą piłka skolidowała, 0 - brak, 1 - boczna, 2 - górna lub dolna
-
-                Brick.list.forEach((brick) => {
-                        if
-                                (
-                                brick.pos.x < el.pos.x + el.size &&
-                                brick.pos.x + brick.size.x > el.pos.x &&
-                                brick.pos.y < el.pos.y + el.size &&
-                                brick.pos.y + brick.size.y > el.pos.y
-                        ) {
-                                side = 2; // Na razie dajemy 2
-
-                                brick.remove(); // Usuwamy cegłe
-                        }
-
-                })
-
-                // Odwracamy kierunek względem dotkniętej cegły
-                switch (side) {
-                        case 1:
-                                el.invertDirX();
-                                break;
-                        case 2:
-                                el.invertDirY();
-                                break;
-                        default:
-                                break;
+                        Brick.list.forEach((brick) => {
+                                if (!hit)
+                                {
+                                        let dX, dY;
+                                        dX = (el.pos.x + el.size / 2) - (brick.pos.x + brick.size.x / 2)
+                                        dY = (el.pos.y + el.size / 2) - (brick.pos.y + brick.size.y / 2)
+                
+                                        let width, height;
+                                        width = (el.size + brick.size.x) / 2
+                                        height = (el.size + brick.size.y) / 2
+                
+                                        let crossWidth, crossHeight;
+                                        crossWidth = width * dY;
+                                        crossHeight = height * dX;
+                
+                                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != brick)
+                                        {
+                                                if (crossWidth > crossHeight)
+                                                        if (crossWidth > -crossHeight) el.invertDirY(); else el.invertDirX();
+                                                else
+                                                        if (crossWidth > -crossHeight) el.invertDirX(); else el.invertDirY();
+                
+                                                hit = true;
+                                                el.lastTouchedObj = brick; // Ustawiamy cegłe na ostatni dotknięty obiekt by ominąć ją w następnej iteracji, zapobiega to błędom w kolizji
+                                                brick.remove(); // Usuwamy cegłe
+                                        }
+                                }
+                        })
                 }
 
-                //Kolizja z platformą
-                if
-                        (
-                        !platform.holdBall &&
-                        platform.pos.x < el.pos.x + el.size &&
-                        platform.pos.x + platform.size.x > el.pos.x &&
-                        platform.pos.y < el.pos.y + el.size &&
-                        platform.pos.y + platform.size.y > el.pos.y
-                ) {
-                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / platform.size.x // W którą strone piłka ma polecieć
 
-                        el.dir.x = hitFactor;
-                        el.dir.y *= -1;
+                //Kolizja z platformą
+                if (!hit)
+                {
+                        let dX, dY;
+                        dX = (el.pos.x + el.size / 2) - (platform.pos.x + platform.size.x / 2)
+                        dY = (el.pos.y + el.size / 2) - (platform.pos.y + platform.size.y / 2)
+
+                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / (platform.size.x / 2) // W którą strone piłka ma polecieć
+
+                        let width, height;
+                        width = (el.size + platform.size.x) / 2
+                        height = (el.size + platform.size.y) / 2
+
+                        let crossWidth, crossHeight;
+                        crossWidth = width * dY;
+                        crossHeight = height * dX;   
+
+                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != platform)
+                        {
+                                if (crossWidth > crossHeight)
+                                        if (crossWidth > -crossHeight) {
+                                                el.dir.x = hitFactor;
+                                                el.invertDirY();
+                                        } else el.invertDirX();
+                                else
+                                        if (crossWidth > -crossHeight) el.invertDirX(); else {
+                                                el.dir.x = hitFactor;
+                                                el.invertDirY();  
+                                        };
+
+                                hit = true;
+                                el.lastTouchedObj = platform;
+                        }
                 }
 
 
                 //Ruch piłek
                 if (!platform.holdBall) {
-                        el.prevPos = el.pos;
-
                         el.pos.x += el.dir.x * el.speed
                         el.pos.y += el.dir.y * el.speed
                 }

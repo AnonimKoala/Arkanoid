@@ -10,36 +10,19 @@ canvas.height = 5000
 // ==================================================================================================== //
 
 
-// ===================================[ Dotyczy ekranu startowego ]==================================== //
+// =======================================[ Dotyczy pauzy gry ]======================================== //
 let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
-let mouseOnCanvas = false // Czy mysz jest nad polem gry
+let gamePaused = false // Czy gra się zatrzymana
 
-function startScreen() {
-        gameStarted = false
-        resetGame() // Resetuje stan cegieł, uruchami funkcję resetAfterLostHealth()
+function pauseTheGame(e) {
+        if (e.key == 'Escape') {
+                gamePaused = !gamePaused
 
-        // ============[ Wczytuje obraz ekranu startowego ]============ //
-        const introImg = new Image();
-        introImg.addEventListener("load", e => {
-                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
-                context.stroke();
-        });
-        introImg.src = "img/startScreen.svg";
-        // ============================================================ //
-
-
-
-        canvas.addEventListener("click", e => {
-                gameStarted = true // Uruchamia grę po kliknięciu w obszarze pola canvas
-        })
-        canvas.addEventListener("mouseenter", e => {
-                mouseOnCanvas = true
-                // console.log(mouseOnCanvas);
-        })
-        canvas.addEventListener("mouseleave", e => {
-                mouseOnCanvas = false
-                // console.log(mouseOnCanvas);
-        })
+                context.font = "bold 540px Arial";
+                context.fillStyle = '#6774eb';
+                context.fillText(`Game paused`, 750, 4000)
+   
+        }
 }
 // ==================================================================================================== //
 
@@ -56,13 +39,32 @@ function resetAfterLostHealth() {
         // Na początku piłka pojawia się nad platformą
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
         originalBall.pos.y = platform.pos.y - 10 - originalBall.size
-
-
-
 }
 // ==================================================================================================== //
 
-function resetGame() {
+
+// =========================================[ Restartuje gre ]========================================= //
+function restartTheGame() {
+        gameStarted = false
+        // ============[ Wczytuje obraz ekranu startowego ]============ //
+        const introImg = new Image();
+        introImg.addEventListener("load", e => {
+                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
+                context.stroke();
+        });
+        introImg.src = "img/startScreen.svg";
+        // ============================================================ //
+
+        canvas.addEventListener("click", e => {
+                gameStarted = true // Uruchamia grę po kliknięciu w obszarze pola canvas
+                document.addEventListener("keydown", pauseTheGame)
+        })
+
+
+
+
+
+
         // ---------------------[ Generuje pozycje cegieł ]---------------------- //
         Brick.list = []
 
@@ -160,58 +162,59 @@ platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.heigh
 // Naciskanie klawiszy
 document.addEventListener("keydown", e => {
         // Ruch platformą strzałkami
-                if (e.key == "ArrowLeft") {
-                        if (platform.pos.x > 0) {
-                                platform.pos.x -= platform.move;
+        if (e.key == "ArrowLeft") {
+                if (platform.pos.x > 0) {
+                        platform.pos.x -= platform.move;
 
-                                if (platform.holdBall) {
-                                        originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
-                                }
-                        }
-                } else if (e.key == "ArrowRight") {
-                        if (platform.pos.x + platform.size.x < canvas.width) {
-                                platform.pos.x += platform.move;
-
-                                if (platform.holdBall) {
-                                        originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
-                                }
+                        if (platform.holdBall) {
+                                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
                         }
                 }
+        } else if (e.key == "ArrowRight") {
+                if (platform.pos.x + platform.size.x < canvas.width) {
+                        platform.pos.x += platform.move;
 
-
-
-                // Wyrzucenie piłki gdy ją trzymamy
-                if (platform.holdBall && e.key == " ") {
-                        platform.holdBall = false;
-
-                        originalBall.setDir(0, -1)
+                        if (platform.holdBall) {
+                                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+                        }
                 }
-                
+        }
+
+
+
+        // Wyrzucenie piłki gdy ją trzymamy
+        if (platform.holdBall && e.key == " ") {
+                platform.holdBall = false;
+
+                originalBall.setDir(0, -1)
+        }
+
 })
 
 // Odpowiada za ruch platformy za pomocą myszki
-canvas.addEventListener("mousemove", e=>{
-        platform.pos.x = platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.1
+canvas.addEventListener("mousemove", e => {
+
+        // Odpowiada za niewychodzenie platformy poza planszę
+        if (
+                platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.45 > 0 &&
+                (platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.45) + platform.size.x < canvas.width
+        )
+                platform.pos.x = platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.45
+
+        // Odpowiada za przesuwanie piłki trzymanje przez platformę
         if (platform.holdBall) {
                 originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
         }
 
 })
-canvas.addEventListener("mousedown", e=>{
-                // Wyrzucenie piłki gdy ją trzymamy LPM
-                if (platform.holdBall && e.button == 0) {
-                        platform.holdBall = false;
+canvas.addEventListener("mousedown", e => {
+        // Wyrzucenie piłki gdy ją trzymamy LPM
+        if (platform.holdBall && e.button == 0) {
+                platform.holdBall = false;
 
-                        originalBall.setDir(0, -1)
-                }
+                originalBall.setDir(0, -1)
+        }
 })
-
-
-
-
-
-
-
 // ==================================================================================================== //
 
 
@@ -224,7 +227,7 @@ class Ball {
                 this.dir = dir; // Przechowuje kierunek piłki
                 this.size = size; // Przechowuje wielkość piłki
 
-                this.speed = 30; //Szybkość z jaką porusza się piłka
+                this.speed = 15; //Szybkość z jaką porusza się piłka
                 this.texture = new Image(); // Tekstura piłki
                 this.texture.src = "img/ball.png";
 
@@ -359,11 +362,12 @@ class Brick {
 // =======================================[ Funkcje cykliczne ]======================================== //
 function gameLoop(cTime) {
 
-        think(cTime);
-        if (gameStarted)
+        if (gameStarted && !gamePaused) {
+                think(cTime);
                 draw();
-        else
-                startScreen();
+        }
+        else if (!gamePaused)
+                restartTheGame();
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
 
@@ -393,32 +397,29 @@ function think(cTime) {
 
 
                 //Kolizja z cegłami
-                if (!hit)
-                {
+                if (!hit) {
                         let side = 0 // Strona cegły z którą piłka skolidowała, 0 - brak, 1 - boczna, 2 - górna lub dolna
 
                         Brick.list.forEach((brick) => {
-                                if (!hit)
-                                {
+                                if (!hit) {
                                         let dX, dY;
                                         dX = (el.pos.x + el.size / 2) - (brick.pos.x + brick.size.x / 2)
                                         dY = (el.pos.y + el.size / 2) - (brick.pos.y + brick.size.y / 2)
-                
+
                                         let width, height;
                                         width = (el.size + brick.size.x) / 2
                                         height = (el.size + brick.size.y) / 2
-                
+
                                         let crossWidth, crossHeight;
                                         crossWidth = width * dY;
                                         crossHeight = height * dX;
-                
-                                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != brick)
-                                        {
+
+                                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != brick) {
                                                 if (crossWidth > crossHeight)
                                                         if (crossWidth > -crossHeight) el.invertDirY(); else el.invertDirX();
                                                 else
                                                         if (crossWidth > -crossHeight) el.invertDirX(); else el.invertDirY();
-                
+
                                                 hit = true;
                                                 el.lastTouchedObj = brick; // Ustawiamy cegłe na ostatni dotknięty obiekt by ominąć ją w następnej iteracji, zapobiega to błędom w kolizji
                                                 brick.remove(); // Usuwamy cegłe
@@ -429,8 +430,7 @@ function think(cTime) {
 
 
                 //Kolizja z platformą
-                if (!hit)
-                {
+                if (!hit) {
                         let dX, dY;
                         dX = (el.pos.x + el.size / 2) - (platform.pos.x + platform.size.x / 2)
                         dY = (el.pos.y + el.size / 2) - (platform.pos.y + platform.size.y / 2)
@@ -443,10 +443,9 @@ function think(cTime) {
 
                         let crossWidth, crossHeight;
                         crossWidth = width * dY;
-                        crossHeight = height * dX;   
+                        crossHeight = height * dX;
 
-                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != platform)
-                        {
+                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != platform) {
                                 if (crossWidth > crossHeight)
                                         if (crossWidth > -crossHeight) {
                                                 el.dir.x = hitFactor;
@@ -455,7 +454,7 @@ function think(cTime) {
                                 else
                                         if (crossWidth > -crossHeight) el.invertDirX(); else {
                                                 el.dir.x = hitFactor;
-                                                el.invertDirY();  
+                                                el.invertDirY();
                                         };
 
                                 hit = true;
@@ -509,7 +508,7 @@ function draw() {
 
         }
         else {
-                startScreen()
+                restartTheGame()
         }
 
         context.stroke(); //Kończy rysować nową klatke

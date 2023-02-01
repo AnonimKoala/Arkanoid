@@ -13,16 +13,30 @@ canvas.height = 5000
 // =======================================[ Dotyczy pauzy gry ]======================================== //
 let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
 let gamePaused = false // Czy gra się zatrzymana
+let gameOvered = false // Czy gra jest zakończona
 
 function pauseTheGame(e) {
-        if (e.key == 'Escape') {
+        if (e.key == 'Escape' && gameStarted) {
                 gamePaused = !gamePaused
 
-                context.font = "bold 540px Arial";
-                context.fillStyle = '#6774eb';
-                context.fillText(`Game paused`, 750, 4000)
-   
+                if (gamePaused) {
+                        context.font = "bold 540px Arial";
+                        context.fillStyle = '#6774eb';
+                        context.fillText(`Game paused`, 750, 4000)
+                }
+
         }
+}
+// ==================================================================================================== //
+
+
+// =============================[ Uruchamiane po stracie wszystkich żyć ]============================== //
+function gameOver() {
+        context.clearRect(0, 0, canvas.width, canvas.height) // Czyści ekran
+
+        document.removeEventListener("click",gameOver)
+        restartTheGame()
+        
 }
 // ==================================================================================================== //
 
@@ -46,6 +60,9 @@ function resetAfterLostHealth() {
 // =========================================[ Restartuje gre ]========================================= //
 function restartTheGame() {
         gameStarted = false
+        gameOvered = false
+        gamePaused = false
+
         // ============[ Wczytuje obraz ekranu startowego ]============ //
         const introImg = new Image();
         introImg.addEventListener("load", e => {
@@ -56,7 +73,10 @@ function restartTheGame() {
         // ============================================================ //
 
         canvas.addEventListener("click", e => {
-                gameStarted = true // Uruchamia grę po kliknięciu w obszarze pola canvas
+                // Uruchamia grę po kliknięciu w obszarze pola canvas
+                gameStarted = true
+                gameOvered = false
+                gamePaused = false
                 document.addEventListener("keydown", pauseTheGame)
         })
 
@@ -362,11 +382,10 @@ class Brick {
 // =======================================[ Funkcje cykliczne ]======================================== //
 function gameLoop(cTime) {
 
-        if (gameStarted && !gamePaused) {
+        if (gameStarted && !gamePaused && !gameOvered) {
                 think(cTime);
                 draw();
-        }
-        else if (!gamePaused)
+        } else if (!gamePaused && !gameOvered)
                 restartTheGame();
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
@@ -508,7 +527,20 @@ function draw() {
 
         }
         else {
-                restartTheGame()
+                // Wyświetla zdobyte punkty
+                context.font = `bold ${canvas.height / 18.5}px Arial`;
+                context.fillStyle = '#0090e1';
+                context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
+
+                // Wyświetla napis koniec gry
+                context.font = "bold 540px Arial";
+                context.fillStyle = '#6774eb';
+                context.fillText(`Game over`, 1000, 2500)
+
+                // Ustawia flagi pauzy i końca gry
+                gameOvered = true
+                document.removeEventListener("keydown", pauseTheGame)
+                document.addEventListener("click", gameOver)       
         }
 
         context.stroke(); //Kończy rysować nową klatke

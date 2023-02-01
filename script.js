@@ -53,6 +53,8 @@ function resetAfterLostHealth() {
         // Na początku piłka pojawia się nad platformą
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
         originalBall.pos.y = platform.pos.y - 10 - originalBall.size
+
+        originalBall.speed = 15;
 }
 // ==================================================================================================== //
 
@@ -138,7 +140,7 @@ class Vector2D {
 
         //Zwraca długość wektora
         length() {
-                return Math.sqrt(Math.pow(this.x) + Math.pow(this.y))
+                return Math.sqrt((this.x * this.x) + (this.y * this.y))
         }
 
         //Zwraca dystans do podanego wektora
@@ -454,7 +456,7 @@ function think(cTime) {
                         dX = (el.pos.x + el.size / 2) - (platform.pos.x + platform.size.x / 2)
                         dY = (el.pos.y + el.size / 2) - (platform.pos.y + platform.size.y / 2)
 
-                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / (platform.size.x / 2) // W którą strone piłka ma polecieć
+                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / (platform.size.x / 2.5) // W którą strone piłka ma polecieć
 
                         let width, height;
                         width = (el.size + platform.size.x) / 2
@@ -481,11 +483,15 @@ function think(cTime) {
                         }
                 }
 
+                if (hit)
+                        el.speed += 1; //Zwiększamy prędkość piłki po kolizji
+
 
                 //Ruch piłek
                 if (!platform.holdBall) {
-                        el.pos.x += el.dir.x * el.speed
-                        el.pos.y += el.dir.y * el.speed
+                        let len = el.dir.length()
+                        el.pos.x += (el.dir.x / len) * el.speed
+                        el.pos.y += (el.dir.y / len) * el.speed
                 }
 
                 // Sprawdza czy piłka wypadła

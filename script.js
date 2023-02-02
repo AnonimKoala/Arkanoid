@@ -8,7 +8,7 @@ const context = canvas.getContext('2d');
 canvas.width = 5000
 canvas.height = 5000
 // ==================================================================================================== //
-
+// let levelsTempTab = []
 
 // =======================================[ Dotyczy pauzy gry ]======================================== //
 let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
@@ -45,8 +45,11 @@ function gameOver() {
 let playerLevel = 1
 let playerHealth = 3
 let playerPoints = 0
+// ==================================================================================================== //
 
-function resetAfterLostHealth() {
+
+// =============[ Ustawia domyśle wartości pozycji i piłki po uruchominiu nowego poziomu ]============= //
+function resetToDefault() {
         platform.holdBall = true
         platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
 
@@ -59,39 +62,11 @@ function resetAfterLostHealth() {
 // ==================================================================================================== //
 
 
-// =========================================[ Restartuje gre ]========================================= //
-function restartTheGame() {
-        gameStarted = false
-        gameOvered = false
-        gamePaused = false
-
-        // ============[ Wczytuje obraz ekranu startowego ]============ //
-        const introImg = new Image();
-        introImg.addEventListener("load", e => {
-                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
-                context.stroke();
-        });
-        introImg.src = "img/startScreen.svg";
-        // ============================================================ //
-
-        canvas.addEventListener("click", e => {
-                // Uruchamia grę po kliknięciu w obszarze pola canvas
-                gameStarted = true
-                gameOvered = false
-                gamePaused = false
-                document.addEventListener("keydown", pauseTheGame)
-        })
-
-
-
-
-
-
-        // ---------------------[ Generuje pozycje cegieł ]---------------------- //
+// ====================================[ Generuje pozycje cegieł ]===================================== //
+function generateBricksPos() {
         Brick.list = []
 
         let allBricks = [] // Tablica wszystkich cegieł
-        const brick = new Image() // Obiekt tworzący cegłe
         for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // Generuje cegły w poziomie [poz. początkowa, poz. końcowa. długość cegły]
                 let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
                 for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
@@ -106,14 +81,54 @@ function restartTheGame() {
                 allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
         }
 
-        // ---------------------------------------------------------------------- //
+        // levelsTempTab.push(Brick.list)
+        // console.log(levelsTempTab);
+}
+// ==================================================================================================== //
+
+
+// =========================================[ Restartuje gre ]========================================= //
+function restartTheGame() {
+        gameStarted = false
+        gameOvered = false
+        gamePaused = false
+
+        playerLevel = 1
+
+        // ============[ Wczytuje obraz ekranu startowego ]============ //
+        const introImg = new Image();
+        introImg.addEventListener("load", () => {
+                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
+                context.stroke();
+        });
+        introImg.src = "img/startScreen.svg";
+        // ============================================================ //
+
+        canvas.addEventListener("click", () => {
+                // Uruchamia grę po kliknięciu w obszarze pola canvas
+                gameStarted = true
+                gameOvered = false
+                gamePaused = false
+
+
+                // // // TODO: Kiedyś mozna zoptymalizowac - nie ruszac ;)
+                // if (Brick.list.length == 100) {
+                //         levelsTempTab.splice(playerLevel - 1, 1, Brick.list) // Zapisuje I poziom - testowo
+                // }
+
+
+
+
+                document.addEventListener("keydown", pauseTheGame)
+        })
+
+        generateBricksPos()
+
         playerPoints = 0
         playerHealth = 3
         playerLevel = 1
 
-        resetAfterLostHealth()
-
-
+        resetToDefault()
 }
 // ==================================================================================================== //
 
@@ -351,7 +366,7 @@ class Brick {
                 else if (this.type == 8) {
                         this.texture.src = "img/bricks/silverBrick.jpg"
                         this.value = 50 * playerLevel
-                        this.health = 2
+                        this.health = parseInt(playerLevel / 8) + 2
                 }
                 else if (this.type == 9) {
                         this.texture.src = "img/bricks/goldBrick.jpg"
@@ -384,10 +399,12 @@ class Brick {
 
 // =======================================[ Funkcje cykliczne ]======================================== //
 function gameLoop(cTime) {
-
         if (gameStarted && !gamePaused && !gameOvered) {
                 think(cTime);
                 draw();
+
+                if (!Brick.list.length)
+                        nextLevel()
         } else if (!gamePaused && !gameOvered)
                 restartTheGame();
 
@@ -420,7 +437,6 @@ function think(cTime) {
 
                 //Kolizja z cegłami
                 if (!hit) {
-                        let side = 0 // Strona cegły z którą piłka skolidowała, 0 - brak, 1 - boczna, 2 - górna lub dolna
 
                         Brick.list.forEach((brick) => {
                                 if (!hit) {
@@ -499,7 +515,7 @@ function think(cTime) {
                 // Sprawdza czy piłka wypadła
                 if (el.pos.y > canvas.height / 100 * 96.4) {
                         playerHealth--
-                        resetAfterLostHealth()
+                        resetToDefault()
                 }
 
         })
@@ -560,8 +576,17 @@ gameLoop(0) //Zaczyna nasz game loop
 
 
 // ======================================================[ Poziomy ]======================================================= //
+function nextLevel() {
+        playerLevel++
+        console.log("Next Level", playerLevel);
+        // console.log(levelsTempTab);
+        generateBricksPos()
+        // levelsTempTab.push(Brick.list)
+        resetToDefault()
 
+        // if(playerLevel == 3)
+        //         Brick.list = [...levelsTempTab[0]]
 
-
+}
 
 // ======================================================================================================================== //

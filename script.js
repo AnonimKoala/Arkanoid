@@ -34,9 +34,9 @@ function pauseTheGame(e) {
 function gameOver() {
         context.clearRect(0, 0, canvas.width, canvas.height) // Czyści ekran
 
-        document.removeEventListener("click",gameOver)
+        document.removeEventListener("click", gameOver)
         restartTheGame()
-        
+
 }
 // ==================================================================================================== //
 
@@ -218,10 +218,11 @@ canvas.addEventListener("mousemove", e => {
 
         // Odpowiada za niewychodzenie platformy poza planszę
         if (
-                platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.45 > 0 &&
-                (platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.45) + platform.size.x < canvas.width
+                (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 > 0 &&
+                (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 + platform.size.x < canvas.width
         )
-                platform.pos.x = platform.size.x + e.offsetX * (canvas.width / 1000) - platform.size.x * 1.45
+                platform.pos.x = (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2
+
 
         // Odpowiada za przesuwanie piłki trzymanje przez platformę
         if (platform.holdBall) {
@@ -483,9 +484,10 @@ function think(cTime) {
                         }
                 }
 
-                if (hit)
-                        el.speed += 1; //Zwiększamy prędkość piłki po kolizji
-
+                if (hit) {
+                        el.speed *= 1.0005; //Zwiększamy prędkość piłki po kolizji
+                        // console.log(el.speed);
+                }
 
                 //Ruch piłek
                 if (!platform.holdBall) {
@@ -546,10 +548,20 @@ function draw() {
                 // Ustawia flagi pauzy i końca gry
                 gameOvered = true
                 document.removeEventListener("keydown", pauseTheGame)
-                document.addEventListener("click", gameOver)       
+                document.addEventListener("click", gameOver)
         }
 
         context.stroke(); //Kończy rysować nową klatke
 }
 // ==================================================================================================== //
 gameLoop(0) //Zaczyna nasz game loop
+
+
+
+
+// ======================================================[ Poziomy ]======================================================= //
+
+
+
+
+// ======================================================================================================================== //

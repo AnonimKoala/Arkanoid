@@ -310,6 +310,49 @@ originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 
 originalBall.pos.y = platform.pos.y - 0 - originalBall.size
 // ==================================================================================================== //
 
+// =========================================[ Klasa ulepszeń ]========================================= //
+
+let nextUpgrade = 4;
+
+class Upgrade
+{
+        static list = [];
+        static typeToTexture = [
+                "upgrades/upgradetest.png"
+        ]
+
+        constructor(pos, type)
+        {
+                this.pos = pos;
+                this.velY = 16;
+                this.type = type;
+
+                this.texture = new Image();
+                this.texture.src = Upgrade.typeToTexture[this.type];
+
+                Upgrade.list.push(this);
+        }
+
+        draw()
+        {
+                context.drawImage(this.texture, this.pos.x, this.pos.y, canvas.width / 20 - 0.1, canvas.width / 20 - 0.1);
+        }
+
+        collect()
+        {
+                this.remove();
+        }
+
+        remove()
+        {
+                Upgrade.list.forEach((el, index) => {
+                        if (el == this)
+                                Upgrade.list.splice(index, 1);
+                })
+        }
+}
+
+// ==================================================================================================== //
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //
 class Brick {
@@ -387,12 +430,20 @@ class Brick {
         remove() {
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0)
+                {
+                        if (nextUpgrade == 0)
+                        {
+                                nextUpgrade = 4;
+                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), 0);
+                        } else nextUpgrade--;
+
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
                                         playerPoints += this.value // Dodaje pkt po rozbiciu cegły
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }
                         })
+                }
         }
 }
 // ==================================================================================================== //
@@ -414,6 +465,31 @@ function gameLoop(cTime) {
 
 // Funkcja mająca na celu zająć się logiką gry
 function think(cTime) {
+        // Logika upgrade'ów
+        Upgrade.list.forEach((el) => {
+                if (el.velY > -36)
+                        el.velY -= 0.5;
+
+                el.pos.y -= el.velY * 0.75;
+
+                //Wyjście poza ekran
+                if (el.pos.y > canvas.height)
+                        el.remove();
+
+
+                //Kolizja z platformą
+                let dX, dY;
+                dX = (el.pos.x + 250 / 2) - (platform.pos.x + platform.size.x / 2)
+                dY = (el.pos.y + 250 / 2) - (platform.pos.y + platform.size.y / 2)
+
+                let width, height;
+                width = (250 + platform.size.x) / 2
+                height = (250 + platform.size.y) / 2
+
+                if (Math.abs(dX) <= width && Math.abs(dY) <= height)
+                        el.collect();
+        })
+
         // System kolizji piłki
         Ball.list.forEach((el) => {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
@@ -501,7 +577,7 @@ function think(cTime) {
                 }
 
                 if (hit) {
-                        el.speed *= 1.0005; //Zwiększamy prędkość piłki po kolizji
+                        el.speed *= 1.015; //Zwiększamy prędkość piłki po kolizji
                         // console.log(el.speed);
                 }
 
@@ -534,6 +610,11 @@ function draw() {
 
                 // Rysuje każdą cegłe
                 Brick.list.forEach((el) => {
+                        el.draw();
+                })
+
+                //Rysuje każdy upgrade
+                Upgrade.list.forEach((el) => {
                         el.draw();
                 })
 

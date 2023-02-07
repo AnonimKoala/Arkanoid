@@ -1,4 +1,5 @@
 
+    
 // =================================[ Odpowiada za działanie cegieł ]================================== //
 class Brick {
     static list = [];
@@ -137,7 +138,7 @@ class Vector2D {
 const rows = document.querySelectorAll(".row")
 const allBricks = document.querySelectorAll(".row > li")
 const chooseColorDiv = document.querySelectorAll("#chooseType > li")
-let pickedColor
+let pickedImage
 let pickedType
 
 
@@ -155,11 +156,6 @@ function setPalette() {
         }
         else
             brickX += 500
-
-
-
-
-
     })
 }
 setPalette()
@@ -171,30 +167,39 @@ chooseColorDiv.forEach((el, i) => {
         })
 
         el.classList.add("picked")
-        pickedColor = e.target.dataset.color
+        pickedImage = e.target.dataset.image
         pickedType = i
     })
 })
 
 allBricks.forEach((el, i) => {
     el.addEventListener("click", e => {
-        e.target.style.backgroundColor = pickedColor
+        e.target.style.backgroundImage = `url(../img/bricks/${pickedImage}.jpg)`
         e.target.dataset.type = pickedType
     })
 })
 
 
 function printJSON() {
-    // allBricks.forEach((el, i) => {
-    //     if (el.dataset.type != 10)
-    //         new Brick(
-    //             new Vector2D(el.dataset.x, el.dataset.y),
-    //             new Vector2D(499.9, 249.9),
-    //             el.dataset.type
-    //         )
-    // })
+    let object = []
+    allBricks.forEach((el, i) => {
+        if (el.dataset.type != 10 && el.dataset.type != undefined)
+            object.push({
+                x: el.dataset.x,
+                y: el.dataset.y,
+                type: el.dataset.type
+            })
+
+            // new Brick(
+            //     new Vector2D(el.dataset.x, el.dataset.y),
+            //     new Vector2D(499.9, 249.9),
+            //     el.dataset.type
+            // )
+    })
     // console.log(JSON.stringify(Brick.list));
-    JSON.stringify(allBricks)
+
+    console.log(JSON.stringify(object));
+    document.querySelector("#jsonArea").value = JSON.stringify(object)
 }
 
 
@@ -214,6 +219,7 @@ function printJSON() {
 //   .then(function (data) {
 //     console.log(data);
 //   })
+
 
 
 

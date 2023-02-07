@@ -1,84 +1,190 @@
-*{
-    margin: 0;
-    padding: 0;
+* {
+  margin: 0;
+  padding: 0;
 }
-ul li{
-    list-style-type: none;
+
+ul li {
+  list-style-type: none;
 }
-.row{
-    display: flex;
-    /* border: 1px solid black;
+#editorArea > ul > li:first-child {
+  margin-top: 7vh;
+}
+.row {
+  display: flex;
+  /* border: 1px solid black;
     margin: 5px; */
 }
-.row > li{
-    height: 5vh;
-    width: 10%;
-    border: 1px solid purple;
-    margin: 5px;
+.row > li {
+  height: 5vh;
+  width: 10%;
+  /* border: 1px solid rgb(255, 233, 255); */
+  /* margin: 5px; */
+  border-top: 1px dashed rgb(255, 233, 255);
 }
-main > ul {
-    width: 80%;
-    margin: 5vh auto;
-    display: block;
+.row > li:not(:last-child) {
+  border-right: 1px dashed rgb(255, 233, 255);
+}
+.row {
+  border-left: 1px dashed rgb(255, 233, 255);
+  border-right: 1px dashed rgb(255, 233, 255);
+}
+#editorArea > ul > li:last-child {
+  border-bottom: 1px dashed rgb(255, 233, 255);
 }
 
+#editorArea {
+  width: 95vh;
+  height: 95vh;
+  max-height: 1000px;
+  max-width: 1000px;
+  margin: auto;
+  /* width: 80%;
+    margin: 5vh auto; */
+  display: block;
+  border: 1px solid orange;
+  position: relative;
+  background-color: rgb(0, 0, 39);
+}
 
-#chooseType li{
-    border: 1px solid black;
-    /* width: 9%; */
-    height: 60px;
-    display: grid;
-    place-items: center;
+#platform {
+  width: 30%;
+  height: 3%;
+  position: absolute;
+  bottom: 5%;
+  right: 50%;
+  background-color: blue;
+  transform: translate(50%, 50%);
+}
+
+.row > li,
+#chooseType li {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+/* ============================================================================================================================================== */
+#template {
+  display: grid;
+  grid-template-columns: 95vh 10vw;
+  justify-content: center;
+}
+
+#chooseType li {
+  border: 1px solid black;
+  /* width: 9%; */
+  /* height: 8.8%; */
+  width: 10vw;
+  display: grid;
+  place-items: center;
+  filter: grayscale(60%);
 }
 
 #chooseType {
-    display: grid;
-    grid-template-columns: repeat(10,1fr) 80px;
-    column-gap:  10px;
-    /* border: 1px solid purple; */
+  display: grid;
+  grid-template-rows: repeat(11, 1fr);
+  height: 95vh;
+  max-height: 1000px;
+  width: 10vw;
+  /* border: 1px solid purple; */
+  margin-left: 15px;
 }
 
-
-#chooseType li:nth-child(1){background-color: rgb(252, 254, 255);}
-#chooseType li:nth-child(2){background-color: orange;}
-#chooseType li:nth-child(3){background-color: cyan;}
-#chooseType li:nth-child(4){background-color: rgb(43, 186, 43);}
-#chooseType li:nth-child(5){background-color: rgb(207, 37, 37);}
-#chooseType li:nth-child(6){background-color: rgb(40, 93, 217);}
-#chooseType li:nth-child(7){background-color: rgb(255, 130, 247);}
-#chooseType li:nth-child(8){background-color: rgb(255, 255, 106);}
-#chooseType li:nth-child(9){background-color: rgb(214, 214, 214);}
-#chooseType li:nth-child(10){background-color: rgb(234, 178, 39);}
-
-.picked {
-    outline: 4px dashed midnightblue;
+#editorArea,
+#chooseType {
+  margin-top: 1vh;
 }
 
+#chooseType li:nth-child(1) {
+  background-image: url("../img/bricks/whiteBrick.jpg");
+}
+#chooseType li:nth-child(2) {
+  background-image: url("../img/bricks/orangeBrick.jpg");
+}
+#chooseType li:nth-child(3) {
+  background-image: url("../img/bricks/cyanBrick.jpg");
+}
+#chooseType li:nth-child(4) {
+  background-image: url("../img/bricks/greenBrick.jpg");
+}
+#chooseType li:nth-child(5) {
+  background-image: url("../img/bricks/redBrick.jpg");
+}
+#chooseType li:nth-child(6) {
+  background-image: url("../img/bricks/blueBrick.jpg");
+}
+#chooseType li:nth-child(7) {
+  background-image: url("../img/bricks/pinkBrick.jpg");
+}
+#chooseType li:nth-child(8) {
+  background-image: url("../img/bricks/yellowBrick.jpg");
+}
+#chooseType li:nth-child(9) {
+  background-image: url("../img/bricks/silverBrick.jpg");
+}
+#chooseType li:nth-child(10) {
+  background-image: url("../img/bricks/goldBrick.jpg");
+}
+
+#chooseType li.picked {
+  filter: grayscale(0%);
+  filter: saturate(180%);
+  transform: scale(1.1);
+  z-index: 2;
+  /* border-right: 20px solid rgb(0, 41, 146); */
+  background-size: 120%;
+}
+#chooseType li:not(.picked):hover {
+  /* height: 120%; */
+  background-size: 120%;
+  filter: grayscale(10%);
+}
 body {
-    background-color: rgb(224, 246, 255);
+  background-color: rgb(239, 250, 255);
 }
 
+button {
+  width: 80%;
+  margin: auto;
+  padding: 10px;
+  font-size: 2rem;
+  border-radius: 20px;
+  background-color: rgb(154, 186, 255);
+  color: rgb(0, 41, 146);
+  border: rgb(0, 41, 146) 2px solid;
+  display: block;
+  cursor: pointer;
+  transition: 0.1s ease-in all;
+}
+button:hover {
+  background-color: rgb(196, 214, 251);
+  outline: 3px solid rgb(63, 96, 180);
+  color: rgb(63, 96, 180);
+}
+textarea {
+  width: 80%;
+  margin: 1vh auto;
+  display: block;
+}
 
-button{
-    width: 80%;
-    margin: auto;
-    padding: 10px;
-    font-size: 2rem;
-    border-radius: 20px;
-    background-color: rgb(154, 186, 255);
-    color: rgb(0, 41, 146);
-    border: rgb(0, 41, 146) 2px solid;
-    display: block;
-    cursor: pointer;
-    transition: .1s ease-in all;
+#voidBrick {
+  position: relative;
+  overflow: hidden;
+  /* background-color: rgb(255, 255, 255); */
+  filter: grayscale(200%);
+  background-image: url("../img/bricks/whiteBrick.jpg");
 }
-button:hover{
-    background-color: rgb(196, 214, 251);
-    outline: 3px solid rgb(63, 96, 180);
-    color: rgb(63, 96, 180);
+#voidBrick::after,
+#voidBrick::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120%;
+  height: 10%;
+  background-color: rgb(120, 35, 35);
+  z-index: 1;
+  transform: rotate(22deg) translate(0%, 500%);
 }
-textarea{
-    width: 80%;
-    margin: 1vh auto;
-    display: block;
+#voidBrick::before{
+    transform: rotate(-23deg) translate(-18%, 350%);
 }

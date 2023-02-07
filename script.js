@@ -164,8 +164,8 @@ function restartTheGame() {
                 document.addEventListener("keydown", pauseTheGame)
         })
 
-        // generateBricksPos()
-        loadLevel()
+        generateBricksPos()
+        // loadLevel()
 
         playerPoints = 0
         playerHealth = 3

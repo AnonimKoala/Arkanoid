@@ -45,6 +45,7 @@ function gameOver() {
 let playerLevel = 1
 let playerHealth = 3
 let playerPoints = 0
+
 // ==================================================================================================== //
 
 
@@ -376,6 +377,7 @@ class Brick {
                 // - teksturę
                 // - wartość punktową
                 // - opcjonalnie życie
+                
                 if (this.type == 0) {
                         this.texture.src = "img/bricks/scaled/whiteBrick.png"
                         this.value = 50
@@ -616,6 +618,3 @@ function draw() {
 }
 // ==================================================================================================== //
 gameLoop(0) //Zaczyna nasz game loop
-
-
-

@@ -50,6 +50,8 @@ let playerPoints = 0
 
 // =============[ Ustawia domyśle wartości pozycji i piłki po uruchominiu nowego poziomu ]============= //
 function resetToDefault() {
+        removePrevUpgrade();
+
         platform.holdBall = true
         platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
 
@@ -294,6 +296,14 @@ class Ball {
         draw() {
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size, this.size)
         }
+
+        remove()
+        {
+                Ball.list.forEach((el, index) => {
+                        if (el == this)
+                                Ball.list.splice(index, 1);
+                })     
+        }
 }
 
 let originalBall = new Ball(
@@ -301,7 +311,7 @@ let originalBall = new Ball(
                 null,   // x
                 null    // y
         ),
-        new Vector2D(0, 0), // Kierunek
+        new Vector2D(0.25, 1), // Kierunek
         180 // Size
 );
 
@@ -313,13 +323,48 @@ originalBall.pos.y = platform.pos.y - 0 - originalBall.size
 // =========================================[ Klasa ulepszeń ]========================================= //
 
 let nextUpgrade = 4;
+let prevUpgrade;
+let curUpgrade = null;
+
+function removePrevUpgrade()
+{
+        switch(prevUpgrade)
+        {
+                case 0:
+                        platform.size.x -= Upgrade.platformSizeIncrease;
+                        platform.pos.x += Upgrade.platformSizeIncrease / 2;
+                        break;
+                case 1:
+                        Ball.list.forEach((el, index) => {
+                                if (el != originalBall)
+                                        el.remove();
+                        })
+                        break;
+                case 2:
+                        break;
+                case 4:
+                        break;
+                case 5:
+                        break;
+                default:
+                        break;
+        }
+}
 
 class Upgrade
 {
         static list = [];
         static typeToTexture = [
+                "upgrades/upgradetest.png",
+                "upgrades/upgradetest.png",
+                "upgrades/upgradetest.png",
+                "upgrades/upgradetest.png",
+                "upgrades/upgradetest.png",
+                "upgrades/upgradetest.png",
                 "upgrades/upgradetest.png"
         ]
+
+        static platformSizeIncrease = 250;
 
         constructor(pos, type)
         {
@@ -340,6 +385,46 @@ class Upgrade
 
         collect()
         {
+                prevUpgrade = curUpgrade;
+                curUpgrade = this.type;
+
+                if (curUpgrade == 3) //Więcej żyć
+                {
+                        playerHealth++;
+
+                        if (prevUpgrade != 3)
+                                removePrevUpgrade();
+                }
+                else if (curUpgrade == 1) //Więcej piłek
+                {
+                        new Ball(new Vector2D(platform.pos.x + platform.size.x / 2 - 180 / 2, platform.pos.y - 15), new Vector2D(0.25, 1), 180)
+
+                        if (prevUpgrade != 1)
+                                removePrevUpgrade();
+                }
+                else if (prevUpgrade != curUpgrade)
+                {
+                        removePrevUpgrade();
+
+                        switch(curUpgrade)
+                        {
+                                case 0: //Zwiększenie długości platformy
+                                        platform.size.x += Upgrade.platformSizeIncrease;
+                                        platform.pos.x -= Upgrade.platformSizeIncrease / 2;
+                                        break;
+                                case 2: //Mocniejsze uderzenie
+                                        break;
+                                case 4: //Laser
+                                        break;
+                                case 5: //Tryb łapania
+                                        break;
+                                case 6: //Klon platformy
+                                        break;
+                                default:
+                                        break;
+                        }
+                }
+
                 this.remove();
         }
 
@@ -431,11 +516,11 @@ class Brick {
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0)
                 {
-                        if (nextUpgrade == 0)
-                        {
-                                nextUpgrade = 4;
-                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), 0);
-                        } else nextUpgrade--;
+                        // if (nextUpgrade == 0)
+                        // {
+                        //         nextUpgrade = 4;
+                        //         new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), 1);
+                        // } else nextUpgrade--;
 
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
@@ -549,7 +634,7 @@ function think(cTime) {
                         dX = (el.pos.x + el.size / 2) - (platform.pos.x + platform.size.x / 2)
                         dY = (el.pos.y + el.size / 2) - (platform.pos.y + platform.size.y / 2)
 
-                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / (platform.size.x / 2.5) // W którą strone piłka ma polecieć
+                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / (platform.size.x / 3.5) // W którą strone piłka ma polecieć
 
                         let width, height;
                         width = (el.size + platform.size.x) / 2

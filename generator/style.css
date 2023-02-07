@@ -1,0 +1,84 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+ul li{
+    list-style-type: none;
+}
+.row{
+    display: flex;
+    /* border: 1px solid black;
+    margin: 5px; */
+}
+.row > li{
+    height: 5vh;
+    width: 10%;
+    border: 1px solid purple;
+    margin: 5px;
+}
+main > ul {
+    width: 80%;
+    margin: 5vh auto;
+    display: block;
+}
+
+
+#chooseType li{
+    border: 1px solid black;
+    /* width: 9%; */
+    height: 60px;
+    display: grid;
+    place-items: center;
+}
+
+#chooseType {
+    display: grid;
+    grid-template-columns: repeat(10,1fr) 80px;
+    column-gap:  10px;
+    /* border: 1px solid purple; */
+}
+
+
+#chooseType li:nth-child(1){background-color: rgb(252, 254, 255);}
+#chooseType li:nth-child(2){background-color: orange;}
+#chooseType li:nth-child(3){background-color: cyan;}
+#chooseType li:nth-child(4){background-color: rgb(43, 186, 43);}
+#chooseType li:nth-child(5){background-color: rgb(207, 37, 37);}
+#chooseType li:nth-child(6){background-color: rgb(40, 93, 217);}
+#chooseType li:nth-child(7){background-color: rgb(255, 130, 247);}
+#chooseType li:nth-child(8){background-color: rgb(255, 255, 106);}
+#chooseType li:nth-child(9){background-color: rgb(214, 214, 214);}
+#chooseType li:nth-child(10){background-color: rgb(234, 178, 39);}
+
+.picked {
+    outline: 4px dashed midnightblue;
+}
+
+body {
+    background-color: rgb(224, 246, 255);
+}
+
+
+button{
+    width: 80%;
+    margin: auto;
+    padding: 10px;
+    font-size: 2rem;
+    border-radius: 20px;
+    background-color: rgb(154, 186, 255);
+    color: rgb(0, 41, 146);
+    border: rgb(0, 41, 146) 2px solid;
+    display: block;
+    cursor: pointer;
+    transition: .1s ease-in all;
+}
+button:hover{
+    background-color: rgb(196, 214, 251);
+    outline: 3px solid rgb(63, 96, 180);
+    color: rgb(63, 96, 180);
+}
+textarea{
+    width: 80%;
+    margin: 1vh auto;
+    display: block;
+}

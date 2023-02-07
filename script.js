@@ -75,17 +75,11 @@ levels[2] = '[{"x":"499.9","y":"1000","type":"6"},{"x":"2999.9","y":"1000","type
 function nextLevel() {
         playerLevel++
         console.log("Next Level", playerLevel);
-        // console.log(levelsTempTab);
-        // generateBricksPos()
 
-        // generateBricksPos()
         loadLevel()
 
-        // levelsTempTab.push(Brick.list)
         resetToDefault()
 
-        // if(playerLevel == 3)
-        //         Brick.list = [...levelsTempTab[0]]
 
 }
 // ==================================================================================================== //

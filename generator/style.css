@@ -2,33 +2,48 @@
   margin: 0;
   padding: 0;
 }
-
+/* ========================================================================================================= */
+body{
+  background: rgb(84,73,255);
+  background: linear-gradient(315deg, rgba(84,73,255,1) 0%, rgba(191,177,255,1) 54%, rgba(73,132,255,1) 100%);
+  background-size: 200%;
+  height: 100vh;
+}
+/* ========================================================================================================= */
 ul li {
   list-style-type: none;
 }
-#editorArea > ul > li:first-child {
+/* ========================================================================================================= */
+#editorArea>ul>li:first-child {
   margin-top: 7vh;
 }
+
+/* ========================================================================================================= */
 .row {
   display: flex;
   /* border: 1px solid black;
     margin: 5px; */
 }
-.row > li {
+
+.row>li {
   height: 5vh;
   width: 10%;
   /* border: 1px solid rgb(255, 233, 255); */
   /* margin: 5px; */
   border-top: 1px dashed rgb(255, 233, 255);
 }
-.row > li:not(:last-child) {
+
+.row>li:not(:last-child) {
   border-right: 1px dashed rgb(255, 233, 255);
 }
+
 .row {
   border-left: 1px dashed rgb(255, 233, 255);
   border-right: 1px dashed rgb(255, 233, 255);
 }
-#editorArea > ul > li:last-child {
+
+/* ========================================================================================================= */
+#editorArea>ul>li:last-child {
   border-bottom: 1px dashed rgb(255, 233, 255);
 }
 
@@ -38,14 +53,17 @@ ul li {
   max-height: 1000px;
   max-width: 1000px;
   margin: auto;
+  padding: 2px;
   /* width: 80%;
     margin: 5vh auto; */
   display: block;
-  border: 1px solid orange;
+  /* border: 1px solid orange; */
   position: relative;
   background-color: rgb(0, 0, 39);
+  box-shadow: 0 0 15px rgb(115, 115, 115);
 }
 
+/* ========================================================================================================= */
 #platform {
   width: 30%;
   height: 3%;
@@ -56,19 +74,15 @@ ul li {
   transform: translate(50%, 50%);
 }
 
-.row > li,
+/* ========================================================================================================= */
+.row>li,
 #chooseType li {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-/* ============================================================================================================================================== */
-#template {
-  display: grid;
-  grid-template-columns: 95vh 10vw;
-  justify-content: center;
-}
 
+/* ========================================================================================================= */
 #chooseType li {
   border: 1px solid black;
   /* width: 9%; */
@@ -77,6 +91,7 @@ ul li {
   display: grid;
   place-items: center;
   filter: grayscale(60%);
+  box-shadow: 2px 2px 5px rgb(113, 113, 113);
 }
 
 #chooseType {
@@ -85,42 +100,52 @@ ul li {
   height: 95vh;
   max-height: 1000px;
   width: 10vw;
+  box-shadow: 0 0 15px rgb(5, 5, 5);
   /* border: 1px solid purple; */
-  margin-left: 15px;
 }
 
 #editorArea,
-#chooseType {
+#chooseType,
+#template>header {
   margin-top: 1vh;
 }
 
 #chooseType li:nth-child(1) {
   background-image: url("../img/bricks/whiteBrick.jpg");
 }
+
 #chooseType li:nth-child(2) {
   background-image: url("../img/bricks/orangeBrick.jpg");
 }
+
 #chooseType li:nth-child(3) {
   background-image: url("../img/bricks/cyanBrick.jpg");
 }
+
 #chooseType li:nth-child(4) {
   background-image: url("../img/bricks/greenBrick.jpg");
 }
+
 #chooseType li:nth-child(5) {
   background-image: url("../img/bricks/redBrick.jpg");
 }
+
 #chooseType li:nth-child(6) {
   background-image: url("../img/bricks/blueBrick.jpg");
 }
+
 #chooseType li:nth-child(7) {
   background-image: url("../img/bricks/pinkBrick.jpg");
 }
+
 #chooseType li:nth-child(8) {
   background-image: url("../img/bricks/yellowBrick.jpg");
 }
+
 #chooseType li:nth-child(9) {
   background-image: url("../img/bricks/silverBrick.jpg");
 }
+
 #chooseType li:nth-child(10) {
   background-image: url("../img/bricks/goldBrick.jpg");
 }
@@ -133,39 +158,26 @@ ul li {
   /* border-right: 20px solid rgb(0, 41, 146); */
   background-size: 120%;
 }
+
 #chooseType li:not(.picked):hover {
   /* height: 120%; */
   background-size: 120%;
   filter: grayscale(10%);
 }
+
+/* ========================================================================================================= */
 body {
   background-color: rgb(239, 250, 255);
 }
 
-button {
-  width: 80%;
-  margin: auto;
-  padding: 10px;
-  font-size: 2rem;
-  border-radius: 20px;
-  background-color: rgb(154, 186, 255);
-  color: rgb(0, 41, 146);
-  border: rgb(0, 41, 146) 2px solid;
-  display: block;
-  cursor: pointer;
-  transition: 0.1s ease-in all;
-}
-button:hover {
-  background-color: rgb(196, 214, 251);
-  outline: 3px solid rgb(63, 96, 180);
-  color: rgb(63, 96, 180);
-}
+/* ========================================================================================================= */
 textarea {
   width: 80%;
   margin: 1vh auto;
   display: block;
 }
 
+/* ========================================================================================================= */
 #voidBrick {
   position: relative;
   overflow: hidden;
@@ -173,6 +185,7 @@ textarea {
   filter: grayscale(200%);
   background-image: url("../img/bricks/whiteBrick.jpg");
 }
+
 #voidBrick::after,
 #voidBrick::before {
   content: "";
@@ -185,6 +198,222 @@ textarea {
   z-index: 1;
   transform: rotate(22deg) translate(0%, 500%);
 }
-#voidBrick::before{
-    transform: rotate(-23deg) translate(-18%, 350%);
+
+#voidBrick::before {
+  transform: rotate(-23deg) translate(-18%, 350%);
+}
+
+/* ========================================================================================================= */
+button {
+  /* width: 30%; */
+  padding: 10px;
+  border-radius: 20px;
+  background-color: rgb(154, 186, 255);
+  color: rgb(0, 41, 146);
+  border: rgb(0, 41, 146) 2px solid;
+  display: block;
+  cursor: pointer;
+  transition: 0.1s ease-in all;
+  box-shadow: 1px 1px 5px rgb(94, 94, 94);
+}
+
+/* ========================================================================================================= */
+#template {
+  display: grid;
+  grid-template-columns: 20% 95vh 10vw;
+  justify-content: center;
+  column-gap: 17px;
+}
+
+#template>header {
+  padding: 10px;
+  /* border: 1px solid black; */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.374);
+  display: grid;
+  grid-template-columns: "loadingDiv loadingDiv" 
+  "savingDiv savingDiv" 
+  "play play" 
+  "bottomButtons bottomButtons";
+  grid-template-rows: 2% 10% 10% 45% 10% 10%;
+  
+}
+
+/* ========================================================================================================= */
+.column80-20 {
+  display: grid;
+  grid-template-columns: 1fr 25%;
+  column-gap: 10px;
+  align-items: center;
+
+}
+
+.column80-20> :first-child {
+  width: 100%;
+  height: 70%;
+  font-size: 1em;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid black;
+  background-color: rgb(255, 255, 255);
+  color: rgb(0, 19, 68);
+  cursor: pointer;
+  transition: 0.1s ease-in all;
+  border-radius: 10px;
+}
+
+.column80-20> :nth-child(2) {
+  height: 70%;
+  display: block;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.column80-20> :nth-child(2) img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ========================================================================================================= */
+#savingDiv>input {
+  padding: 0;
+  padding-left: 10px;
+}
+
+#savingDiv>input[type="text"] {
+  width: calc(100% - 15px);
+}
+#savingDiv {
+  grid-area: 'savingDiv';
+}
+/* ========================================================================================================= */
+.column-50-50-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  align-items: center;
+}
+
+.column-50-50-buttons>* {
+  margin: 1.2rem 5px;
+}
+
+/* ========================================================================================================= */
+#clearButton {
+  background-color: rgb(255, 208, 202);
+  color: rgb(0, 41, 146);
+  border: rgb(146, 0, 0) 6px solid;
+}
+
+#clearButton:hover {
+  background-color: rgb(255, 172, 163);
+  outline: rgb(146, 0, 0) 3px solid;
+  box-shadow: 0 0 10px rgb(59, 59, 59);
+}
+
+/* ========================================================================================================= */
+#deleteButton {
+  background-color: rgb(48, 150, 49);
+  border: rgb(46, 90, 47) 6px solid;
+}
+
+#deleteButton:hover {
+  background-color: rgb(0, 169, 3);
+  outline: rgb(46, 90, 47) 3px solid;
+  box-shadow: 0 0 10px rgb(59, 59, 59);
+}
+
+
+/* ========================================================================================================= */
+#play {
+  grid-area: 'play';
+  width: 100%;
+  /* height: 20%; */
+  padding: 1px;
+  background-color: rgb(255, 229, 84);
+  border: rgb(134, 111, 33) 4px solid;
+}
+
+#play:hover {
+  background-color: rgb(255, 217, 0);
+  outline: rgb(134, 111, 33) 3px solid;
+  box-shadow: 0 0 10px rgb(59, 59, 59);
+}
+
+#play img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ========================================================================================================= */
+#saveButton {
+  background-color: rgba(186, 204, 255, 0.623);
+  border: rgb(0, 41, 146) 4px solid;
+  box-shadow: 1px 1px 2px rgb(94, 94, 94);
+
+}
+
+#saveButton:hover {
+  background-color: rgb(177, 203, 255);
+  outline: rgb(0, 41, 146) 2px solid;
+  box-shadow: 0 0 5px rgb(59, 59, 59);
+}
+
+#levelName {
+  background-color: rgba(231, 236, 255, 0.717);
+  border: rgb(0, 41, 146) 3px solid;
+  color: rgb(0, 41, 146);
+  font-size: 1.4rem;
+  box-shadow: 1px 1px 2px rgb(94, 94, 94);
+}
+
+#levelName::placeholder {
+  color: rgb(0, 41, 146);
+}
+
+#levelName:focus {
+  outline: rgb(0, 41, 146) 2px solid;
+  background-color: rgba(207, 217, 255, 0.717);
+}
+
+#levelName:hover {
+  outline: rgb(0, 41, 146) 2px solid;
+  background-color: rgba(207, 217, 255, 0.717);
+
+}
+
+/* ========================================================================================================= */
+#loadButton {
+  background-color: rgb(211, 255, 166);
+  border: rgb(55, 138, 0) 4px solid;
+  box-shadow: 1px 1px 2px rgb(94, 94, 94);
+}
+
+#loadButton:hover {
+  background-color: rgb(196, 255, 136);
+  outline: rgb(55, 138, 0) 2px solid;
+  box-shadow: 0 0 5px rgb(59, 59, 59);
+}
+
+#chooseToEdit {
+  background-color: rgb(234, 255, 216);
+  border: rgb(55, 138, 0) 3px solid;
+  color: rgb(34, 84, 0);
+  /* font-weight: bold; */
+  font-size: 1.4rem;
+  box-shadow: 1px 1px 2px rgb(94, 94, 94);
+}
+
+#chooseToEdit:is(:hover, :focus) {
+  background-color: rgba(204, 255, 153, 0.826);
+  outline: rgb(55, 138, 0) 2px solid;
+}
+/* ========================================================================================================= */
+#bottomButtons{
+  grid-area: 'bottomButtons';
+}
+/* ========================================================================================================= */
+#loadingDiv{
+  grid-area: 'loadingDiv';
 }

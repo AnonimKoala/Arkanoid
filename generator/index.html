@@ -1,180 +1,239 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level Generator Beta</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Level Generator Beta</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-    <main id="template">
-        <article id="editorArea">
-            <ul>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-                <li>
-                    <ul class="row">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                    </ul>
-                </li>
-            </ul>
+  <main id="template">
+    <header>
+      <span></span>
+      <div id="loadingDiv" class="column80-20">
+        <select name="" id="chooseToEdit">
+          <option value="lvl1">Poziom 1</option>
+          <option value="lvl2">Poziom 2</option>
+          <option value="lvl3">Poziom 3</option>
+          <option value="lvl4">Poziom 4</option>
+          <option value="lvl5">Poziom 5</option>
+          <option value="lvl6">Poziom 6</option>
+          <option value="lvl7">Poziom 7</option>
+          <option value="lvl8">Poziom 8</option>
+          <option value="lvl9">Poziom 9</option>
+          <option value="lvl10">Poziom 10</option>
+          <option value="lvl11">Poziom 11</option>
+          <option value="lvl12">Poziom 12</option>
+          <option value="lvl13">Poziom 13</option>
+          <option value="lvl14">Poziom 14</option>
+          <option value="lvl15">Poziom 15</option>
+          <option value="lvl16">Poziom 16</option>
+          <option value="lvl17">Poziom 17</option>
+          <option value="lvl18">Poziom 18</option>
+          <option value="lvl19">Poziom 19</option>
+          <option value="lvl20">Poziom 20</option>
+          <option value="lvl21">Poziom 21</option>
+          <option value="lvl22">Poziom 22</option>
+          <option value="lvl23">Poziom 23</option>
+          <option value="lvl24">Poziom 24</option>
+          <option value="lvl25">Poziom 25</option>
+          <option value="lvl26">Poziom 26</option>
+          <option value="lvl27">Poziom 27</option>
+          <option value="lvl28">Poziom 28</option>
+          <option value="lvl29">Poziom 29</option>
+          <option value="lvl30">Poziom 30</option>
+          <option value="lvl31">Poziom 31</option>
+          <option value="lvl32">Poziom 32</option>
+          <option value="lvl33">Poziom 33</option>
+        </select>
+        <button id="loadButton">
+          <img src="../img/icons/download.svg" alt="Wczytaj" />
+        </button>
+      </div>
+      <div id="savingDiv" class="column80-20">
+        <input type="text" id="levelName" placeholder="Nazwa poziomu" />
+        <button id="saveButton">
+          <img src="../img/icons/save.svg" alt="Zapisz" />
+        </button>
+      </div>
+      <span></span>
+      <button id="play"><img src="../img/icons/play.svg" alt=""></button>
+      <div class="column-50-50-buttons" id="bottomButtons">
+        <button id="deleteButton">
+          <img src="../img/icons/delete_bin.svg" alt="Usuń" />
+        </button>
+        <button id="clearButton">
+          <img src="../img/icons/rubber.svg" alt="Wyczyść pole edytora" />
+        </button>
+      </div>
+    </header>
+    
+    <article id="editorArea">
+      <ul>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+      </ul>
 
-            <div id="platform"></div>
-        </article>
+      <div id="platform"></div>
+    </article>
 
-        <ul id="chooseType">
-            <li data-image="whiteBrick"></li>
-            <li data-image="orangeBrick"></li>
-            <li data-image="cyanBrick"></li>
-            <li data-image="greenBrick"></li>
-            <li data-image="redBrick"></li>
-            <li data-image="blueBrick"></li>
-            <li data-image="pinkBrick"></li>
-            <li data-image="yellowBrick"></li>
-            <li data-image="silverBrick"></li>
-            <li data-image="goldBrick"></li>
-            <li data-image="" id="voidBrick"></li>
+    <ul id="chooseType">
+      <li data-image="whiteBrick"></li>
+      <li data-image="orangeBrick"></li>
+      <li data-image="cyanBrick"></li>
+      <li data-image="greenBrick"></li>
+      <li data-image="redBrick"></li>
+      <li data-image="blueBrick"></li>
+      <li data-image="pinkBrick"></li>
+      <li data-image="yellowBrick"></li>
+      <li data-image="silverBrick"></li>
+      <li data-image="goldBrick"></li>
+      <li data-image="" id="voidBrick"></li>
+    </ul>
+  </main>
 
-        </ul>
-        <!-- <button onclick="printJSON()">Generuj Json</button>
-        <textarea name="" id="jsonArea" cols="30" rows="10"></textarea> -->
-    </main>
-
-
-    <script src="generatorScript.js"></script>
+  <script src="generatorScript.js"></script>
 </body>
+
 </html>

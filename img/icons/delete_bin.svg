@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="svg-icon"
+   style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+   viewBox="0 0 1024 1024"
+   version="1.1"
+   id="svg2223"
+   sodipodi:docname="delete_bin.svg"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs2227" />
+  <sodipodi:namedview
+     id="namedview2225"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="0.97460938"
+     inkscape:cx="512"
+     inkscape:cy="513.02605"
+     inkscape:window-width="1486"
+     inkscape:window-height="1214"
+     inkscape:window-x="2603"
+     inkscape:window-y="40"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg2223" />
+  <path
+     d="m 856.89905,304.3466 h -689.7981 a 26.530696,31.148011 0 0 1 0,-62.29602 h 150.3406 V 138.22387 a 53.061394,62.296021 0 0 1 53.0614,-62.296015 h 282.9941 a 53.061394,62.296021 0 0 1 53.0614,62.296015 v 103.82671 h 150.3406 a 26.530696,31.148011 0 0 1 0,62.29602 z M 653.49705,179.75456 A 35.374263,41.53068 0 0 0 618.12278,138.22387 H 405.87722 a 35.374263,41.53068 0 0 0 -35.37427,41.53069 v 62.29602 h 282.9941 z M 388.19009,771.56674 V 439.3213 a 26.530696,31.148011 0 0 1 53.06138,0 v 332.24544 a 26.530696,31.148011 0 0 1 -53.06138,0 z m 194.55844,0 V 439.3213 a 26.530696,31.148011 0 0 1 53.06138,0 v 332.24544 a 26.530696,31.148011 0 0 1 -53.06138,0 z M 255.53659,345.87727 a 26.300764,30.878061 0 0 1 24.76199,20.76535 h 1.76871 v 477.60282 a 35.374263,41.53068 0 0 0 35.37426,41.53069 h 389.1169 a 35.374263,41.53068 0 0 0 35.37426,-41.53069 V 366.64262 h 1.76871 a 26.159267,30.711938 0 0 1 49.52396,0 h 1.76872 v 519.13351 a 53.061394,62.296021 0 0 1 -53.06139,62.29602 H 282.06729 A 53.061394,62.296021 0 0 1 229.0059,885.77613 V 366.64262 h 1.76872 a 26.300764,30.878061 0 0 1 24.76197,-20.76535 z"
+     id="path2221"
+     style="fill:#eeffaa;stroke-width:0.786046" />
+</svg>

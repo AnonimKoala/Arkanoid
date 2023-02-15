@@ -1,5 +1,4 @@
 
-
 // =================================[ Odpowiada za działanie cegieł ]================================== //
 class Brick {
     static list = [];
@@ -152,8 +151,25 @@ const deleteButton = document.querySelector("#deleteButton")
 const clearButton = document.querySelector("#clearButton")
 
 
+// ==================================================================================================== //
+// Resetuje poziomy domyślne
+// ==================================================================================================== //
+function resetToDefault() {
+    fetch("../levels.json")
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (jsonFile) {
+            jsonFile.forEach((el, i) => {
+                localStorage.setItem(el.id, JSON.stringify(el.bricks))
+            })
+        })
+        // TODO: naprawić aby nie powatrzał sie poziom w select po resecie
+}
 
-
+// ==================================================================================================== //
+// Ustawia paletę klocków
+// ==================================================================================================== //
 function setPalette() {
     let brickX = -0.1
     let brickY = 500
@@ -169,154 +185,164 @@ function setPalette() {
             brickX += 500
     })
 }
-setPalette()
+// ==================================================================================================== //
+// Uruchamia skrypt
+// ==================================================================================================== //
+startGenerator()
 
-chooseColorDiv.forEach((el, i) => {
-    el.addEventListener("click", e => {
-        chooseColorDiv.forEach(eC => {
-            eC.classList.remove("picked")
+function startGenerator() {
+    setPalette()
+
+    // Wczytuje wybrany kolor
+    chooseColorDiv.forEach((el, i) => {
+        el.addEventListener("click", e => {
+            chooseColorDiv.forEach(eC => {
+                eC.classList.remove("picked")
+            })
+
+            el.classList.add("picked")
+            pickedImage = e.target.dataset.image
+            pickedType = i
         })
-
-        el.classList.add("picked")
-        pickedImage = e.target.dataset.image
-        pickedType = i
     })
-})
-
-allBricks.forEach((el, i) => {
-    el.addEventListener("click", e => {
-        e.target.style.backgroundImage = `url(../img/bricks/${pickedImage}.jpg)`
-        e.target.dataset.type = pickedType
-    })
-})
-
-// ==================================================================================================== //
-// Skrypt do wczytywania poziomów z pliku JSON
-// ==================================================================================================== //
-let jsonFile
-let levelList = []
-fetch("../levels.json")
-    .then(function (response) {
-        return response.json();
-    })
-    .then(function (jsonFile) {
-        jsonFile.forEach((el, i) => {
-            levelList.push(el.id)
+    // Wczytuje img do klocków
+    allBricks.forEach((el, i) => {
+        el.addEventListener("click", e => {
+            e.target.style.backgroundImage = `url(../img/bricks/${pickedImage}.jpg)`
+            e.target.dataset.type = pickedType
         })
-        levelList.forEach((el, i) => {
-            let option = document.createElement("option")
-            option.value = el
-            console.log(el);
-            option.innerText = el
-            selectLevel.appendChild(option)
-        })
-
     })
 
 
-// ==================================================================================================== //
-// Wczytywanie poziomu
-// ==================================================================================================== //
-loadButton.addEventListener("click", e => {
-    let levelName = selectLevel.value
-    levelNameInput.value = levelName
-
+    // Czyta poziomy z pliku JSON
+    let levelList = []
     fetch("../levels.json")
         .then(function (response) {
             return response.json();
         })
         .then(function (jsonFile) {
             jsonFile.forEach((el, i) => {
-                if (el.id == levelName) {
-                    el.bricks.forEach((el, i) => {
-                        allBricks.forEach((el2, i2) => {
-                            if (el.x == el2.dataset.x && el.y == el2.dataset.y) {
-                                switch (parseInt(el.type)) {
-                                    case 0:
-                                        el2.style.backgroundImage = "url(../img/bricks/whiteBrick.jpg)"
-                                        break;
-                                    case 1:
-                                        el2.style.backgroundImage = "url(../img/bricks/orangeBrick.jpg)"
-                                        break;
-                                    case 2:
-                                        el2.style.backgroundImage = "url(../img/bricks/cyanBrick.jpg)"
-                                        break;
-                                    case 3:
-                                        el2.style.backgroundImage = "url(../img/bricks/greenBrick.jpg)"
-                                        break;
-                                    case 4:
-                                        el2.style.backgroundImage = "url(../img/bricks/redBrick.jpg)"
-                                        break;
-                                    case 5:
-                                        el2.style.backgroundImage = "url(../img/bricks/blueBrick.jpg)"
-                                        break;
-                                    case 6:
-                                        el2.style.backgroundImage = "url(../img/bricks/pinkBrick.jpg)"
-                                        break;
-                                    case 7:
-                                        el2.style.backgroundImage = "url(../img/bricks/yellowBrick.jpg)"
-                                        break;
-                                    case 8:
-                                        el2.style.backgroundImage = "url(../img/bricks/silverBrick.jpg)"
-                                        break;
-                                    case 9:
-                                        el2.style.backgroundImage = "url(../img/bricks/goldBrick.jpg)"
-                                        break;
-                                    default:
-                                        el2.style.backgroundImage = `url(../img/bricks/${el.type}.jpg)`
-                                        
-                                }
-                                el2.dataset.type = el.type
-                            }
-                        })
-                    })
+                levelList.push(el.id)
+
+                // Sprawdza czy poziom jest w localstorage
+                if (localStorage.getItem(el.id) == null)
+                    localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
+            })
+            // Wczytuje poziomy do selecta
+            levelList.forEach((el, i) => {
+                let option = document.createElement("option")
+                option.value = el
+                console.log(el);
+                option.innerText = el
+                selectLevel.appendChild(option)
+
+            })
+
+        })
+
+}
+
+// ==================================================================================================== //
+// Czyści edytor
+// ==================================================================================================== //
+function clearEditor() {
+    allBricks.forEach((el, i) => {
+        el.style.backgroundImage = "none"
+        el.dataset.type = 10
+    })
+}
+clearButton.addEventListener("click", clearEditor)
+
+// ==================================================================================================== //
+// Wczytywanie poziomu z localstorage do edytora
+// ==================================================================================================== //
+loadButton.addEventListener("click", e => {
+    if (selectLevel.value != 0) {
+        clearEditor()
+
+        let levelName = selectLevel.value
+        levelNameInput.value = levelName
+
+        let level = JSON.parse(localStorage.getItem(levelName))
+        level.forEach((el, i) => {
+            allBricks.forEach((el2, i2) => {
+                if (el.x == el2.dataset.x && el.y == el2.dataset.y) {
+                    el2.dataset.type = el.type
+                    switch (parseInt(el.type)) {
+                        case 0:
+                            el2.style.backgroundImage = "url(../img/bricks/whiteBrick.jpg)"
+                            break;
+                        case 1:
+                            el2.style.backgroundImage = "url(../img/bricks/orangeBrick.jpg)"
+                            break;
+                        case 2:
+                            el2.style.backgroundImage = "url(../img/bricks/cyanBrick.jpg)"
+                            break;
+                        case 3:
+                            el2.style.backgroundImage = "url(../img/bricks/greenBrick.jpg)"
+                            break;
+                        case 4:
+                            el2.style.backgroundImage = "url(../img/bricks/redBrick.jpg)"
+                            break;
+                        case 5:
+                            el2.style.backgroundImage = "url(../img/bricks/blueBrick.jpg)"
+                            break;
+                        case 6:
+                            el2.style.backgroundImage = "url(../img/bricks/pinkBrick.jpg)"
+                            break;
+                        case 7:
+                            el2.style.backgroundImage = "url(../img/bricks/yellowBrick.jpg)"
+                            break;
+                        case 8:
+                            el2.style.backgroundImage = "url(../img/bricks/silverBrick.jpg)"
+                            break;
+                        case 9:
+                            el2.style.backgroundImage = "url(../img/bricks/goldBrick.jpg)"
+                            break;
+                        default:
+                            el2.style.backgroundImage = `url(../img/bricks/${el.type}.jpg)`
+                            break;
+                    }
                 }
             })
         })
+    }
+
 })
 // ==================================================================================================== //
 // Zapisywanie poziomu
 // ==================================================================================================== //
 saveButton.addEventListener("click", e => {
-    let levelName = levelNameInput.value
-    let object = []
-    allBricks.forEach((el, i) => {
-        if (el.dataset.type != 10 && el.dataset.type != undefined)
-            object.push({
-                x: el.dataset.x,
-                y: el.dataset.y,
-                type: el.dataset.type
-            })
-    })
-    let level = {
-        id: levelName,
-        bricks: object
-    }
-    let json = JSON.stringify(level)
-
-    fetch("../levels.json")
-    .then(function (response) {
-        return response.json();
-    })
-    .then(function (jsonFile) {
-        jsonFile.forEach((el, i) => {
-            if (el.id == levelName) {
-                jsonFile[i] = level
-            }
-            else {
-                jsonFile.push(level)
-            }
+    if (levelNameInput.value != "") {
+        let levelName = levelNameInput.value
+        let object = []
+        allBricks.forEach((el, i) => {
+            if (el.dataset.type != 10 && el.dataset.type != undefined)
+                object.push({
+                    x: el.dataset.x,
+                    y: el.dataset.y,
+                    type: el.dataset.type
+                })
         })
-    })
+        let level = {
+            id: levelName,
+            bricks: object
+        }
+        let json = JSON.stringify(object)
 
 
-    let blob = new Blob([json], { type: "application/json" });
-    let link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = "levels.json";
-    link.click();
 
-    alert("Poziom został zapisany,\nAby otrzymac do niego dostęp musisz zastąpić nim plik levels.json w folderze z grą.\n(nWymagana ta sama nazwa)\nPojawi się on na liście poziomów do wybrania\n")
+        // Zapis poziomu do localStorage
+        localStorage.setItem(levelName, json)
+        // Dodaje poziom do selecta
+        let option = document.createElement("option")
+        option.value = levelName
+        option.innerText = levelName
+        selectLevel.appendChild(option)
+    }
+    else {
+        alert("Podaj nazwę poziomu")
+    }
 
 })
 // ==================================================================================================== //
@@ -324,19 +350,8 @@ saveButton.addEventListener("click", e => {
 // ==================================================================================================== //
 deleteButton.addEventListener("click", e => {
     let levelName = selectLevel.value
-    fetch("../levels.json")
-    .then(function (response) {
-        return response.json();
-    })
-    .then(function (jsonFile) {
-        jsonFile.forEach((el, i) => {
-            if (el.id == levelName) {
-                jsonFile.splice(i, 1)
-            }
-        })
-    })
-    console.log(browser.downloads.showDefaultFolder());
-    alert("Poziom został usunięty,\nAby usunąć go z listy musisz zastąpić plik levels.json w folderze z grą.\n(nWymagana ta sama nazwa)\n")
+    localStorage.removeItem(levelName)
+    selectLevel.removeChild(selectLevel.querySelector(`option[value="${levelName}"]`))
 })
 
 
@@ -344,21 +359,12 @@ deleteButton.addEventListener("click", e => {
 
 
 
-clearButton.addEventListener("click", e => {
-    allBricks.forEach((el, i) => {
-        el.style.backgroundImage = "none"
-        el.dataset.type = 10
-    })
-})
-// deleteButton.addEventListener("click", e => {
-//     let levelName = selectLevel.value
 
 
 
 
 
 
- 
 
 
 

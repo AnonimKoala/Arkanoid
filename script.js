@@ -152,15 +152,6 @@ function restartTheGame() {
                 gameOvered = false
                 gamePaused = false
 
-
-                // // // TODO: Kiedyś mozna zoptymalizowac - nie ruszac ;)
-                // if (Brick.list.length == 100) {
-                //         levelsTempTab.splice(playerLevel - 1, 1, Brick.list) // Zapisuje I poziom - testowo
-                // }
-
-
-
-
                 document.addEventListener("keydown", pauseTheGame)
         })
 

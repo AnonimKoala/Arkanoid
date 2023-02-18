@@ -231,6 +231,7 @@ let platform = {
         move: canvas.width / 100 * 5,
         holdBall: true, //Czy nasza platforma trzyma piłke
         timesIncreased: 0, //Ile razy nasza platforma została powiększona upgradem
+        canCatchBall: false, //Czy może złapać piłke (upgrade łapania)
 
         // Funkcja do rysowania platformy
         draw() {
@@ -390,7 +391,13 @@ class Ball {
                         context.globalAlpha = 1;
                 }
 
+                //Dodatkowe piłki są przeźroczyste
+                if (this != originalBall)
+                        context.globalAlpha = 0.5;
+
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
+
+                context.globalAlpha = 1;
         }
 
         remove()
@@ -474,7 +481,7 @@ let curUpgrade = null;
 const UPGRADE_MOREHP = 0; //Więcej życia (x)
 const UPGRADE_BALLPOWER = 1; //Większa siła piłki 
 const UPGRADE_MOREBALLS = 2; //Więcej piłek (x)
-const UPGRADE_BALLGRAB = 3; //Tryb chwytania piłki (x)
+const UPGRADE_BALLCATCH = 3; //Tryb chwytania piłki (x)
 const UPGRADE_PLATFORMCLONE = 4; //Klon platformy
 const UPGRADE_PLATFORMSIZE = 5; //Powiększenie platformy (x)
 const UPGRADE_LASER = 6; //Laser
@@ -494,6 +501,9 @@ function removeUpgradeEffect(upgrade)
                         Ball.list.splice(1);
                         break;
 
+                case UPGRADE_BALLCATCH:
+                        platform.canCatchBall = false;
+                        break;
                 case UPGRADE_PLATFORMSIZE:
                         platform.size.x -= Upgrade.platformSizeIncrease * platform.timesIncreased;
                         platform.pos.x += Upgrade.platformSizeIncrease * platform.timesIncreased / 2;
@@ -575,9 +585,11 @@ class Upgrade
                                 break;
 
                         //Platforma
-                        case UPGRADE_BALLGRAB:
+                        case UPGRADE_BALLCATCH:
                                 removeUpgradeEffect(UPGRADE_PLATFORMSIZE);
                                 removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
+
+                                platform.canCatchBall = true;
                                 break;
                         case UPGRADE_PLATFORMCLONE:
                                 removeUpgradeEffect(UPGRADE_PLATFORMSIZE);
@@ -898,7 +910,7 @@ function think(cTime) {
                                         el.dir.x = col.hitFactor * 5;
                                         el.invertDirY();
 
-                                        if (curUpgrade == UPGRADE_BALLGRAB && platform.holdBall == null)
+                                        if (platform.canCatchBall && platform.holdBall == null)
                                                 platform.holdBall = el;
                                 }
 
@@ -942,8 +954,14 @@ function think(cTime) {
 
                 // Sprawdza czy piłka wypadła
                 if (el.pos.y > canvas.height / 100 * 96.4) {
-                        playerHealth--;
-                        resetToDefault();
+                        if (el == originalBall)
+                        {
+                                playerHealth--;
+                                resetToDefault();
+                        } else {
+                                el.remove();
+                        }
+
                 }
 
         })

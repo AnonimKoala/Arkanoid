@@ -690,8 +690,8 @@ class Brick {
                         if (nextUpgrade == 0)
                         {
                                 nextUpgrade = upgradeFrequency;
-                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 7));
-                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLPOWER);
+                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 7));
+                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLPOWER);
                         } else nextUpgrade--;
 
                         Brick.list.forEach((el, index) => {

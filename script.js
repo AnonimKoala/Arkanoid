@@ -8,7 +8,6 @@ const context = canvas.getContext('2d');
 canvas.width = 5000
 canvas.height = 5000
 // ==================================================================================================== //
-// let levelsTempTab = []
 
 // =======================================[ Dotyczy pauzy gry ]======================================== //
 let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
@@ -75,21 +74,24 @@ function resetToDefault() {
 // ====================================[ Uruchami kolejny poziom ]===================================== //
 function nextLevel() {
         playerLevel++
-        console.log("Next Level", playerLevel);
 
         loadLevel()
 
         resetToDefault()
-
-
 }
 // ==================================================================================================== //
 
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
-function loadLevel() {
+function loadLevel(startFrom = null) {
         // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
-        let json = localStorage.getItem(`Poziom ${playerLevel}`)
+        let json
+        if (startFrom != null)
+                json = localStorage.getItem(startFrom)
+
+        else
+                json = localStorage.getItem(`Poziom ${playerLevel}`)
+
         let allBricks = JSON.parse(json)
 
         Laser.list = [];
@@ -159,12 +161,25 @@ function restartTheGame() {
                 document.addEventListener("keydown", pauseTheGame)
         })
 
-        // generateBricksPos()
-        loadLevel()
 
         playerPoints = 0
-        playerHealth = 3
         playerLevel = 1
+        playerHealth = 3
+
+        // Wczytuje pierwszy poziom
+        if (localStorage.getItem("_startFrom") != null) { // Wczytuje poziom wybrany przez gracza w edytorze
+                gameStarted = true
+                gameOvered = false
+                gamePaused = false
+
+                if (localStorage.getItem("_startFrom") != "Poziom 1")
+                        playerLevel = 0
+
+                loadLevel(localStorage.getItem("_startFrom"))
+                localStorage.removeItem("_startFrom")
+        } else
+                loadLevel() // Wczytuje pierwszy poziom jeśli nie ma wybranego przez gracza
+
 
         resetToDefault()
 }
@@ -723,10 +738,9 @@ function gameLoop(cTime) {
                 think(cTime);
                 draw();
 
-                // TODO: Zobczyc czy dziala
                 // TODO: Dodac warunek na koniec gry
                 if (!Brick.list.filter(el => el.type != 9).length) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
-                        nextLevel() 
+                        nextLevel()
         } else if (!gamePaused && !gameOvered)
                 restartTheGame();
 

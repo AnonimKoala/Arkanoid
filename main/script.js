@@ -51,14 +51,22 @@ let playerPoints = 0
 
 // =============[ Ustawia domyśle wartości pozycji i piłki po uruchominiu nowego poziomu ]============= //
 function resetToDefault() {
-        platform.holdBall = true
+        prevUpgrade = curUpgrade;
+        curUpgrade = null;
+        removeAllUpgrades();
+
+        Upgrade.list = [];
+
+        platform.holdBall = originalBall;
         platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
 
         // Na początku piłka pojawia się nad platformą
-        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
-        originalBall.pos.y = platform.pos.y - 10 - originalBall.size
+        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
+        originalBall.pos.y = platform.pos.y - 10 - originalBall.size.y
 
         originalBall.speed = 15;
+        originalBall.dir.x = 0.25;
+        originalBall.dir.y = -1;
 }
 // ==================================================================================================== //
 
@@ -96,7 +104,9 @@ function loadLevel(){
         const json = levels[playerLevel-1]
         let allBricks = JSON.parse(json)
 
-        Brick.list = []
+        Laser.list = [];
+
+        Brick.list = [];
 
         allBricks.forEach((el, i) => {
                 new Brick(
@@ -235,6 +245,7 @@ let platform = {
         pos: null, // Pozycja platformy
         move: canvas.width / 100 * 5,
         holdBall: true, //Czy nasza platforma trzyma piłke
+        timesIncreased: 0, //Ile razy nasza platforma została powiększona upgradem
 
         // Funkcja do rysowania platformy
         draw() {
@@ -245,23 +256,51 @@ let platform = {
 }
 
 platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
+
+//Klon platformy używany do upgrade'u
+let platformClone = {
+        ...platform,
+}
+
+platformClone.enabled = false;
+platformClone.draw = () => {
+        context.fillStyle = 'blue';
+        context.globalAlpha = 0.5;
+        context.fillRect(platformClone.pos.x, platformClone.pos.y, platformClone.size.x, platformClone.size.y);
+        context.globalAlpha = 1;
+}
+
 // Naciskanie klawiszy
 document.addEventListener("keydown", e => {
+        let oldPlatformPosX = platform.pos.x;
+
         // Ruch platformą strzałkami
         if (e.key == "ArrowLeft") {
                 if (platform.pos.x > 0) {
                         platform.pos.x -= platform.move;
 
-                        if (platform.holdBall) {
-                                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+                        if (platformClone.enabled) {
+                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                        }
+
+                        if (platform.holdBall != null) {
+                                let ballDiff = platform.holdBall.pos.x - oldPlatformPosX;
+
+                                platform.holdBall.pos.x = platform.pos.x + ballDiff;
                         }
                 }
         } else if (e.key == "ArrowRight") {
                 if (platform.pos.x + platform.size.x < canvas.width) {
                         platform.pos.x += platform.move;
 
-                        if (platform.holdBall) {
-                                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+                        if (platformClone.enabled) {
+                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                        }
+
+                        if (platform.holdBall != null) {
+                                let ballDiff = platform.holdBall.pos.x - oldPlatformPosX;
+
+                                platform.holdBall.pos.x = platform.pos.x + ballDiff;
                         }
                 }
         }
@@ -269,10 +308,10 @@ document.addEventListener("keydown", e => {
 
 
         // Wyrzucenie piłki gdy ją trzymamy
-        if (platform.holdBall && e.key == " ") {
-                platform.holdBall = false;
+        if (platform.holdBall != null && e.key == " ") {
+                platform.holdBall = null;
 
-                originalBall.setDir(0, -1)
+                // originalBall.setDir(0, -1)
         }
 
 })
@@ -281,25 +320,34 @@ document.addEventListener("keydown", e => {
 canvas.addEventListener("mousemove", e => {
 
         // Odpowiada za niewychodzenie platformy poza planszę
+        let oldPlatformPosX = platform.pos.x;
+
         if (
                 (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 > 0 &&
                 (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 + platform.size.x < canvas.width
         )
+        {
                 platform.pos.x = (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2
+        }
 
+        if (platformClone.enabled) {
+                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+        }
 
         // Odpowiada za przesuwanie piłki trzymanje przez platformę
-        if (platform.holdBall) {
-                originalBall.setPos(platform.pos.x + platform.size.x / 2 - originalBall.size / 2, platform.pos.y - 15 - originalBall.size);
+        if (platform.holdBall != null) {
+                let ballDiff = platform.holdBall.pos.x - oldPlatformPosX;
+
+                platform.holdBall.pos.x = platform.pos.x + ballDiff;
         }
 
 })
 canvas.addEventListener("mousedown", e => {
         // Wyrzucenie piłki gdy ją trzymamy LPM
-        if (platform.holdBall && e.button == 0) {
-                platform.holdBall = false;
+        if (platform.holdBall != null && e.button == 0) {
+                platform.holdBall = null;
 
-                originalBall.setDir(0, -1)
+                // originalBall.setDir(0, -1)
         }
 })
 // ==================================================================================================== //
@@ -307,6 +355,7 @@ canvas.addEventListener("mousedown", e => {
 // ==========================================[ Klasa piłek ]=========================================== //
 class Ball {
         static list = []; // Lista wszystkich piłek
+        static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
 
         constructor(pos, dir, size) {
                 this.pos = pos; // Przechowuje pozycje piłki
@@ -316,6 +365,8 @@ class Ball {
                 this.speed = 15; //Szybkość z jaką porusza się piłka
                 this.texture = new Image(); // Tekstura piłki
                 this.texture.src = "img/ball.png";
+
+                this.power = Ball.ballPower;
 
                 Ball.list.push(this); // Dodaje do listy wszystkich piłek
         }
@@ -340,7 +391,21 @@ class Ball {
 
         // Rysuje naszą piłke
         draw() {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size, this.size)
+                //Efekt gdy piłka ma więcej mocy
+                if (this.power > 0)
+                {
+                        let len = this.dir.length();
+
+                        for (let i = 0; i < this.power; i++)
+                        {
+                                context.globalAlpha = 0.75 - (0.75 / (this.power + 1) * (i + 1));
+                                context.drawImage(this.texture, this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1)), this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1)), this.size.x, this.size.y)   
+                        }
+
+                        context.globalAlpha = 1;
+                }
+
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
         }
 
         remove()
@@ -350,6 +415,13 @@ class Ball {
                                 Ball.list.splice(index, 1);
                 })     
         }
+
+        static refreshBallPower()
+        {
+                Ball.list.forEach((el) => {
+                        el.power = Ball.ballPower;
+                })
+        }
 }
 
 let originalBall = new Ball(
@@ -357,43 +429,104 @@ let originalBall = new Ball(
                 null,   // x
                 null    // y
         ),
-        new Vector2D(0.25, 1), // Kierunek
-        180 // Size
+        new Vector2D(0.25, -1), // Kierunek
+        new Vector2D(180, 180) // Size
 );
 
 // Na początku piłka pojawia się nad platformą
-originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size / 2
-originalBall.pos.y = platform.pos.y - 0 - originalBall.size
+originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
+originalBall.pos.y = platform.pos.y - 0 - originalBall.size.y
 // ==================================================================================================== //
 
-// =========================================[ Klasa ulepszeń ]========================================= //
+// =========================================[ Ulepszenia ]========================================= //
 
-let nextUpgrade = 4;
+class Laser
+{
+        static list = [];
+        static playerLasers = 0;
+        static nextPlayerFire = 0;
+        static playerLaserSize = new Vector2D(100, 250);
+
+        constructor(pos, dir, size, speed, player)
+        {
+                this.pos = pos;
+                this.dir = dir;
+                this.size = size;
+                this.speed = speed;
+                this.isPlayers = player
+
+                this.texture = new Image();
+                this.texture.src = "img/laserProjectile.png";
+
+                Laser.list.push(this);
+        }
+
+        draw()
+        {       
+                context.save()
+                context.translate(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2)
+                context.rotate((90 * this.dir.x) * Math.PI / 180)
+                context.translate(-this.pos.x - this.size.x / 2, -this.pos.y - this.size.y / 2)
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
+                context.restore()
+        }
+
+        remove()
+        {
+                Laser.list.forEach((el, index) => {
+                        if (el == this)
+                                Laser.list.splice(index, 1);
+                })
+        }
+}
+
+let upgradeFrequency = 4;
+let nextUpgrade = upgradeFrequency;
 let prevUpgrade;
 let curUpgrade = null;
 
-function removePrevUpgrade()
+//Dla lepszej czytelności kodu
+const UPGRADE_MOREHP = 0; //Więcej życia (x)
+const UPGRADE_BALLPOWER = 1; //Większa siła piłki 
+const UPGRADE_MOREBALLS = 2; //Więcej piłek (x)
+const UPGRADE_BALLGRAB = 3; //Tryb chwytania piłki (x)
+const UPGRADE_PLATFORMCLONE = 4; //Klon platformy
+const UPGRADE_PLATFORMSIZE = 5; //Powiększenie platformy (x)
+const UPGRADE_LASER = 6; //Laser
+
+function removeUpgradeEffect(upgrade)
 {
-        switch(prevUpgrade)
+        switch(upgrade)
         {
-                case 0:
-                        platform.size.x -= Upgrade.platformSizeIncrease;
-                        platform.pos.x += Upgrade.platformSizeIncrease / 2;
+                case UPGRADE_LASER:
+                        Laser.playerLasers = 0;
                         break;
-                case 1:
-                        Ball.list.forEach((el, index) => {
-                                if (el != originalBall)
-                                        el.remove();
-                        })
+                case UPGRADE_BALLPOWER:
+                        Ball.ballPower = 0;
+                        Ball.refreshBallPower();
                         break;
-                case 2:
+                case UPGRADE_MOREBALLS:
+                        Ball.list.splice(1);
                         break;
-                case 4:
+
+                case UPGRADE_PLATFORMSIZE:
+                        platform.size.x -= Upgrade.platformSizeIncrease * platform.timesIncreased;
+                        platform.pos.x += Upgrade.platformSizeIncrease * platform.timesIncreased / 2;
+                        platform.timesIncreased = 0;
                         break;
-                case 5:
+                case UPGRADE_PLATFORMCLONE:
+                        platformClone.enabled = false;
                         break;
                 default:
                         break;
+        }
+}
+
+function removeAllUpgrades()
+{
+        for (let i = 0; i <= 6; i++)
+        {
+                removeUpgradeEffect(i);
         }
 }
 
@@ -401,13 +534,13 @@ class Upgrade
 {
         static list = [];
         static typeToTexture = [
-                "upgrades/upgradetest.png",
-                "upgrades/upgradetest.png",
-                "upgrades/upgradetest.png",
-                "upgrades/upgradetest.png",
-                "upgrades/upgradetest.png",
-                "upgrades/upgradetest.png",
-                "upgrades/upgradetest.png"
+                "img/upgrades/upgrade_hp.svg",
+                "img/upgrades/upgrade_strength.svg",
+                "img/upgrades/upgrade_moreballs.svg",
+                "img/upgrades/upgrade_stick.svg",
+                "img/upgrades/upgrade_doppelganger.svg",
+                "img/upgrades/upgrade_size.svg",
+                "img/upgrades/upgrade_laser.svg",
         ]
 
         static platformSizeIncrease = 250;
@@ -417,6 +550,7 @@ class Upgrade
                 this.pos = pos;
                 this.velY = 16;
                 this.type = type;
+                this.size = new Vector2D(canvas.width / 10 - 0.1, canvas.width / 10 - 0.1);
 
                 this.texture = new Image();
                 this.texture.src = Upgrade.typeToTexture[this.type];
@@ -426,7 +560,7 @@ class Upgrade
 
         draw()
         {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, canvas.width / 20 - 0.1, canvas.width / 20 - 0.1);
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
         collect()
@@ -434,41 +568,46 @@ class Upgrade
                 prevUpgrade = curUpgrade;
                 curUpgrade = this.type;
 
-                if (curUpgrade == 3) //Więcej żyć
+                switch(curUpgrade)
                 {
-                        playerHealth++;
+                        //Ogólne
+                        case UPGRADE_MOREHP:
+                                playerHealth++;
+                                break;
+                        case UPGRADE_LASER:
+                                Laser.playerLasers++;
+                                break;
 
-                        if (prevUpgrade != 3)
-                                removePrevUpgrade();
-                }
-                else if (curUpgrade == 1) //Więcej piłek
-                {
-                        new Ball(new Vector2D(platform.pos.x + platform.size.x / 2 - 180 / 2, platform.pos.y - 15), new Vector2D(0.25, 1), 180)
+                        //Piłki
+                        case UPGRADE_MOREBALLS:
+                                removeUpgradeEffect(UPGRADE_BALLPOWER);
+                                new Ball(new Vector2D(platform.pos.x + platform.size.x / 2 - 180 / 2, platform.pos.y - 180), new Vector2D(0.25, 1), new Vector2D(180, 180));
+                                break;
+                        case UPGRADE_BALLPOWER:
+                                removeUpgradeEffect(UPGRADE_MOREBALLS);
+                                Ball.ballPower++;
+                                Ball.refreshBallPower();
+                                break;
 
-                        if (prevUpgrade != 1)
-                                removePrevUpgrade();
-                }
-                else if (prevUpgrade != curUpgrade)
-                {
-                        removePrevUpgrade();
-
-                        switch(curUpgrade)
-                        {
-                                case 0: //Zwiększenie długości platformy
-                                        platform.size.x += Upgrade.platformSizeIncrease;
-                                        platform.pos.x -= Upgrade.platformSizeIncrease / 2;
-                                        break;
-                                case 2: //Mocniejsze uderzenie
-                                        break;
-                                case 4: //Laser
-                                        break;
-                                case 5: //Tryb łapania
-                                        break;
-                                case 6: //Klon platformy
-                                        break;
-                                default:
-                                        break;
-                        }
+                        //Platforma
+                        case UPGRADE_BALLGRAB:
+                                removeUpgradeEffect(UPGRADE_PLATFORMSIZE);
+                                removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
+                                break;
+                        case UPGRADE_PLATFORMCLONE:
+                                removeUpgradeEffect(UPGRADE_PLATFORMSIZE);
+                                platformClone.enabled = true;
+                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                                break;
+                        case UPGRADE_PLATFORMSIZE:   
+                                removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
+                                platform.size.x += Upgrade.platformSizeIncrease;
+                                platform.pos.x -= Upgrade.platformSizeIncrease / 2;   
+                                
+                                platform.timesIncreased++;
+                                break;
+                        default:
+                                break;
                 }
 
                 this.remove();
@@ -486,6 +625,7 @@ class Upgrade
 // ==================================================================================================== //
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //
+
 class Brick {
         static list = [];
 
@@ -562,11 +702,12 @@ class Brick {
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0)
                 {
-                        // if (nextUpgrade == 0)
-                        // {
-                        //         nextUpgrade = 4;
-                        //         new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), 1);
-                        // } else nextUpgrade--;
+                        if (nextUpgrade == 0)
+                        {
+                                nextUpgrade = upgradeFrequency;
+                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 7));
+                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLPOWER);
+                        } else nextUpgrade--;
 
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
@@ -576,6 +717,46 @@ class Brick {
                         })
                 }
         }
+}
+
+
+
+function checkCollision(obj1, obj2)
+{
+        if (obj1 == null || obj2 == null)
+                return null;
+
+        let colData = {}; //Objekt które zwrócimy zawierający informację o kolizji
+
+        let dX, dY;
+        dX = (obj1.pos.x + obj1.size.x / 2) - (obj2.pos.x + obj2.size.x / 2)
+        dY = (obj1.pos.y + obj1.size.y / 2) - (obj2.pos.y + obj2.size.y / 2)
+
+        let width, height;
+        width = (obj1.size.x + obj2.size.x) / 2
+        height = (obj1.size.y + obj2.size.y) / 2
+
+        let crossWidth, crossHeight;
+        crossWidth = width * dY;
+        crossHeight = height * dX;
+
+        let side = 'none';
+        let hit = false;
+
+        if (Math.abs(dX) <= width && Math.abs(dY) <= height) {
+                if (crossWidth > crossHeight)
+                        if (crossWidth > -crossHeight) side = 'top'; else side = 'left';
+                else
+                        if (crossWidth > -crossHeight) side = 'right'; else side = 'bottom';
+
+                hit = true;
+        }
+
+        colData.side = side;
+        colData.hit = hit;
+        colData.hitFactor = (obj1.pos.x - (obj2.pos.x + obj2.size.x / 2)) / obj2.size.x
+
+        return colData;
 }
 // ==================================================================================================== //
 
@@ -591,15 +772,64 @@ function gameLoop(cTime) {
                 restartTheGame();
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
-
 }
 
 // Funkcja mająca na celu zająć się logiką gry
 function think(cTime) {
+        //Strzela laserami z platformy
+        if (Laser.playerLasers > 0 && Laser.nextPlayerFire < cTime)
+        {
+                Laser.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
+                
+                for (let i = 0; i < Laser.playerLasers; i++)
+                {
+                        let el = new Laser(new Vector2D((platform.pos.x + (platform.size.x / (Laser.playerLasers + 1)) * (i+1)) - Laser.playerLaserSize.x / 2, platform.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
+                        el.dir.x = (el.pos.x + el.size.x / 2 - (platform.pos.x + platform.size.x / 2)) / platform.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
+                }
+
+                if (platformClone.enabled)
+                {
+                        for (let i = 0; i < Laser.playerLasers; i++)
+                        {
+                                let el = new Laser(new Vector2D((platformClone.pos.x + (platformClone.size.x / (Laser.playerLasers + 1)) * (i+1)) - Laser.playerLaserSize.x / 2, platformClone.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
+                                el.dir.x = (el.pos.x + el.size.x / 2 - (platformClone.pos.x + platformClone.size.x / 2)) / platformClone.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
+                        }
+                }
+        }
+
+        // Logika laserów
+        Laser.list.forEach((el) => {
+                //Sprawdzamy kolizje z cegłami jeśli laser jest gracza
+                if (el.isPlayers)
+                {
+                        Brick.list.forEach((brick) => {
+                                let col = checkCollision(el, brick);
+
+                                if (col.hit)
+                                {
+                                        brick.remove();
+                                        el.remove();
+                                }
+                        })
+                }
+
+                //Usuwamy laser jeśli jest poza ekranem
+                if (
+                        el.pos.x + el.size.x < 0 ||
+                        el.pos.x > canvas.width ||
+                        el.pos.y + el.size.y < 0 ||
+                        el.pos.y > canvas.height
+                ) el.remove();
+
+                let len = el.dir.length();
+                el.pos.x += (el.dir.x / len) * el.speed;
+                el.pos.y += (el.dir.y / len) * el.speed;
+        })
+
         // Logika upgrade'ów
         Upgrade.list.forEach((el) => {
-                if (el.velY > -36)
-                        el.velY -= 0.5;
+                if (el.velY > -42)
+                        el.velY -= 0.35;
 
                 el.pos.y -= el.velY * 0.75;
 
@@ -609,31 +839,34 @@ function think(cTime) {
 
 
                 //Kolizja z platformą
-                let dX, dY;
-                dX = (el.pos.x + 250 / 2) - (platform.pos.x + platform.size.x / 2)
-                dY = (el.pos.y + 250 / 2) - (platform.pos.y + platform.size.y / 2)
+                let col = checkCollision(el, platform)
 
-                let width, height;
-                width = (250 + platform.size.x) / 2
-                height = (250 + platform.size.y) / 2
-
-                if (Math.abs(dX) <= width && Math.abs(dY) <= height)
+                if (col.hit)
                         el.collect();
+
+                //Kolizja z klonem platformy
+                if (platformClone.enabled && !col.hit)
+                {
+                        col = checkCollision(el, platformClone);
+
+                        if (col.hit)
+                                el.collect();
+                }
         })
 
         // System kolizji piłki
-        Ball.list.forEach((el) => {
+        Ball.list.forEach((el, index) => {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
 
                 //Kolizja z ścianami
-                if (el.pos.x <= 0 || el.pos.x + el.size >= canvas.width) // Kolizja z lewą i prawą ścianą
+                if (el.pos.x <= 0 || el.pos.x + el.size.x >= canvas.width) // Kolizja z lewą i prawą ścianą
                 {
                         hit = true;
                         el.invertDirX();
                         el.lastTouchedObj = null;
                 }
 
-                if (el.pos.y <= 0 || el.pos.y + el.size >= canvas.height && !hit) // Kolizja z górną i dolną ścianą
+                if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
                 {
                         hit = true;
                         el.invertDirY();
@@ -647,27 +880,20 @@ function think(cTime) {
 
                         Brick.list.forEach((brick) => {
                                 if (!hit) {
-                                        let dX, dY;
-                                        dX = (el.pos.x + el.size / 2) - (brick.pos.x + brick.size.x / 2)
-                                        dY = (el.pos.y + el.size / 2) - (brick.pos.y + brick.size.y / 2)
+                                        let col = checkCollision(el, brick)
 
-                                        let width, height;
-                                        width = (el.size + brick.size.x) / 2
-                                        height = (el.size + brick.size.y) / 2
-
-                                        let crossWidth, crossHeight;
-                                        crossWidth = width * dY;
-                                        crossHeight = height * dX;
-
-                                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != brick) {
-                                                if (crossWidth > crossHeight)
-                                                        if (crossWidth > -crossHeight) el.invertDirY(); else el.invertDirX();
+                                        if (col.hit && el.lastTouchedObj != brick)
+                                        {
+                                                if (el.power > 0 && brick.type != 9 && brick.type != 8)
+                                                        el.power--;
+                                                else if (el.power > 0 && brick.type == 8 && el.power >= brick.health)
+                                                        el.power -= brick.health;
                                                 else
-                                                        if (crossWidth > -crossHeight) el.invertDirX(); else el.invertDirY();
+                                                        if (col.side == 'left' || col.side == 'right') el.invertDirX(); else el.invertDirY();
 
                                                 hit = true;
-                                                el.lastTouchedObj = brick; // Ustawiamy cegłe na ostatni dotknięty obiekt by ominąć ją w następnej iteracji, zapobiega to błędom w kolizji
-                                                brick.remove(); // Usuwamy cegłe
+                                                el.lastTouchedObj = brick;
+                                                brick.remove();
                                         }
                                 }
                         })
@@ -675,45 +901,55 @@ function think(cTime) {
 
 
                 //Kolizja z platformą
-                if (!hit) {
-                        let dX, dY;
-                        dX = (el.pos.x + el.size / 2) - (platform.pos.x + platform.size.x / 2)
-                        dY = (el.pos.y + el.size / 2) - (platform.pos.y + platform.size.y / 2)
+                if (!hit && platform.holdBall != el && el.lastTouchedObj != platform) {
+                        let col = checkCollision(el, platform)
 
-                        let hitFactor = (el.pos.x - (platform.pos.x + platform.size.x / 2)) / (platform.size.x / 3.5) // W którą strone piłka ma polecieć
-
-                        let width, height;
-                        width = (el.size + platform.size.x) / 2
-                        height = (el.size + platform.size.y) / 2
-
-                        let crossWidth, crossHeight;
-                        crossWidth = width * dY;
-                        crossHeight = height * dX;
-
-                        if (Math.abs(dX) <= width && Math.abs(dY) <= height && el.lastTouchedObj != platform) {
-                                if (crossWidth > crossHeight)
-                                        if (crossWidth > -crossHeight) {
-                                                el.dir.x = hitFactor;
-                                                el.invertDirY();
-                                        } else el.invertDirX();
+                        if (col.hit && el.lastTouchedObj != platform)
+                        {
+                                if (col.side == 'left' || col.side == 'right')
+                                        el.invertDirX();
                                 else
-                                        if (crossWidth > -crossHeight) el.invertDirX(); else {
-                                                el.dir.x = hitFactor;
-                                                el.invertDirY();
-                                        };
+                                {
+                                        el.dir.x = col.hitFactor * 5;
+                                        el.invertDirY();
+
+                                        if (curUpgrade == UPGRADE_BALLGRAB && platform.holdBall == null)
+                                                platform.holdBall = el;
+                                }
 
                                 hit = true;
                                 el.lastTouchedObj = platform;
+                                el.power = Ball.ballPower;
                         }
                 }
 
-                if (hit) {
+                //Kolizja z klonem platformy
+                if (!hit && platformClone.enabled && el.lastTouchedObj != platformClone) {
+                        let col = checkCollision(el, platformClone)
+
+                        if (col.hit && el.lastTouchedObj != platformClone)
+                        {
+                                if (col.side == 'left' || col.side == 'right')
+                                        el.invertDirX();
+                                else
+                                {
+                                        el.dir.x = col.hitFactor * 5;
+                                        el.invertDirY();
+                                }
+
+                                hit = true;
+                                el.lastTouchedObj = platformClone;
+                                el.power = Ball.ballPower;
+                        }
+                }
+
+                if (hit && platform.holdBall != el) {
                         el.speed *= 1.015; //Zwiększamy prędkość piłki po kolizji
                         // console.log(el.speed);
                 }
 
                 //Ruch piłek
-                if (!platform.holdBall) {
+                if (platform.holdBall != el) {
                         let len = el.dir.length()
                         el.pos.x += (el.dir.x / len) * el.speed
                         el.pos.y += (el.dir.y / len) * el.speed
@@ -721,8 +957,8 @@ function think(cTime) {
 
                 // Sprawdza czy piłka wypadła
                 if (el.pos.y > canvas.height / 100 * 96.4) {
-                        playerHealth--
-                        resetToDefault()
+                        playerHealth--;
+                        resetToDefault();
                 }
 
         })
@@ -733,6 +969,9 @@ function draw() {
 
         if (playerHealth > 0) {
                 platform.draw(); // Rysuje platformę
+
+                if (platformClone.enabled)
+                        platformClone.draw(); //Rysuję klona platformy jeśli mamy jego upgrade
 
                 // Rysuje każdą piłke
                 Ball.list.forEach((el) => {
@@ -746,6 +985,11 @@ function draw() {
 
                 //Rysuje każdy upgrade
                 Upgrade.list.forEach((el) => {
+                        el.draw();
+                })
+
+                //Rysuje kazdy laser
+                Laser.list.forEach((el) => {
                         el.draw();
                 })
 

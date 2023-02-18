@@ -71,13 +71,6 @@ function resetToDefault() {
 // ==================================================================================================== //
 
 
-// =================================[ Przechowuje wszystkie poziomy ]================================== //
-const levels = []
-levels[0] = '[{"x":"1999.9","y":"750","type":"3"},{"x":"1499.9","y":"1000","type":"6"},{"x":"1999.9","y":"1000","type":"7"},{"x":"2499.9","y":"1000","type":"6"},{"x":"-0.1","y":"1250","type":"1"},{"x":"1499.9","y":"1250","type":"7"},{"x":"1999.9","y":"1250","type":"7"},{"x":"2499.9","y":"1250","type":"7"},{"x":"3999.9","y":"1250","type":"1"},{"x":"499.9","y":"1500","type":"1"},{"x":"1499.9","y":"1500","type":"4"},{"x":"1999.9","y":"1500","type":"7"},{"x":"2499.9","y":"1500","type":"4"},{"x":"3499.9","y":"1500","type":"1"},{"x":"999.9","y":"1750","type":"1"},{"x":"1499.9","y":"1750","type":"7"},{"x":"1999.9","y":"1750","type":"4"},{"x":"2499.9","y":"1750","type":"7"},{"x":"2999.9","y":"1750","type":"1"},{"x":"1999.9","y":"2000","type":"5"},{"x":"1999.9","y":"2250","type":"5"},{"x":"1499.9","y":"2500","type":"5"},{"x":"2499.9","y":"2500","type":"5"}]'
-levels[1] = '[{"x":"-0.1","y":"500","type":"2"},{"x":"499.9","y":"500","type":"2"},{"x":"3999.9","y":"500","type":"2"},{"x":"4499.9","y":"500","type":"2"},{"x":"-0.1","y":"750","type":"2"},{"x":"1499.9","y":"750","type":"4"},{"x":"2999.9","y":"750","type":"4"},{"x":"4499.9","y":"750","type":"2"},{"x":"-0.1","y":"1000","type":"3"},{"x":"999.9","y":"1000","type":"4"},{"x":"1499.9","y":"1000","type":"4"},{"x":"1999.9","y":"1000","type":"4"},{"x":"2499.9","y":"1000","type":"4"},{"x":"2999.9","y":"1000","type":"4"},{"x":"3499.9","y":"1000","type":"4"},{"x":"4499.9","y":"1000","type":"3"},{"x":"499.9","y":"1250","type":"3"},{"x":"999.9","y":"1250","type":"4"},{"x":"1499.9","y":"1250","type":"9"},{"x":"1999.9","y":"1250","type":"4"},{"x":"2499.9","y":"1250","type":"4"},{"x":"2999.9","y":"1250","type":"9"},{"x":"3499.9","y":"1250","type":"4"},{"x":"3999.9","y":"1250","type":"3"},{"x":"999.9","y":"1500","type":"4"},{"x":"1499.9","y":"1500","type":"4"},{"x":"1999.9","y":"1500","type":"4"},{"x":"2499.9","y":"1500","type":"4"},{"x":"2999.9","y":"1500","type":"4"},{"x":"3499.9","y":"1500","type":"4"},{"x":"999.9","y":"1750","type":"4"},{"x":"1499.9","y":"1750","type":"8"},{"x":"1999.9","y":"1750","type":"4"},{"x":"2499.9","y":"1750","type":"4"},{"x":"2999.9","y":"1750","type":"8"},{"x":"3499.9","y":"1750","type":"4"},{"x":"499.9","y":"2000","type":"3"},{"x":"999.9","y":"2000","type":"4"},{"x":"1499.9","y":"2000","type":"4"},{"x":"1999.9","y":"2000","type":"8"},{"x":"2499.9","y":"2000","type":"8"},{"x":"2999.9","y":"2000","type":"4"},{"x":"3499.9","y":"2000","type":"4"},{"x":"3999.9","y":"2000","type":"3"},{"x":"-0.1","y":"2250","type":"3"},{"x":"1499.9","y":"2250","type":"4"},{"x":"1999.9","y":"2250","type":"4"},{"x":"2499.9","y":"2250","type":"4"},{"x":"2999.9","y":"2250","type":"4"},{"x":"4499.9","y":"2250","type":"3"},{"x":"-0.1","y":"2500","type":"2"},{"x":"1999.9","y":"2500","type":"4"},{"x":"2499.9","y":"2500","type":"4"},{"x":"4499.9","y":"2500","type":"2"},{"x":"-0.1","y":"2750","type":"2"},{"x":"499.9","y":"2750","type":"2"},{"x":"1499.9","y":"2750","type":"6"},{"x":"2999.9","y":"2750","type":"6"},{"x":"3999.9","y":"2750","type":"2"},{"x":"4499.9","y":"2750","type":"2"}]'
-levels[2] = '[{"x":"499.9","y":"1000","type":"6"},{"x":"2999.9","y":"1000","type":"6"},{"x":"499.9","y":"1250","type":"6"},{"x":"2999.9","y":"1250","type":"6"},{"x":"499.9","y":"1750","type":"4"},{"x":"2999.9","y":"1750","type":"4"},{"x":"999.9","y":"2000","type":"4"},{"x":"1499.9","y":"2000","type":"4"},{"x":"1999.9","y":"2000","type":"4"},{"x":"2499.9","y":"2000","type":"4"}]'
-// ==================================================================================================== //
-
 
 // ====================================[ Uruchami kolejny poziom ]===================================== //
 function nextLevel() {
@@ -94,8 +87,9 @@ function nextLevel() {
 
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
-function loadLevel(){
-        const json = levels[playerLevel-1]
+function loadLevel() {
+        // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
+        let json = localStorage.getItem(`Poziom ${playerLevel}`)
         let allBricks = JSON.parse(json)
 
         Laser.list = [];
@@ -165,8 +159,8 @@ function restartTheGame() {
                 document.addEventListener("keydown", pauseTheGame)
         })
 
-        generateBricksPos()
-        // loadLevel()
+        // generateBricksPos()
+        loadLevel()
 
         playerPoints = 0
         playerHealth = 3
@@ -310,8 +304,7 @@ canvas.addEventListener("mousemove", e => {
         if (
                 (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 > 0 &&
                 (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 + platform.size.x < canvas.width
-        )
-        {
+        ) {
                 platform.pos.x = (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2
         }
 
@@ -377,14 +370,12 @@ class Ball {
         // Rysuje naszą piłke
         draw() {
                 //Efekt gdy piłka ma więcej mocy
-                if (this.power > 0)
-                {
+                if (this.power > 0) {
                         let len = this.dir.length();
 
-                        for (let i = 0; i < this.power; i++)
-                        {
+                        for (let i = 0; i < this.power; i++) {
                                 context.globalAlpha = 0.75 - (0.75 / (this.power + 1) * (i + 1));
-                                context.drawImage(this.texture, this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1)), this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1)), this.size.x, this.size.y)   
+                                context.drawImage(this.texture, this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1)), this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1)), this.size.x, this.size.y)
                         }
 
                         context.globalAlpha = 1;
@@ -393,16 +384,14 @@ class Ball {
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
         }
 
-        remove()
-        {
+        remove() {
                 Ball.list.forEach((el, index) => {
                         if (el == this)
                                 Ball.list.splice(index, 1);
-                })     
+                })
         }
 
-        static refreshBallPower()
-        {
+        static refreshBallPower() {
                 Ball.list.forEach((el) => {
                         el.power = Ball.ballPower;
                 })
@@ -425,15 +414,13 @@ originalBall.pos.y = platform.pos.y - 0 - originalBall.size.y
 
 // =========================================[ Ulepszenia ]========================================= //
 
-class Laser
-{
+class Laser {
         static list = [];
         static playerLasers = 0;
         static nextPlayerFire = 0;
         static playerLaserSize = new Vector2D(100, 250);
 
-        constructor(pos, dir, size, speed, player)
-        {
+        constructor(pos, dir, size, speed, player) {
                 this.pos = pos;
                 this.dir = dir;
                 this.size = size;
@@ -446,8 +433,7 @@ class Laser
                 Laser.list.push(this);
         }
 
-        draw()
-        {       
+        draw() {
                 context.save()
                 context.translate(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2)
                 context.rotate((90 * this.dir.x) * Math.PI / 180)
@@ -456,8 +442,7 @@ class Laser
                 context.restore()
         }
 
-        remove()
-        {
+        remove() {
                 Laser.list.forEach((el, index) => {
                         if (el == this)
                                 Laser.list.splice(index, 1);
@@ -479,10 +464,8 @@ const UPGRADE_PLATFORMCLONE = 4; //Klon platformy
 const UPGRADE_PLATFORMSIZE = 5; //Powiększenie platformy (x)
 const UPGRADE_LASER = 6; //Laser
 
-function removeUpgradeEffect(upgrade)
-{
-        switch(upgrade)
-        {
+function removeUpgradeEffect(upgrade) {
+        switch (upgrade) {
                 case UPGRADE_LASER:
                         Laser.playerLasers = 0;
                         break;
@@ -507,16 +490,13 @@ function removeUpgradeEffect(upgrade)
         }
 }
 
-function removeAllUpgrades()
-{
-        for (let i = 0; i <= 6; i++)
-        {
+function removeAllUpgrades() {
+        for (let i = 0; i <= 6; i++) {
                 removeUpgradeEffect(i);
         }
 }
 
-class Upgrade
-{
+class Upgrade {
         static list = [];
         static typeToTexture = [
                 "img/upgrades/upgrade_hp.svg",
@@ -530,8 +510,7 @@ class Upgrade
 
         static platformSizeIncrease = 250;
 
-        constructor(pos, type)
-        {
+        constructor(pos, type) {
                 this.pos = pos;
                 this.velY = 16;
                 this.type = type;
@@ -543,18 +522,15 @@ class Upgrade
                 Upgrade.list.push(this);
         }
 
-        draw()
-        {
+        draw() {
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
-        collect()
-        {
+        collect() {
                 prevUpgrade = curUpgrade;
                 curUpgrade = this.type;
 
-                switch(curUpgrade)
-                {
+                switch (curUpgrade) {
                         //Ogólne
                         case UPGRADE_MOREHP:
                                 playerHealth++;
@@ -584,11 +560,11 @@ class Upgrade
                                 platformClone.enabled = true;
                                 platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
                                 break;
-                        case UPGRADE_PLATFORMSIZE:   
+                        case UPGRADE_PLATFORMSIZE:
                                 removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
                                 platform.size.x += Upgrade.platformSizeIncrease;
-                                platform.pos.x -= Upgrade.platformSizeIncrease / 2;   
-                                
+                                platform.pos.x -= Upgrade.platformSizeIncrease / 2;
+
                                 platform.timesIncreased++;
                                 break;
                         default:
@@ -598,8 +574,7 @@ class Upgrade
                 this.remove();
         }
 
-        remove()
-        {
+        remove() {
                 Upgrade.list.forEach((el, index) => {
                         if (el == this)
                                 Upgrade.list.splice(index, 1);
@@ -685,10 +660,8 @@ class Brick {
         // Usuwa cegłe
         remove() {
                 this.health-- // Odejmuje życie cegły
-                if (this.health == 0)
-                {
-                        if (nextUpgrade == 0)
-                        {
+                if (this.health == 0) {
+                        if (nextUpgrade == 0) {
                                 nextUpgrade = upgradeFrequency;
                                 new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 7));
                                 // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLPOWER);
@@ -706,8 +679,7 @@ class Brick {
 
 
 
-function checkCollision(obj1, obj2)
-{
+function checkCollision(obj1, obj2) {
         if (obj1 == null || obj2 == null)
                 return null;
 
@@ -751,8 +723,10 @@ function gameLoop(cTime) {
                 think(cTime);
                 draw();
 
-                if (!Brick.list.length)
-                        nextLevel()
+                // TODO: Zobczyc czy dziala
+                // TODO: Dodac warunek na koniec gry
+                if (!Brick.list.filter(el => el.type != 9).length) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
+                        nextLevel() 
         } else if (!gamePaused && !gameOvered)
                 restartTheGame();
 
@@ -762,21 +736,17 @@ function gameLoop(cTime) {
 // Funkcja mająca na celu zająć się logiką gry
 function think(cTime) {
         //Strzela laserami z platformy
-        if (Laser.playerLasers > 0 && Laser.nextPlayerFire < cTime)
-        {
+        if (Laser.playerLasers > 0 && Laser.nextPlayerFire < cTime) {
                 Laser.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
-                
-                for (let i = 0; i < Laser.playerLasers; i++)
-                {
-                        let el = new Laser(new Vector2D((platform.pos.x + (platform.size.x / (Laser.playerLasers + 1)) * (i+1)) - Laser.playerLaserSize.x / 2, platform.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
+
+                for (let i = 0; i < Laser.playerLasers; i++) {
+                        let el = new Laser(new Vector2D((platform.pos.x + (platform.size.x / (Laser.playerLasers + 1)) * (i + 1)) - Laser.playerLaserSize.x / 2, platform.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
                         el.dir.x = (el.pos.x + el.size.x / 2 - (platform.pos.x + platform.size.x / 2)) / platform.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                 }
 
-                if (platformClone.enabled)
-                {
-                        for (let i = 0; i < Laser.playerLasers; i++)
-                        {
-                                let el = new Laser(new Vector2D((platformClone.pos.x + (platformClone.size.x / (Laser.playerLasers + 1)) * (i+1)) - Laser.playerLaserSize.x / 2, platformClone.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
+                if (platformClone.enabled) {
+                        for (let i = 0; i < Laser.playerLasers; i++) {
+                                let el = new Laser(new Vector2D((platformClone.pos.x + (platformClone.size.x / (Laser.playerLasers + 1)) * (i + 1)) - Laser.playerLaserSize.x / 2, platformClone.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
                                 el.dir.x = (el.pos.x + el.size.x / 2 - (platformClone.pos.x + platformClone.size.x / 2)) / platformClone.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                         }
                 }
@@ -785,13 +755,11 @@ function think(cTime) {
         // Logika laserów
         Laser.list.forEach((el) => {
                 //Sprawdzamy kolizje z cegłami jeśli laser jest gracza
-                if (el.isPlayers)
-                {
+                if (el.isPlayers) {
                         Brick.list.forEach((brick) => {
                                 let col = checkCollision(el, brick);
 
-                                if (col.hit)
-                                {
+                                if (col.hit) {
                                         brick.remove();
                                         el.remove();
                                 }
@@ -830,8 +798,7 @@ function think(cTime) {
                         el.collect();
 
                 //Kolizja z klonem platformy
-                if (platformClone.enabled && !col.hit)
-                {
+                if (platformClone.enabled && !col.hit) {
                         col = checkCollision(el, platformClone);
 
                         if (col.hit)
@@ -867,8 +834,7 @@ function think(cTime) {
                                 if (!hit) {
                                         let col = checkCollision(el, brick)
 
-                                        if (col.hit && el.lastTouchedObj != brick)
-                                        {
+                                        if (col.hit && el.lastTouchedObj != brick) {
                                                 if (el.power > 0 && brick.type != 9 && brick.type != 8)
                                                         el.power--;
                                                 else if (el.power > 0 && brick.type == 8 && el.power >= brick.health)
@@ -889,12 +855,10 @@ function think(cTime) {
                 if (!hit && platform.holdBall != el && el.lastTouchedObj != platform) {
                         let col = checkCollision(el, platform)
 
-                        if (col.hit && el.lastTouchedObj != platform)
-                        {
+                        if (col.hit && el.lastTouchedObj != platform) {
                                 if (col.side == 'left' || col.side == 'right')
                                         el.invertDirX();
-                                else
-                                {
+                                else {
                                         el.dir.x = col.hitFactor * 5;
                                         el.invertDirY();
 
@@ -912,12 +876,10 @@ function think(cTime) {
                 if (!hit && platformClone.enabled && el.lastTouchedObj != platformClone) {
                         let col = checkCollision(el, platformClone)
 
-                        if (col.hit && el.lastTouchedObj != platformClone)
-                        {
+                        if (col.hit && el.lastTouchedObj != platformClone) {
                                 if (col.side == 'left' || col.side == 'right')
                                         el.invertDirX();
-                                else
-                                {
+                                else {
                                         el.dir.x = col.hitFactor * 5;
                                         el.invertDirY();
                                 }

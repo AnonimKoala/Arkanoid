@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Level Generator Beta</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <main id="template">
+    <header>
+      <span></span>
+      <div id="loadingDiv" class="column80-20">
+        <select name="" id="chooseToEdit">
+          <option value="0">Wybierz poziom</option>
+        </select>
+        <button id="loadButton">
+          <img src="../img/icons/download.svg" alt="Wczytaj" />
+        </button>
+      </div>
+      <div id="savingDiv" class="column80-20">
+        <input type="text" id="levelName" placeholder="Nazwa poziomu" />
+        <button id="saveButton">
+          <img src="../img/icons/save.svg" alt="Zapisz" />
+        </button>
+      </div>
+      <span></span>
+      <button id="play"><img src="../img/icons/play.svg" alt=""></button>
+      <div class="column-50-50-buttons" id="bottomButtons">
+        <button id="deleteButton">
+          <img src="../img/icons/delete_bin.svg" alt="Usuń" />
+        </button>
+        <button id="clearButton">
+          <img src="../img/icons/rubber.svg" alt="Wyczyść pole edytora" />
+        </button>
+      </div>
+    </header>
+    
+    <article id="editorArea">
+      <ul>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li>
+          <ul class="row">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+      </ul>
+
+      <div id="platform"></div>
+    </article>
+
+    <ul id="chooseType">
+      <li data-image="whiteBrick"></li>
+      <li data-image="orangeBrick"></li>
+      <li data-image="cyanBrick"></li>
+      <li data-image="greenBrick"></li>
+      <li data-image="redBrick"></li>
+      <li data-image="blueBrick"></li>
+      <li data-image="pinkBrick"></li>
+      <li data-image="yellowBrick"></li>
+      <li data-image="silverBrick"></li>
+      <li data-image="goldBrick"></li>
+      <li data-image="" id="voidBrick"></li>
+    </ul>
+  </main>
+
+  <script src="generatorScript.js"></script>
+</body>
+
+</html>

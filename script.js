@@ -83,17 +83,11 @@ levels[2] = '[{"x":"499.9","y":"1000","type":"6"},{"x":"2999.9","y":"1000","type
 function nextLevel() {
         playerLevel++
         console.log("Next Level", playerLevel);
-        // console.log(levelsTempTab);
-        // generateBricksPos()
 
-        // generateBricksPos()
         loadLevel()
 
-        // levelsTempTab.push(Brick.list)
         resetToDefault()
 
-        // if(playerLevel == 3)
-        //         Brick.list = [...levelsTempTab[0]]
 
 }
 // ==================================================================================================== //
@@ -168,20 +162,11 @@ function restartTheGame() {
                 gameOvered = false
                 gamePaused = false
 
-
-                // // // TODO: Kiedyś mozna zoptymalizowac - nie ruszac ;)
-                // if (Brick.list.length == 100) {
-                //         levelsTempTab.splice(playerLevel - 1, 1, Brick.list) // Zapisuje I poziom - testowo
-                // }
-
-
-
-
                 document.addEventListener("keydown", pauseTheGame)
         })
 
-        // generateBricksPos()
-        loadLevel()
+        generateBricksPos()
+        // loadLevel()
 
         playerPoints = 0
         playerHealth = 3

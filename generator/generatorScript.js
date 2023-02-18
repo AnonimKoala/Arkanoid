@@ -82,7 +82,7 @@ function startGenerator() {
                 levelList.forEach((el, i) => {
                     let option = document.createElement("option")
                     option.value = el
-                    console.log(el);
+                    // console.log(el);
                     option.innerText = el
                     selectLevel.appendChild(option)
 

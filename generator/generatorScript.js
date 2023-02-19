@@ -1,4 +1,3 @@
-
 const rows = document.querySelectorAll(".row")
 const allBricks = document.querySelectorAll(".row > li")
 const chooseColorDiv = document.querySelectorAll("#chooseType > li")
@@ -93,7 +92,9 @@ function startGenerator() {
     } else {
         for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i)
-            levelList.push(key)
+
+            if (key[0] != "_")
+                levelList.push(key)
         }
         // Wczytuje poziomy do selecta
         levelList.forEach((el, i) => {
@@ -229,27 +230,29 @@ deleteButton.addEventListener("click", e => {
 // ==================================================================================================== //
 // Uruchamia poziom
 // ==================================================================================================== //
-// playButton.addEventListener("click", e => {
-//     if (selectLevel.value != 0) {
-//         let levelName = selectLevel.value
-//         let level = JSON.parse(localStorage.getItem(levelName))
-//         level.forEach((el, i) => {
-//             new Brick(
-//                 new Vector2D(el.x, el.y),
-//                 new Vector2D(499.9, 249.9),
-//                 el.type
-//             )
-//         })
-//         gameStart()
-//     }
-// })
+playButton.addEventListener("click", e => {
+    if (selectLevel.value != 0) {
+        alert("Pamiętaj, aby zapisać wybrany poziom przed uruchomieniem")
+        let levelName = selectLevel.value
+        let level = JSON.parse(localStorage.getItem(levelName))
+        localStorage.setItem("_startFrom", levelName)
+
+        // Owtórz link z poziomem w tej samej karcie
+        window.open(`../index.html?level=${levelName}`, "_self")
+
+
+    }
+    else {
+        alert("Wybierz poziom")
+    }
+})
 
 
 
 // ==================================================================================================== //
 // Export poziomów do pliku JSON
 // ==================================================================================================== //
-function exportJSON(){
+function exportJSON() {
     let allLevels = []
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i)
@@ -262,20 +265,18 @@ function exportJSON(){
         allLevels.push(object)
     }
     let json = JSON.stringify(allLevels)
-    var textFileAsBlob = new Blob([json], {type:'text/plain'});
+    var textFileAsBlob = new Blob([json], { type: 'text/plain' });
     var fileNameToSaveAs = "levels.json";
 
     var downloadLink = document.createElement("a");
     downloadLink.download = fileNameToSaveAs;
     downloadLink.innerHTML = "Download File";
-    if (window.webkitURL != null)
-    {
+    if (window.webkitURL != null) {
         // Chrome pozwala aby link został kliknięty
         // bez dodawania do DOM.
         downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
     }
-    else
-    {
+    else {
         // Firefox wymaga dodania linku do DOM
         // zanim można go kliknąć.
         downloadLink.href = window.URL.createObjectURL(textFileAsBlob);

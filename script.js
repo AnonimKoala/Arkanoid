@@ -163,12 +163,12 @@ function restartTheGame() {
         playerLevel = 1
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
-        const introImg = new Image();
-        introImg.addEventListener("load", () => {
-                context.drawImage(introImg, 0, 0, 3000, 638);
-                context.stroke();
-        });
-        introImg.src = "img/icons/logo_screen.png";
+        // const introImg = new Image();
+        // introImg.addEventListener("load", () => {
+        //         context.drawImage(introImg, 0, 0, 3000, 638);
+        //         context.stroke();
+        // });
+        // introImg.src = "img/icons/logo_screen.png";
         // ============================================================ //
 
         canvas.addEventListener("click", () => {

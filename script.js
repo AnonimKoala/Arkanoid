@@ -165,10 +165,10 @@ function restartTheGame() {
         // ============[ Wczytuje obraz ekranu startowego ]============ //
         const introImg = new Image();
         introImg.addEventListener("load", () => {
-                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
+                context.drawImage(introImg, 0, 0, 3000, 638);
                 context.stroke();
         });
-        introImg.src = "img/startScreen.svg";
+        introImg.src = "img/icons/logo_screen.png";
         // ============================================================ //
 
         canvas.addEventListener("click", () => {

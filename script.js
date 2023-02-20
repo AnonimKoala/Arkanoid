@@ -84,6 +84,21 @@ function nextLevel() {
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
 function loadLevel(startFrom = null) {
+        if (localStorage.length == 0) {
+                fetch("generator/basicLevels.json")
+                        .then(function (response) {
+                                return response.json();
+                        })
+                        .then(function (jsonFile) {
+                                jsonFile.forEach((el, i) => {
+                                        // levelList.push(el.id)
+
+                                        // Sprawdza czy poziom jest w localstorage
+                                        if (localStorage.getItem(el.id) == null)
+                                                localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
+                                })
+                        })
+        }
         // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
         let json
         if (startFrom != null)
@@ -105,6 +120,10 @@ function loadLevel(startFrom = null) {
                         parseInt(el.type)
                 )
         })
+
+
+
+
 }
 // ==================================================================================================== //
 
@@ -238,7 +257,7 @@ let platform = {
         size: new Vector2D(canvas.width / 4.54, canvas.height / 100 * 2.5), // Długość i szerokość platformy
         pos: null, // Pozycja platformy
         move: canvas.width / 100 * 5,
-        holdBall: true, //Czy nasza platforma trzyma piłke
+        holdBall: null, //Czy nasza platforma trzyma piłke
         timesIncreased: 0, //Ile razy nasza platforma została powiększona upgradem
         canCatchBall: false, //Czy może złapać piłke (upgrade łapania)
 
@@ -476,8 +495,7 @@ class Portal {
         static list = [];
         static enabled = false;
 
-        constructor(pos, size)
-        {
+        constructor(pos, size) {
                 this.pos = pos;
                 this.size = size;
 
@@ -487,13 +505,11 @@ class Portal {
                 Portal.list.push(this);
         }
 
-        draw()
-        {
+        draw() {
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
-        remove()
-        {
+        remove() {
                 Portal.list.forEach((el, index) => {
                         if (el == this)
                                 Portal.list.splice(index, 1);
@@ -551,10 +567,8 @@ function removeUpgradeEffect(upgrade) {
         }
 }
 
-function removeAllUpgrades()
-{
-        for (let i = 0; i <= 7; i++)
-        {
+function removeAllUpgrades() {
+        for (let i = 0; i <= 7; i++) {
                 removeUpgradeEffect(i);
         }
 }
@@ -732,14 +746,12 @@ class Brick {
         // Usuwa cegłe
         remove() {
                 this.health-- // Odejmuje życie cegły
-                if (this.health == 0)
-                {
+                if (this.health == 0) {
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
                                         playerPoints += this.value // Dodaje pkt po rozbiciu cegły
 
-                                        if (this.type != 8 && this.type != 9 && playerPoints >= nextUpgrade)
-                                        {
+                                        if (this.type != 8 && this.type != 9 && playerPoints >= nextUpgrade) {
                                                 nextUpgrade = playerPoints + Upgrade.nextUpgradePoints;
                                                 new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 8));
                                                 // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_SKIP);
@@ -987,8 +999,7 @@ function think(cTime) {
 
                 // Sprawdza czy piłka wypadła
                 if (el.pos.y > canvas.height / 100 * 96.4) {
-                        if (el == originalBall)
-                        {
+                        if (el == originalBall) {
                                 playerHealth--;
                                 resetToDefault();
                         } else {

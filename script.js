@@ -3,6 +3,11 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 // ==================================================================================================== //
 
+// ========================================= [ Ustawia guziki ] ======================================= //
+const playButton = document.getElementById('playButton')
+const introScreen = document.getElementById('introScreen')
+// ==================================================================================================== //
+
 
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
 canvas.width = 5000
@@ -160,15 +165,20 @@ function restartTheGame() {
         gameOvered = false
         gamePaused = false
 
+        introScreen.style.display = "grid";
+
         playerLevel = 1
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
-        // const introImg = new Image();
-        // introImg.addEventListener("load", () => {
-        //         context.drawImage(introImg, 0, 0, 3000, 638);
-        //         context.stroke();
-        // });
-        // introImg.src = "img/icons/logo_screen.png";
+        
+        playButton.addEventListener('click', () => {
+                introScreen.style.display = "none";
+                gameStarted = true
+                gameOvered = false
+                gamePaused = false
+
+                document.addEventListener("keydown", pauseTheGame)
+        })
         // ============================================================ //
 
         canvas.addEventListener("click", () => {

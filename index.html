@@ -6,45 +6,31 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arkanoid</title>
+    <link rel="stylesheet" href="styleMain.css">
 
 </head>
-<style>
-    canvas:hover {
-        cursor: none;
-    }
-
-    canvas {
-        border: 1px solid black;
-        height: 100%;
-        width: 100%;
-        background-color: rgb(0, 0, 39);
-    }
-
-    #div {
-        width: 95vh;
-        height: 95vh;
-        max-height: 1000px;
-        max-width: 1000px;
-        margin: auto;
-        position: absolute;
-        transform: translate(-50%, -50%);
-        top: 50%;
-        left: 50%;
-    }
-
-    body {
-        width: 100vw;
-        overflow: hidden;
-        background: rgb(84, 73, 255);
-        background: linear-gradient(315deg, rgba(84, 73, 255, 1) 0%, rgba(191, 177, 255, 1) 54%, rgba(73, 132, 255, 1) 100%);
-        background-size: 200%;
-        height: 100vh;
-    }
-</style>
 
 <body>
     <div id="div">
         <canvas id="canvas"></canvas>
+        <div id="introScreen">
+            <div id="logo">
+                <img src="img/icons/logo_screen.png" alt="Arkanoid by Suscy Koderzy">
+            </div>
+            <div id="buttons">
+                <button id="playButton">
+                    <img src="img/icons/play_button_screen.png" alt="Rozpocznij grę">
+                </button>
+                <button id="loadButton">
+                    <a href="generator/index.html">
+                        <img src="img/icons/load_button_screen.png" alt="Wczytaj poziom">
+                    </a>
+                </button>
+                <button id="helpButton">
+                    <img src="img/icons/help_button_screen.png" alt="Pomoc">
+                </button>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

@@ -3,6 +3,11 @@ const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 // ==================================================================================================== //
 
+// ========================================= [ Ustawia guziki ] ======================================= //
+const playButton = document.getElementById('playButton')
+const introScreen = document.getElementById('introScreen')
+// ==================================================================================================== //
+
 
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
 canvas.width = 5000
@@ -84,6 +89,21 @@ function nextLevel() {
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
 function loadLevel(startFrom = null) {
+        if (localStorage.length == 0) {
+                fetch("generator/basicLevels.json")
+                        .then(function (response) {
+                                return response.json();
+                        })
+                        .then(function (jsonFile) {
+                                jsonFile.forEach((el, i) => {
+                                        // levelList.push(el.id)
+
+                                        // Sprawdza czy poziom jest w localstorage
+                                        if (localStorage.getItem(el.id) == null)
+                                                localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
+                                })
+                        })
+        }
         // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
         let json
         if (startFrom != null)
@@ -95,7 +115,7 @@ function loadLevel(startFrom = null) {
         let allBricks = JSON.parse(json)
 
         Laser.list = [];
-
+        Upgrade.list = [];
         Brick.list = [];
 
         allBricks.forEach((el, i) => {
@@ -105,6 +125,10 @@ function loadLevel(startFrom = null) {
                         parseInt(el.type)
                 )
         })
+
+
+
+
 }
 // ==================================================================================================== //
 
@@ -141,15 +165,20 @@ function restartTheGame() {
         gameOvered = false
         gamePaused = false
 
+        introScreen.style.display = "grid";
+
         playerLevel = 1
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
-        const introImg = new Image();
-        introImg.addEventListener("load", () => {
-                context.drawImage(introImg, 0, 0, canvas.width, canvas.height);
-                context.stroke();
-        });
-        introImg.src = "img/startScreen.svg";
+        
+        playButton.addEventListener('click', () => {
+                introScreen.style.display = "none";
+                gameStarted = true
+                gameOvered = false
+                gamePaused = false
+
+                document.addEventListener("keydown", pauseTheGame)
+        })
         // ============================================================ //
 
         canvas.addEventListener("click", () => {
@@ -238,7 +267,7 @@ let platform = {
         size: new Vector2D(canvas.width / 4.54, canvas.height / 100 * 2.5), // Długość i szerokość platformy
         pos: null, // Pozycja platformy
         move: canvas.width / 100 * 5,
-        holdBall: true, //Czy nasza platforma trzyma piłke
+        holdBall: null, //Czy nasza platforma trzyma piłke
         timesIncreased: 0, //Ile razy nasza platforma została powiększona upgradem
         canCatchBall: false, //Czy może złapać piłke (upgrade łapania)
 
@@ -472,25 +501,58 @@ class Laser {
         }
 }
 
-let upgradeFrequency = 4;
-let nextUpgrade = upgradeFrequency;
+class Portal {
+        static list = [];
+        static enabled = false;
+
+        constructor(pos, size) {
+                this.pos = pos;
+                this.size = size;
+
+                this.texture = new Image();
+                this.texture.src = "img/portal.png";
+
+                Portal.list.push(this);
+        }
+
+        draw() {
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+        }
+
+        remove() {
+                Portal.list.forEach((el, index) => {
+                        if (el == this)
+                                Portal.list.splice(index, 1);
+                })
+        }
+}
+
+new Portal(new Vector2D(canvas.width * 0.0005 - 25, canvas.height - canvas.height * 0.025 - 500), new Vector2D(200, 500));
+new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - 200 + 25, canvas.height - canvas.height * 0.025 - 500), new Vector2D(200, 500));
+
+
 let prevUpgrade;
 let curUpgrade = null;
 
 //Dla lepszej czytelności kodu
-const UPGRADE_MOREHP = 0; //Więcej życia (x)
-const UPGRADE_BALLPOWER = 1; //Większa siła piłki 
-const UPGRADE_MOREBALLS = 2; //Więcej piłek (x)
-const UPGRADE_BALLCATCH = 3; //Tryb chwytania piłki (x)
-const UPGRADE_PLATFORMCLONE = 4; //Klon platformy
-const UPGRADE_PLATFORMSIZE = 5; //Powiększenie platformy (x)
-const UPGRADE_LASER = 6; //Laser
+const UPGRADE_MOREHP = 0; // Więcej życia
+const UPGRADE_BALLPOWER = 1; // Większa siła piłki 
+const UPGRADE_MOREBALLS = 2; // Więcej piłek
+const UPGRADE_BALLCATCH = 3; // Tryb chwytania piłki
+const UPGRADE_PLATFORMCLONE = 4; // Klon platformy
+const UPGRADE_PLATFORMSIZE = 5; // Powiększenie platformy
+const UPGRADE_LASER = 6; // Laser
+const UPGRADE_SKIP = 7; // Przejście do następnego poziomu
 
 function removeUpgradeEffect(upgrade) {
         switch (upgrade) {
                 case UPGRADE_LASER:
                         Laser.playerLasers = 0;
                         break;
+                case UPGRADE_SKIP:
+                        Portal.enabled = false;
+                        break;
+
                 case UPGRADE_BALLPOWER:
                         Ball.ballPower = 0;
                         Ball.refreshBallPower();
@@ -516,7 +578,7 @@ function removeUpgradeEffect(upgrade) {
 }
 
 function removeAllUpgrades() {
-        for (let i = 0; i <= 6; i++) {
+        for (let i = 0; i <= 7; i++) {
                 removeUpgradeEffect(i);
         }
 }
@@ -531,8 +593,10 @@ class Upgrade {
                 "img/upgrades/upgrade_doppelganger.svg",
                 "img/upgrades/upgrade_size.svg",
                 "img/upgrades/upgrade_laser.svg",
+                "img/upgrades/upgrade_skip.svg"
         ]
 
+        static nextUpgradePoints = 500; //Punkty do kolejnego upgrade'u
         static platformSizeIncrease = 250;
 
         constructor(pos, type) {
@@ -562,6 +626,9 @@ class Upgrade {
                                 break;
                         case UPGRADE_LASER:
                                 Laser.playerLasers++;
+                                break;
+                        case UPGRADE_SKIP:
+                                Portal.enabled = true;
                                 break;
 
                         //Piłki
@@ -608,6 +675,8 @@ class Upgrade {
                 })
         }
 }
+
+let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints;
 
 // ==================================================================================================== //
 
@@ -688,15 +757,15 @@ class Brick {
         remove() {
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0) {
-                        if (nextUpgrade == 0) {
-                                nextUpgrade = upgradeFrequency;
-                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 7));
-                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLPOWER);
-                        } else nextUpgrade--;
-
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
                                         playerPoints += this.value // Dodaje pkt po rozbiciu cegły
+
+                                        if (this.type != 8 && this.type != 9 && playerPoints >= nextUpgrade) {
+                                                nextUpgrade = playerPoints + Upgrade.nextUpgradePoints;
+                                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 8));
+                                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_SKIP);
+                                        }
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }
                         })
@@ -832,6 +901,16 @@ function think(cTime) {
                 }
         })
 
+        //Logika portali
+        if (Portal.enabled)
+                Portal.list.forEach((el) => {
+                        let col = checkCollision(el, platform)
+
+                        if (col.hit)
+                                nextLevel();
+                })
+
+
         // System kolizji piłki
         Ball.list.forEach((el, index) => {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
@@ -930,8 +1009,7 @@ function think(cTime) {
 
                 // Sprawdza czy piłka wypadła
                 if (el.pos.y > canvas.height / 100 * 96.4) {
-                        if (el == originalBall)
-                        {
+                        if (el == originalBall) {
                                 playerHealth--;
                                 resetToDefault();
                         } else {
@@ -951,6 +1029,11 @@ function draw() {
 
                 if (platformClone.enabled)
                         platformClone.draw(); //Rysuję klona platformy jeśli mamy jego upgrade
+
+                if (Portal.enabled)
+                        Portal.list.forEach((el) => {
+                                el.draw();
+                        })
 
                 // Rysuje każdą piłke
                 Ball.list.forEach((el) => {

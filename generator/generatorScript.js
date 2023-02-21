@@ -117,13 +117,16 @@ function clearEditor() {
         el.dataset.type = 10
     })
 }
-clearButton.addEventListener("click", clearEditor)
+clearButton.addEventListener("click", () => {
+    if (confirm("Czy na pewno chcesz wyczyścić edytor?"))
+        clearEditor()
+})
 
 // ==================================================================================================== //
 // Wczytywanie poziomu z localstorage do edytora
 // ==================================================================================================== //
 loadButton.addEventListener("click", e => {
-    if (selectLevel.value != 0) {
+    if (selectLevel.value != 0 && confirm("Upewnij się, że Twoja praca została zapisana przed wczytaniem nowego poziomu! \nW przeciwnym wypadku dane zostaną utracone.")) {
         clearEditor()
 
         let levelName = selectLevel.value
@@ -180,7 +183,7 @@ loadButton.addEventListener("click", e => {
 // ==================================================================================================== //
 // Zapisywanie poziomu
 // ==================================================================================================== //
-saveButton.addEventListener("click", e => {
+function saveLevel(saveButton = false) {
     if (levelNameInput.value != "") {
         let levelName = levelNameInput.value
         let object = []
@@ -198,32 +201,50 @@ saveButton.addEventListener("click", e => {
         }
         let json = JSON.stringify(object)
 
+        if (object) {
+            // Zapis poziomu do localStorage
+            localStorage.setItem(levelName, json)
+            // Dodaje poziom do selecta
+            let option = document.createElement("option")
+            // Jeśli poziom jeszcze nie istnieje to dodaje
+            if (selectLevel.querySelector(`option[value="${levelName}"]`) == null) {
+                option.value = levelName
+                option.innerText = levelName
+                selectLevel.appendChild(option)
+            }
 
 
-        // Zapis poziomu do localStorage
-        localStorage.setItem(levelName, json)
-        // Dodaje poziom do selecta
-        let option = document.createElement("option")
-        // Jeśli poziom jeszcze nie istnieje to dodaje
-        if (selectLevel.querySelector(`option[value="${levelName}"]`) == null) {
-            option.value = levelName
-            option.innerText = levelName
-            selectLevel.appendChild(option)
+            if (saveButton)
+                alert("Poziom został zapisany")
+
+            return true
+        } else {
+            alert("Nie można zapisać pustego poziomu")
+            return false
         }
+
+
     }
     else {
-        alert("Podaj nazwę poziomu")
+        if (saveButton)
+            alert("Podaj nazwę poziomu")
+        return false
     }
+}
 
+saveButton.addEventListener("click", () => {
+    saveLevel(true)
 })
 // ==================================================================================================== //
 // Usuwanie poziomu
 // ==================================================================================================== //
 deleteButton.addEventListener("click", e => {
     if (selectLevel.value != 0) {
-        let levelName = selectLevel.value
-        localStorage.removeItem(levelName)
-        selectLevel.removeChild(selectLevel.querySelector(`option[value="${levelName}"]`))
+        if (confirm(`Czy na pewno chcesz usunąć ${selectLevel.value}`)) {
+            let levelName = selectLevel.value
+            localStorage.removeItem(levelName)
+            selectLevel.removeChild(selectLevel.querySelector(`option[value="${levelName}"]`))
+        }
     }
 })
 
@@ -231,19 +252,19 @@ deleteButton.addEventListener("click", e => {
 // Uruchamia poziom
 // ==================================================================================================== //
 playButton.addEventListener("click", e => {
-    if (selectLevel.value != 0) {
-        alert("Pamiętaj, aby zapisać wybrany poziom przed uruchomieniem")
+    if (selectLevel.value != 0 && saveLevel()) {
+
         let levelName = selectLevel.value
         let level = JSON.parse(localStorage.getItem(levelName))
         localStorage.setItem("_startFrom", levelName)
 
         // Owtórz link z poziomem w tej samej karcie
-        window.open(`../index.html?level=${levelName}`, "_self")
+        window.open(`../index.html`, "_self")
 
 
     }
     else {
-        alert("Wybierz poziom")
+        alert("Wczytaj poziom lub zapisz go przed uruchomieniem")
     }
 })
 

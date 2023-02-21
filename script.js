@@ -106,11 +106,18 @@ function loadLevel(startFrom = null) {
         }
         // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
         let json
-        if (startFrom != null)
-                json = localStorage.getItem(startFrom)
+        if (startFrom != null) {
+                json = localStorage.getItem(startFrom) // Wczytuje poziom z localStorage
+                introScreen.style.display = "none"; // Ukrywa ekran startowy
+
+
+                if (startFrom.includes("Poziom")) // Jeżeli jest to zwykły poziom to wpisuje jego numer do playerLevel
+                        playerLevel = parseInt(startFrom.replace("Poziom ", "")) // Wpisuje numer poziomu do playerLevel
+
+        }
 
         else
-                json = localStorage.getItem(`Poziom ${playerLevel}`)
+                json = localStorage.getItem(`Poziom ${playerLevel}`) // Wczytuje poziom z localStorage
 
         let allBricks = JSON.parse(json)
 
@@ -170,7 +177,7 @@ function restartTheGame() {
         playerLevel = 1
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
-        
+
         playButton.addEventListener('click', () => {
                 introScreen.style.display = "none";
                 gameStarted = true

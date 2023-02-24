@@ -15,8 +15,10 @@ canvas.height = 5000
 // ==================================================================================================== //
 
 // ========================================[ Odtwarza dźwięk ]======================================== // 
+let audio1 = new Audio('audio/main.mp3');
+audio1.play();
 function playAudio() {
-        let audio = new Audio('audio/temp.mp3');
+        let audio = new Audio('audio/plum.mp3');
         audio.play();
 }
 // ==================================================================================================== //
@@ -448,6 +450,7 @@ class Ball {
         }
 
         remove() {
+
                 Ball.list.forEach((el, index) => {
                         if (el == this)
                                 Ball.list.splice(index, 1);
@@ -767,6 +770,7 @@ class Brick {
 
         // Usuwa cegłe
         remove() {
+                playAudio()
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0) {
                         Brick.list.forEach((el, index) => {

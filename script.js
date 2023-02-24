@@ -14,6 +14,13 @@ canvas.width = 5000
 canvas.height = 5000
 // ==================================================================================================== //
 
+// ========================================[ Odtwarza dźwięk ]======================================== // 
+function playAudio() {
+        let audio = new Audio('audio/temp.mp3');
+        audio.play();
+}
+// ==================================================================================================== //
+
 // =======================================[ Dotyczy pauzy gry ]======================================== //
 let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
 let gamePaused = false // Czy gra się zatrzymana
@@ -114,9 +121,7 @@ function loadLevel(startFrom = null) {
                 if (startFrom.includes("Poziom")) // Jeżeli jest to zwykły poziom to wpisuje jego numer do playerLevel
                         playerLevel = parseInt(startFrom.replace("Poziom ", "")) // Wpisuje numer poziomu do playerLevel
 
-        }
-
-        else
+        } else
                 json = localStorage.getItem(`Poziom ${playerLevel}`) // Wczytuje poziom z localStorage
 
         let allBricks = JSON.parse(json)

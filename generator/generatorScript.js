@@ -78,24 +78,37 @@ function startGenerator() {
                     if (localStorage.getItem(el.id) == null)
                         localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
                 })
-                // Wczytuje poziomy do selecta
-                levelList.forEach((el, i) => {
-                    let option = document.createElement("option")
-                    option.value = el
-                    // console.log(el);
-                    option.innerText = el
-                    selectLevel.appendChild(option)
+                // // Wczytuje poziomy do selecta
+                // levelList.forEach((el, i) => {
+                //     let option = document.createElement("option")
+                //     option.value = el
+                //     // console.log(el);
+                //     option.innerText = el
+                //     selectLevel.appendChild(option)
 
-                })
+                // })
 
             })
-    } else {
+    } 
+    // Wczytuje poziomy z localstorage do levelList nie zaczynające się od "_" (nr rozpoczęcia poziomu do rozpoczynania gry)
         for (let i = 0; i < localStorage.length; i++) {
             let key = localStorage.key(i)
 
             if (key[0] != "_")
                 levelList.push(key)
         }
+
+        // Sortuje levelList po id
+        levelList.sort((a, b) => {
+            if (parseInt(a.slice(7)) > parseInt(b.slice(7)))
+                return 1
+            else if (parseInt(a.slice(7)) < parseInt(b.slice(7)))
+                return -1
+            else
+                return 0
+        })
+
+
         // Wczytuje poziomy do selecta
         levelList.forEach((el, i) => {
             let option = document.createElement("option")
@@ -104,7 +117,9 @@ function startGenerator() {
             selectLevel.appendChild(option)
 
         })
-    }
+    
+
+
 
 }
 

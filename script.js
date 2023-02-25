@@ -280,8 +280,9 @@ let platform = {
 
         // Funkcja do rysowania platformy
         draw() {
-                context.fillStyle = 'blue';
-                context.fillRect(this.pos.x, this.pos.y, this.size.x, this.size.y)
+                let texture = new Image();
+                texture.src = "img/textures/platform.png";
+                context.drawImage(texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
         }
 
 }

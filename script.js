@@ -23,11 +23,11 @@ function pauseTheGame(e) {
         if (e.key == 'Escape' && gameStarted) {
                 gamePaused = !gamePaused
 
-                if (gamePaused) {
-                        context.font = "bold 540px Arial";
-                        context.fillStyle = '#6774eb';
-                        context.fillText(`Game paused`, 750, 4000)
-                }
+                // if (gamePaused) {
+                //         let texture = new Image()
+                //         texture.src = "img/gamePaused.png"
+                //         context.drawImage(texture, 796, canvas.height - 1500, 3408, 852)
+                // }
 
         }
 }
@@ -283,7 +283,9 @@ let platform = {
                 let texture = new Image();
                 texture.src = "img/textures/platform.png";
                 context.drawImage(texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
+
         }
+        // TODO: Dodaj możliwość zmiany tekstury platformy kiedy przylepia piłki
 
 }
 
@@ -296,9 +298,10 @@ let platformClone = {
 
 platformClone.enabled = false;
 platformClone.draw = () => {
-        context.fillStyle = 'blue';
         context.globalAlpha = 0.5;
-        context.fillRect(platformClone.pos.x, platformClone.pos.y, platformClone.size.x, platformClone.size.y);
+        let texture = new Image();
+        texture.src = "img/textures/platform.png";
+        context.drawImage(texture, platformClone.pos.x, platformClone.pos.y, platformClone.size.x, platformClone.size.y)
         context.globalAlpha = 1;
 }
 
@@ -832,6 +835,14 @@ function gameLoop(cTime) {
                         nextLevel()
         } else if (!gamePaused && !gameOvered)
                 restartTheGame();
+
+        // Rysuije napis pauzy jeśli gra jest wstrzymana
+        if (gamePaused && !gameOvered && gameStarted) {
+                let texture = new Image()
+                texture.src = "img/gamePaused.png"
+                context.drawImage(texture, 796, canvas.height - 1500, 3408, 852)
+                // TODO: Naprawić border
+        }
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
 }

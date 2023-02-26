@@ -604,7 +604,8 @@ function removeAllUpgrades() {
                 removeUpgradeEffect(i);
         }
 }
-
+// TODO: Zmienić szerokość portalu żeby dobrze wyglądało
+// TODO: Zrobić portal tylko po prawej stronie, ewentualnie po lewej moze cofac poziom
 class Upgrade {
         static list = [];
         static typeToTexture = [

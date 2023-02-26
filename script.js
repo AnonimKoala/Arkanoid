@@ -9,6 +9,17 @@ const introScreen = document.getElementById('introScreen')
 // ==================================================================================================== //
 
 
+// ================================[ Otwiera ekran pomocy ]============================================ //
+const helpScreen = document.getElementById('helpScreen')
+helpScreen.addEventListener("click", function () {
+        helpScreen.style.display = "none"
+})
+function openHelp() {
+        helpScreen.style.display = "block"
+}
+document.querySelector("#helpButton").addEventListener("click", openHelp)
+// ==================================================================================================== //
+
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
 canvas.width = 5000
 canvas.height = 5000

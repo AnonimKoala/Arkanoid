@@ -15,11 +15,23 @@ canvas.height = 5000
 // ==================================================================================================== //
 
 // ========================================[ Odtwarza dźwięk ]======================================== // 
-let audio1 = new Audio('audio/main.mp3');
-audio1.play();
-function playAudio() {
-        let audio = new Audio('audio/plum.mp3');
-        audio.play();
+function playSound(sound, type = 0) {
+        switch (sound) {
+                case 'hitEdge': // Uderza w krawędź canvas
+                        new Audio('audio/balHitEdge.ogg').play()
+                        break;
+                case "brickHit": // Uderza w cegłę
+                        if (type != 8 && type != 9)
+                                new Audio('audio/brickHit.ogg').play()
+                        else if (type == 9)
+                                new Audio('audio/goldHitSound.ogg').play() // Silver brick sound
+                        else if (type == 8)
+                                new Audio('audio/silverHitSound.ogg').play() // Gold brick sound
+                        break;
+                case "hitPlatform": // Uderza w platformę
+                        new Audio('audio/platformHit.ogg').play()
+
+        }
 }
 // ==================================================================================================== //
 
@@ -770,7 +782,7 @@ class Brick {
 
         // Usuwa cegłe
         remove() {
-                playAudio()
+                playSound("brickHit", this.type)
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0) {
                         Brick.list.forEach((el, index) => {

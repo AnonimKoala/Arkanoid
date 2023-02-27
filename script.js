@@ -25,6 +25,27 @@ canvas.width = 5000
 canvas.height = 5000
 // ==================================================================================================== //
 
+// ========================================[ Odtwarza dźwięk ]======================================== // 
+function playSound(sound, type = 0) {
+        switch (sound) {
+                case 'hitEdge': // Uderza w krawędź canvas
+                        new Audio('audio/balHitEdge.ogg').play()
+                        break;
+                case "brickHit": // Uderza w cegłę
+                        if (type != 8 && type != 9)
+                                new Audio('audio/brickHit.ogg').play()
+                        else if (type == 9)
+                                new Audio('audio/goldHitSound.ogg').play() // Silver brick sound
+                        else if (type == 8)
+                                new Audio('audio/silverHitSound.ogg').play() // Gold brick sound
+                        break;
+                case "hitPlatform": // Uderza w platformę
+                        new Audio('audio/platformHit.ogg').play()
+
+        }
+}
+// ==================================================================================================== //
+
 // =======================================[ Dotyczy pauzy gry ]======================================== //
 let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
 let gamePaused = false // Czy gra się zatrzymana
@@ -125,9 +146,7 @@ function loadLevel(startFrom = null) {
                 if (startFrom.includes("Poziom")) // Jeżeli jest to zwykły poziom to wpisuje jego numer do playerLevel
                         playerLevel = parseInt(startFrom.replace("Poziom ", "")) // Wpisuje numer poziomu do playerLevel
 
-        }
-
-        else
+        } else
                 json = localStorage.getItem(`Poziom ${playerLevel}`) // Wczytuje poziom z localStorage
 
         let allBricks = JSON.parse(json)
@@ -458,6 +477,7 @@ class Ball {
         }
 
         remove() {
+
                 Ball.list.forEach((el, index) => {
                         if (el == this)
                                 Ball.list.splice(index, 1);
@@ -778,6 +798,7 @@ class Brick {
 
         // Usuwa cegłe
         remove() {
+                playSound("brickHit", this.type)
                 this.health-- // Odejmuje życie cegły
                 if (this.health == 0) {
                         Brick.list.forEach((el, index) => {

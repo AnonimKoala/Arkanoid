@@ -78,7 +78,8 @@ function gameOver() {
 
 
 // ========================================[ Dotyczące gracza ]======================================== //
-let playerLevel = 1
+// let playerLevel = 1
+let playerLevel = 33;
 let playerHealth = 3
 let playerPoints = 0
 
@@ -92,6 +93,10 @@ function resetToDefault() {
         removeAllUpgrades();
 
         Upgrade.list = [];
+        Projectile.list = [];
+        DOH.list.forEach((el) => {
+                el.fireBalls = [null, null];
+        })
 
         platform.holdBall = originalBall;
         platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
@@ -112,7 +117,10 @@ function resetToDefault() {
 function nextLevel() {
         playerLevel++
 
-        loadLevel()
+        if (playerLevel == 33)
+                summonDOH();
+        else
+                loadLevel();
 
         resetToDefault()
 }
@@ -151,8 +159,6 @@ function loadLevel(startFrom = null) {
 
         let allBricks = JSON.parse(json)
 
-        Laser.list = [];
-        Upgrade.list = [];
         Brick.list = [];
 
         allBricks.forEach((el, i) => {
@@ -204,7 +210,7 @@ function restartTheGame() {
 
         introScreen.style.display = "grid";
 
-        playerLevel = 1
+        playerLevel = 1 // FIXME: Może to nie działać
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
 
@@ -225,6 +231,10 @@ function restartTheGame() {
                 gamePaused = false
 
                 document.addEventListener("keydown", pauseTheGame)
+        })
+
+        DOH.list.forEach((el) => {
+                el.remove();
         })
 
 
@@ -250,6 +260,11 @@ function restartTheGame() {
         resetToDefault()
 }
 // ==================================================================================================== //
+
+function victory()
+{
+
+}
 
 
 // ================================[ Klasa wektorów ]========================= //
@@ -421,18 +436,29 @@ class Ball {
         static list = []; // Lista wszystkich piłek
         static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
 
-        constructor(pos, dir, size) {
+        constructor(pos, dir, size, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki
                 this.dir = dir; // Przechowuje kierunek piłki
                 this.size = size; // Przechowuje wielkość piłki
+                this.enemyBall = enemyBall;
 
-                this.speed = 15; //Szybkość z jaką porusza się piłka
+                if (enemyBall)
+                        this.parent = enemyParent;
+
+                if (enemyBall)
+                        this.speed = 45;
+                else
+                        this.speed = 15; //Szybkość z jaką porusza się piłka
                 this.texture = new Image(); // Tekstura piłki
-                this.texture.src = "img/ball.png";
+
+                if (enemyBall)
+                        this.texture.src = "img/FireBall.svg";
+                else
+                        this.texture.src = "img/ball.png";
 
                 this.power = Ball.ballPower;
 
-                Ball.list.push(this); // Dodaje do listy wszystkich piłek
+                if (!enemyBall) Ball.list.push(this); // Dodaje do listy wszystkich piłek
         }
 
         // Zmienia pozycje piłki
@@ -453,10 +479,168 @@ class Ball {
         invertDirX() { this.dir.x *= -1; } // Odwraca nasz kierunek tylko na osi X
         invertDirY() { this.dir.y *= -1; } // Odwraca nasz kierunek tylko na osi Y
 
+        think()
+        {
+                let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
+                let el = this;
+
+                //Kolizja z ścianami
+                if (el.pos.x <= 0 || el.pos.x + el.size.x >= canvas.width) // Kolizja z lewą i prawą ścianą
+                {
+                        hit = true;
+                        el.invertDirX();
+                        el.lastTouchedObj = null;
+                }
+
+                if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
+                {
+                        hit = true;
+                        el.invertDirY();
+                        el.lastTouchedObj = null;
+                }
+
+
+
+                //Kolizja z cegłami
+                if (!hit && !el.enemyBall) {
+                        Brick.list.forEach((brick) => {
+                                if (!hit) {
+                                        let col = checkCollision(el, brick)
+
+                                        if (col.hit && el.lastTouchedObj != brick) {
+                                                if (el.power > 0 && brick.type != 9 && brick.type != 8)
+                                                        el.power--;
+                                                else if (el.power > 0 && brick.type == 8 && el.power >= brick.health)
+                                                        el.power -= brick.health;
+                                                else
+                                                        if (col.side == 'left' || col.side == 'right') el.invertDirX(); else el.invertDirY();
+
+                                                hit = true;
+                                                el.lastTouchedObj = brick;
+                                                brick.remove();
+                                        }
+                                }
+                        })
+                }
+
+                //Kolizja z DOH'em
+                if (!hit && !el.enemyBall)
+                {
+                        DOH.list.forEach((doh) => {
+                                let col = checkCollision(el, doh)
+                                
+                                if (col.hit && el.lastTouchedObj != doh)
+                                {
+                                        if (col.side == 'left' || col.side == 'right')
+                                                el.invertDirX();
+                                        else
+                                                el.invertDirY();
+
+                                        if (doh.minionsNum <= 0)
+                                                if (el.power > 0) doh.hp -= el.power; else doh.hp--;
+
+                                        el.lastTouchedObj = doh;
+                                }
+                        })
+                }
+
+                //Kolizja z MiniDOH'em
+                if (!hit && !el.enemyBall)
+                {
+                        MiniDOH.list.forEach((doh) => {
+                                let col = checkCollision(el, doh)
+                                
+                                if (col.hit && el.lastTouchedObj != doh)
+                                {
+                                        if (col.side == 'left' || col.side == 'right')
+                                                el.invertDirX();
+                                        else
+                                                el.invertDirY();
+
+                                        if (el.power > 0) doh.hp -= el.power; else doh.hp--;
+                                        el.lastTouchedObj = doh;
+
+                                        if (doh.hp <= 0)
+                                                doh.remove();
+                                }
+                        })
+                }
+
+
+                //Kolizja z platformą
+                if (!hit && platform.holdBall != el && el.lastTouchedObj != platform) {
+                        let col = checkCollision(el, platform)
+
+                        if (col.hit && el.lastTouchedObj != platform) {
+                                if (!el.enemyBall)
+                                {
+                                        if (col.side == 'left' || col.side == 'right')
+                                                el.invertDirX();
+                                        else {
+                                                el.dir.x = col.hitFactor * 5;
+                                                el.invertDirY();
+
+                                                if (platform.canCatchBall && platform.holdBall == null)
+                                                        platform.holdBall = el;
+                                        }
+
+                                        hit = true;
+                                        el.lastTouchedObj = platform;
+                                        el.power = Ball.ballPower;
+                                } else {
+                                        playerHealth--;
+                                        resetToDefault(); 
+                                }
+
+                        }
+                }
+
+                //Kolizja z klonem platformy
+                if (!hit && platformClone.enabled && el.lastTouchedObj != platformClone && !el.enemyBall) {
+                        let col = checkCollision(el, platformClone)
+
+                        if (col.hit && el.lastTouchedObj != platformClone) {
+                                if (col.side == 'left' || col.side == 'right')
+                                        el.invertDirX();
+                                else {
+                                        el.dir.x = col.hitFactor * 5;
+                                        el.invertDirY();
+                                }
+
+                                hit = true;
+                                el.lastTouchedObj = platformClone;
+                                el.power = Ball.ballPower;
+                        }
+                }
+
+                if (hit && platform.holdBall != el && !el.enemyBall) {
+                        el.speed *= 1.015; //Zwiększamy prędkość piłki po kolizji
+                        // console.log(el.speed);
+                }
+
+                //Ruch piłek
+                if (platform.holdBall != el) {
+                        let len = el.dir.length()
+                        el.pos.x += (el.dir.x / len) * el.speed
+                        el.pos.y += (el.dir.y / len) * el.speed
+                }
+
+                // Sprawdza czy piłka wypadła
+                if (el.pos.y > canvas.height / 100 * 96.4 && !el.enemyBall) {
+                        if (el == originalBall) {
+                                playerHealth--;
+                                resetToDefault();
+                        } else {
+                                el.remove();
+                        }
+
+                }
+        }
+
         // Rysuje naszą piłke
         draw() {
                 //Efekt gdy piłka ma więcej mocy
-                if (this.power > 0) {
+                if (this.power > 0 && !this.enemyBall) {
                         let len = this.dir.length();
 
                         for (let i = 0; i < this.power; i++) {
@@ -468,7 +652,7 @@ class Ball {
                 }
 
                 //Dodatkowe piłki są przeźroczyste
-                if (this != originalBall)
+                if (this != originalBall && !this.enemyBall)
                         context.globalAlpha = 0.5;
 
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
@@ -477,11 +661,16 @@ class Ball {
         }
 
         remove() {
-
-                Ball.list.forEach((el, index) => {
-                        if (el == this)
-                                Ball.list.splice(index, 1);
-                })
+                if (!this.enemyBall)
+                        Ball.list.forEach((el, index) => {
+                                if (el == this)
+                                        Ball.list.splice(index, 1);
+                        })
+                else
+                        this.enemyParent.fireBalls.forEach((el, index) => {
+                                if (el == this)
+                                        this.enemyParent.fireBalls[index] = null;
+                        })
         }
 
         static refreshBallPower() {
@@ -507,13 +696,13 @@ originalBall.pos.y = platform.pos.y - 0 - originalBall.size.y
 
 // =========================================[ Ulepszenia ]========================================= //
 
-class Laser {
+class Projectile {
         static list = [];
         static playerLasers = 0;
         static nextPlayerFire = 0;
         static playerLaserSize = new Vector2D(100, 250);
 
-        constructor(pos, dir, size, speed, player) {
+        constructor(pos, dir, size, speed, player, texture = "img/laserProjectile.png") {
                 this.pos = pos;
                 this.dir = dir;
                 this.size = size;
@@ -521,24 +710,26 @@ class Laser {
                 this.isPlayers = player
 
                 this.texture = new Image();
-                this.texture.src = "img/laserProjectile.png";
+                this.texture.src = texture;
 
-                Laser.list.push(this);
+                Projectile.list.push(this);
         }
 
         draw() {
                 context.save()
                 context.translate(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2)
-                context.rotate((90 * this.dir.x) * Math.PI / 180)
-                context.translate(-this.pos.x - this.size.x / 2, -this.pos.y - this.size.y / 2)
+
+                // context.rotate((90 * this.dir.x) + 0.5 * Math.PI)
+                context.rotate((90 * this.dir.x) * Math.PI / 180 * this.dir.y)
+                context.translate(-(this.pos.x - this.size.x / 2), -(this.pos.y - this.size.y / 2))
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
                 context.restore()
         }
 
         remove() {
-                Laser.list.forEach((el, index) => {
+                Projectile.list.forEach((el, index) => {
                         if (el == this)
-                                Laser.list.splice(index, 1);
+                                Projectile.list.splice(index, 1);
                 })
         }
 }
@@ -589,7 +780,7 @@ const UPGRADE_SKIP = 7; // Przejście do następnego poziomu
 function removeUpgradeEffect(upgrade) {
         switch (upgrade) {
                 case UPGRADE_LASER:
-                        Laser.playerLasers = 0;
+                        Projectile.playerLasers = 0;
                         break;
                 case UPGRADE_SKIP:
                         Portal.enabled = false;
@@ -668,7 +859,7 @@ class Upgrade {
                                 playerHealth++;
                                 break;
                         case UPGRADE_LASER:
-                                Laser.playerLasers++;
+                                Projectile.playerLasers++;
                                 break;
                         case UPGRADE_SKIP:
                                 Portal.enabled = true;
@@ -722,6 +913,129 @@ class Upgrade {
 let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints;
 
 // ==================================================================================================== //
+
+// ==============================================[ DOH ]=============================================== //
+
+class MiniDOH
+{
+        static list = [];
+
+        constructor(pos, size, parent, hp = 3)
+        {
+                this.pos = pos;
+                this.size = size;
+                this.hp = hp;
+                this.parent = parent;
+
+                this.texture = new Image();
+                this.texture.src = "img/doh.png";
+
+                MiniDOH.list.push(this);
+        }
+
+        draw()
+        {
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);      
+        }
+
+        remove()
+        {
+                MiniDOH.list.forEach((el, index) => {
+                        if (el == this)
+                        {
+                                this.parent.minionsNum--;
+                                MiniDOH.list.splice(index, 1);
+                        }
+                })  
+        }
+}
+
+class DOH {
+        static list = [];
+
+        constructor(pos, size, hp = 20)
+        {
+                this.pos = pos;
+                this.size = size;
+                this.hp = hp;
+
+                this.texture = new Image();
+                this.texture.src = "img/doh.png";
+
+                this.nextAttack = -1; // Czas do następnego ataku bazowany na cTime
+                this.counter = 0; // Licznik, służy w atakach by np. sprawdzic ile razy wystrzelił lasery
+                this.summonedMinions = false;
+                this.fireBalls = [null, null];
+                this.minionsNum = 0;
+
+                DOH.list.push(this);
+        }
+
+        think(cTime)
+        {
+                this.fireBalls.forEach((el) => {
+                        if (el != null) el.think();
+                })
+
+                if (this.hp <= 0)
+                        this.remove();
+
+                if (this.hp <= 10 && !this.summonedMinions)
+                {
+                        this.summonedMinions = true;
+
+                        new MiniDOH(new Vector2D(this.pos.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x + 400, this.pos.y + this.size.y), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 800, this.pos.y + this.size.y), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
+
+                        this.minionsNum = 4;
+                }
+
+                if (this.fireBalls[0] == null && platform.holdBall == null)
+                {
+                        this.fireBalls[0] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(0.2, 1), new Vector2D(250, 250), true, this);
+                }
+
+                if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10)
+                {
+                        this.fireBalls[1] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(-0.2, 1), new Vector2D(250, 250), true, this);
+                }
+        }
+
+        draw()
+        {
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+
+                this.fireBalls.forEach((el) => {
+                        if (el != null) el.draw();
+                })
+        }
+
+        remove()
+        {
+                DOH.list.forEach((el, index) => {
+                        if (el == this)
+                        {
+                                victory();
+                                DOH.list.splice(index, 1);
+                        }
+                })
+        }
+}
+
+
+
+function summonDOH()
+{
+        Brick.list = [];
+
+        let width, height;
+        width = 2000;
+        height = 2500;
+
+        new DOH(new Vector2D(canvas.width / 2 - width / 2, canvas.height / 2 - height / 1.5), new Vector2D(width, height));
+}
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //
 
@@ -864,7 +1178,7 @@ function gameLoop(cTime) {
                 draw();
 
                 // TODO: Dodac warunek na koniec gry
-                if (!Brick.list.filter(el => el.type != 9).length) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
+                if (!Brick.list.filter(el => el.type != 9).length && playerLevel != 33) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
                         nextLevel()
         } else if (!gamePaused && !gameOvered)
                 restartTheGame();
@@ -882,25 +1196,29 @@ function gameLoop(cTime) {
 
 // Funkcja mająca na celu zająć się logiką gry
 function think(cTime) {
-        //Strzela laserami z platformy
-        if (Laser.playerLasers > 0 && Laser.nextPlayerFire < cTime) {
-                Laser.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
 
-                for (let i = 0; i < Laser.playerLasers; i++) {
-                        let el = new Laser(new Vector2D((platform.pos.x + (platform.size.x / (Laser.playerLasers + 1)) * (i + 1)) - Laser.playerLaserSize.x / 2, platform.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
+        //Wywołuje funkcję logiki u DOH'a
+        DOH.list.forEach((el) => el.think(cTime));
+
+        //Strzela laserami z platformy
+        if (Projectile.playerLasers > 0 && Projectile.nextPlayerFire < cTime) {
+                Projectile.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
+
+                for (let i = 0; i < Projectile.playerLasers; i++) {
+                        let el = new Projectile(new Vector2D((platform.pos.x + (platform.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2, platform.pos.y - Projectile.playerLaserSize.y), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
                         el.dir.x = (el.pos.x + el.size.x / 2 - (platform.pos.x + platform.size.x / 2)) / platform.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                 }
 
                 if (platformClone.enabled) {
-                        for (let i = 0; i < Laser.playerLasers; i++) {
-                                let el = new Laser(new Vector2D((platformClone.pos.x + (platformClone.size.x / (Laser.playerLasers + 1)) * (i + 1)) - Laser.playerLaserSize.x / 2, platformClone.pos.y - Laser.playerLaserSize.y), new Vector2D(0, -1), Laser.playerLaserSize, 65, true);
+                        for (let i = 0; i < Projectile.playerLasers; i++) {
+                                let el = new Laser(new Vector2D((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2, platformClone.pos.y - Projectile.playerLaserSize.y), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
                                 el.dir.x = (el.pos.x + el.size.x / 2 - (platformClone.pos.x + platformClone.size.x / 2)) / platformClone.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                         }
                 }
         }
 
         // Logika laserów
-        Laser.list.forEach((el) => {
+        Projectile.list.forEach((el) => {
                 //Sprawdzamy kolizje z cegłami jeśli laser jest gracza
                 if (el.isPlayers) {
                         Brick.list.forEach((brick) => {
@@ -965,111 +1283,7 @@ function think(cTime) {
 
         // System kolizji piłki
         Ball.list.forEach((el, index) => {
-                let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
-
-                //Kolizja z ścianami
-                if (el.pos.x <= 0 || el.pos.x + el.size.x >= canvas.width) // Kolizja z lewą i prawą ścianą
-                {
-                        hit = true;
-                        el.invertDirX();
-                        el.lastTouchedObj = null;
-                }
-
-                if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
-                {
-                        hit = true;
-                        el.invertDirY();
-                        el.lastTouchedObj = null;
-                }
-
-
-
-                //Kolizja z cegłami
-                if (!hit) {
-
-                        Brick.list.forEach((brick) => {
-                                if (!hit) {
-                                        let col = checkCollision(el, brick)
-
-                                        if (col.hit && el.lastTouchedObj != brick) {
-                                                if (el.power > 0 && brick.type != 9 && brick.type != 8)
-                                                        el.power--;
-                                                else if (el.power > 0 && brick.type == 8 && el.power >= brick.health)
-                                                        el.power -= brick.health;
-                                                else
-                                                        if (col.side == 'left' || col.side == 'right') el.invertDirX(); else el.invertDirY();
-
-                                                hit = true;
-                                                el.lastTouchedObj = brick;
-                                                brick.remove();
-                                        }
-                                }
-                        })
-                }
-
-
-                //Kolizja z platformą
-                if (!hit && platform.holdBall != el && el.lastTouchedObj != platform) {
-                        let col = checkCollision(el, platform)
-
-                        if (col.hit && el.lastTouchedObj != platform) {
-                                if (col.side == 'left' || col.side == 'right')
-                                        el.invertDirX();
-                                else {
-                                        el.dir.x = col.hitFactor * 5;
-                                        el.invertDirY();
-
-                                        if (platform.canCatchBall && platform.holdBall == null)
-                                                platform.holdBall = el;
-                                }
-
-                                hit = true;
-                                el.lastTouchedObj = platform;
-                                el.power = Ball.ballPower;
-                        }
-                }
-
-                //Kolizja z klonem platformy
-                if (!hit && platformClone.enabled && el.lastTouchedObj != platformClone) {
-                        let col = checkCollision(el, platformClone)
-
-                        if (col.hit && el.lastTouchedObj != platformClone) {
-                                if (col.side == 'left' || col.side == 'right')
-                                        el.invertDirX();
-                                else {
-                                        el.dir.x = col.hitFactor * 5;
-                                        el.invertDirY();
-                                }
-
-                                hit = true;
-                                el.lastTouchedObj = platformClone;
-                                el.power = Ball.ballPower;
-                        }
-                }
-
-                if (hit && platform.holdBall != el) {
-                        el.speed *= 1.015; //Zwiększamy prędkość piłki po kolizji
-                        // console.log(el.speed);
-                }
-
-                //Ruch piłek
-                if (platform.holdBall != el) {
-                        let len = el.dir.length()
-                        el.pos.x += (el.dir.x / len) * el.speed
-                        el.pos.y += (el.dir.y / len) * el.speed
-                }
-
-                // Sprawdza czy piłka wypadła
-                if (el.pos.y > canvas.height / 100 * 96.4) {
-                        if (el == originalBall) {
-                                playerHealth--;
-                                resetToDefault();
-                        } else {
-                                el.remove();
-                        }
-
-                }
-
+                el.think();
         })
 }
 
@@ -1082,30 +1296,23 @@ function draw() {
                 if (platformClone.enabled)
                         platformClone.draw(); //Rysuję klona platformy jeśli mamy jego upgrade
 
+                DOH.list.forEach((el) => el.draw());
+                MiniDOH.list.forEach((el) => el.draw());
+
                 if (Portal.enabled)
-                        Portal.list.forEach((el) => {
-                                el.draw();
-                        })
+                        Portal.list.forEach((el) => el.draw());
 
                 // Rysuje każdą piłke
-                Ball.list.forEach((el) => {
-                        el.draw();
-                })
+                Ball.list.forEach((el) => el.draw())
 
                 // Rysuje każdą cegłe
-                Brick.list.forEach((el) => {
-                        el.draw();
-                })
+                Brick.list.forEach((el) => el.draw());
 
                 //Rysuje każdy upgrade
-                Upgrade.list.forEach((el) => {
-                        el.draw();
-                })
+                Upgrade.list.forEach((el) => el.draw());
 
                 //Rysuje kazdy laser
-                Laser.list.forEach((el) => {
-                        el.draw();
-                })
+                Projectile.list.forEach((el) => el.draw());
 
 
 
@@ -1117,6 +1324,18 @@ function draw() {
 
                 context.fillStyle = '#f8312f';
                 context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
+
+                //Pasek życia DOH'a
+                if (DOH.list.length > 0)
+                {
+                        let doh = DOH.list[0];
+
+                        context.fillStyle = '#0e0a24';
+                        context.fillRect(canvas.width * 0.2, canvas.height / 15.625 - canvas.height / 18.5, canvas.width * 0.6, canvas.height / 18.5);
+
+                        if (doh.minionsNum > 0) context.fillStyle = '#0089c4'; else context.fillStyle = '#de4f35';
+                        context.fillRect(canvas.width * 0.2 + 25, canvas.height / 15.625 - canvas.height / 18.5 + 25, (canvas.width * 0.6 - 50) * (doh.hp / 20), canvas.height / 18.5 - 50);
+                }
 
 
         }

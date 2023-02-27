@@ -184,6 +184,10 @@ function restartTheGame() {
                 document.addEventListener("keydown", pauseTheGame)
         })
 
+        DOH.list.forEach((el) => {
+                el.remove();
+        })
+
 
         playerPoints = 0
         playerLevel = 1
@@ -207,6 +211,11 @@ function restartTheGame() {
         resetToDefault()
 }
 // ==================================================================================================== //
+
+function victory()
+{
+
+}
 
 
 // ================================[ Klasa wektorów ]========================= //
@@ -474,7 +483,9 @@ class Ball {
                                         else
                                                 el.invertDirY();
 
-                                        if (el.power > 0) doh.hp -= el.power; else doh.hp--;
+                                        if (doh.minionsNum <= 0)
+                                                if (el.power > 0) doh.hp -= el.power; else doh.hp--;
+
                                         el.lastTouchedObj = doh;
                                 }
                         })
@@ -549,7 +560,7 @@ class Ball {
                         }
                 }
 
-                if (hit && platform.holdBall != el) {
+                if (hit && platform.holdBall != el && !el.enemyBall) {
                         el.speed *= 1.015; //Zwiększamy prędkość piłki po kolizji
                         // console.log(el.speed);
                 }
@@ -855,11 +866,12 @@ class MiniDOH
 {
         static list = [];
 
-        constructor(pos, size, hp = 3)
+        constructor(pos, size, parent, hp = 3)
         {
                 this.pos = pos;
                 this.size = size;
                 this.hp = hp;
+                this.parent = parent;
 
                 this.texture = new Image();
                 this.texture.src = "img/doh.png";
@@ -876,7 +888,10 @@ class MiniDOH
         {
                 MiniDOH.list.forEach((el, index) => {
                         if (el == this)
+                        {
+                                this.parent.minionsNum--;
                                 MiniDOH.list.splice(index, 1);
+                        }
                 })  
         }
 }
@@ -897,6 +912,7 @@ class DOH {
                 this.counter = 0; // Licznik, służy w atakach by np. sprawdzic ile razy wystrzelił lasery
                 this.summonedMinions = false;
                 this.fireBalls = [null, null];
+                this.minionsNum = 0;
 
                 DOH.list.push(this);
         }
@@ -914,20 +930,22 @@ class DOH {
                 {
                         this.summonedMinions = true;
 
-                        new MiniDOH(new Vector2D(this.pos.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720));
-                        new MiniDOH(new Vector2D(this.pos.x + 400, this.pos.y + this.size.y), new Vector2D(400, 720));
-                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 800, this.pos.y + this.size.y), new Vector2D(400, 720));
-                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720));
+                        new MiniDOH(new Vector2D(this.pos.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x + 400, this.pos.y + this.size.y), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 800, this.pos.y + this.size.y), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
+
+                        this.minionsNum = 4;
                 }
 
                 if (this.fireBalls[0] == null && platform.holdBall == null)
                 {
-                        this.fireBalls[0] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(0.25, 1), new Vector2D(250, 250), true, this);
+                        this.fireBalls[0] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(0.2, 1), new Vector2D(250, 250), true, this);
                 }
 
                 if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10)
                 {
-                        this.fireBalls[1] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(-0.25, 1), new Vector2D(250, 250), true, this);
+                        this.fireBalls[1] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(-0.2, 1), new Vector2D(250, 250), true, this);
                 }
         }
 
@@ -944,7 +962,10 @@ class DOH {
         {
                 DOH.list.forEach((el, index) => {
                         if (el == this)
+                        {
+                                victory();
                                 DOH.list.splice(index, 1);
+                        }
                 })
         }
 }
@@ -1240,6 +1261,18 @@ function draw() {
 
                 context.fillStyle = '#f8312f';
                 context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
+
+                //Pasek życia DOH'a
+                if (DOH.list.length > 0)
+                {
+                        let doh = DOH.list[0];
+
+                        context.fillStyle = '#0e0a24';
+                        context.fillRect(canvas.width * 0.2, canvas.height / 15.625 - canvas.height / 18.5, canvas.width * 0.6, canvas.height / 18.5);
+
+                        if (doh.minionsNum > 0) context.fillStyle = '#0089c4'; else context.fillStyle = '#de4f35';
+                        context.fillRect(canvas.width * 0.2 + 25, canvas.height / 15.625 - canvas.height / 18.5 + 25, (canvas.width * 0.6 - 50) * (doh.hp / 20), canvas.height / 18.5 - 50);
+                }
 
 
         }

@@ -1187,6 +1187,7 @@ function gameLoop(cTime) {
         if (gamePaused && !gameOvered && gameStarted) {
                 let texture = new Image()
                 texture.src = "img/gamePaused.png"
+                context.clearRect(796, canvas.height - 1500, 3408, 852) // FIXME: Jeśli chcieć zrobić bez dublowania brodera napisu, ale pilke (texture) moze ucinac
                 context.drawImage(texture, 796, canvas.height - 1500, 3408, 852)
                 // TODO: Naprawić border
         }

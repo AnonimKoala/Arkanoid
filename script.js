@@ -105,7 +105,7 @@ function resetToDefault() {
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
         originalBall.pos.y = platform.pos.y - 10 - originalBall.size.y
 
-        originalBall.speed = 15;
+        originalBall.speed = 30;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
 }
@@ -237,6 +237,8 @@ function restartTheGame() {
                 el.remove();
         })
 
+        MiniDOH.list = [];
+
 
         playerPoints = 0
         playerLevel = 1
@@ -322,16 +324,14 @@ let platform = {
         holdBall: null, //Czy nasza platforma trzyma piłke
         timesIncreased: 0, //Ile razy nasza platforma została powiększona upgradem
         canCatchBall: false, //Czy może złapać piłke (upgrade łapania)
+        texture: new Image(),
 
         // Funkcja do rysowania platformy
         draw() {
-                let texture = new Image();
-                texture.src = "img/textures/platform.png";
-                context.drawImage(texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
+                if (this.canCatchBall) this.texture.src = "img/textures/platform_sticky.png"; else this.texture.src = "img/textures/platform.png";
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
 
         }
-        // TODO: Dodaj możliwość zmiany tekstury platformy kiedy przylepia piłki
-
 }
 
 platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
@@ -445,10 +445,10 @@ class Ball {
                 if (enemyBall)
                         this.parent = enemyParent;
 
+                this.speed = 30;
                 if (enemyBall)
                         this.speed = 45;
-                else
-                        this.speed = 15; //Szybkość z jaką porusza się piłka
+
                 this.texture = new Image(); // Tekstura piłki
 
                 if (enemyBall)
@@ -580,7 +580,7 @@ class Ball {
                                                 el.dir.x = col.hitFactor * 5;
                                                 el.invertDirY();
 
-                                                if (platform.canCatchBall && platform.holdBall == null)
+                                                if (platform.canCatchBall && platform.holdBall == null && col.side == 'top')
                                                         platform.holdBall = el;
                                         }
 
@@ -614,7 +614,7 @@ class Ball {
                 }
 
                 if (hit && platform.holdBall != el && !el.enemyBall) {
-                        el.speed *= 1.015; //Zwiększamy prędkość piłki po kolizji
+                        el.speed += 0.15; //Zwiększamy prędkość piłki po kolizji
                         // console.log(el.speed);
                 }
 
@@ -760,8 +760,7 @@ class Portal {
         }
 }
 
-new Portal(new Vector2D(canvas.width * 0.0005 - 25, canvas.height - canvas.height * 0.025 - 500), new Vector2D(200, 500));
-new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - 200 + 25, canvas.height - canvas.height * 0.025 - 500), new Vector2D(200, 500));
+new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - 400 + 25, canvas.height - canvas.height * 0.025 - 500), new Vector2D(400, 500));
 
 
 let prevUpgrade;
@@ -815,8 +814,7 @@ function removeAllUpgrades() {
                 removeUpgradeEffect(i);
         }
 }
-// TODO: Zmienić szerokość portalu żeby dobrze wyglądało
-// TODO: Zrobić portal tylko po prawej stronie, ewentualnie po lewej moze cofac poziom
+
 class Upgrade {
         static list = [];
         static typeToTexture = [
@@ -830,7 +828,7 @@ class Upgrade {
                 "img/upgrades/upgrade_skip.svg"
         ]
 
-        static nextUpgradePoints = 500; //Punkty do kolejnego upgrade'u
+        static nextUpgradePoints = 700; //Punkty do kolejnego upgrade'u
         static platformSizeIncrease = 250;
 
         constructor(pos, type) {
@@ -910,7 +908,7 @@ class Upgrade {
         }
 }
 
-let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints;
+let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 51);
 
 // ==================================================================================================== //
 
@@ -1120,8 +1118,10 @@ class Brick {
                                         playerPoints += this.value // Dodaje pkt po rozbiciu cegły
 
                                         if (this.type != 8 && this.type != 9 && playerPoints >= nextUpgrade) {
-                                                nextUpgrade = playerPoints + Upgrade.nextUpgradePoints;
-                                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), Math.floor(Math.random() * 8));
+                                                nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 51);
+
+                                                let randUpgrade = Math.floor(Math.random() * 8);
+                                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), randUpgrade);
                                                 // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_SKIP);
                                         }
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł

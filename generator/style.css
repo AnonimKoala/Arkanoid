@@ -2,17 +2,20 @@
   margin: 0;
   padding: 0;
 }
+
 /* ========================================================================================================= */
-body{
-  background: rgb(84,73,255);
-  background: linear-gradient(315deg, rgba(84,73,255,1) 0%, rgba(191,177,255,1) 54%, rgba(73,132,255,1) 100%);
+body {
+  background: rgb(84, 73, 255);
+  background: linear-gradient(315deg, rgba(84, 73, 255, 1) 0%, rgba(191, 177, 255, 1) 54%, rgba(73, 132, 255, 1) 100%);
   background-size: 200%;
   height: 100vh;
 }
+
 /* ========================================================================================================= */
 ul li {
   list-style-type: none;
 }
+
 /* ========================================================================================================= */
 #editorArea>ul>li:first-child {
   margin-top: 7vh;
@@ -59,7 +62,9 @@ ul li {
   display: block;
   /* border: 1px solid orange; */
   position: relative;
-  background-color: rgb(0, 0, 39);
+  /* background-color: rgb(0, 0, 39); */
+  background-image: url("../img/background.jpg");
+  background-size: 100%;
   box-shadow: 0 0 15px rgb(115, 115, 115);
 }
 
@@ -230,12 +235,12 @@ button {
   /* border: 1px solid black; */
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.374);
   display: grid;
-  grid-template-columns: "loadingDiv loadingDiv" 
-  "savingDiv savingDiv" 
-  "play play" 
-  "bottomButtons bottomButtons";
+  grid-template-columns: "loadingDiv loadingDiv"
+    "savingDiv savingDiv"
+    "play play"
+    "bottomButtons bottomButtons";
   grid-template-rows: 2% 10% 10% 45% 10% 10%;
-  
+
 }
 
 /* ========================================================================================================= */
@@ -283,9 +288,11 @@ button {
 #savingDiv>input[type="text"] {
   width: calc(100% - 15px);
 }
+
 #savingDiv {
   grid-area: 'savingDiv';
 }
+
 /* ========================================================================================================= */
 .column-50-50-buttons {
   display: grid;
@@ -409,11 +416,13 @@ button {
   background-color: rgba(204, 255, 153, 0.826);
   outline: rgb(55, 138, 0) 2px solid;
 }
+
 /* ========================================================================================================= */
-#bottomButtons{
+#bottomButtons {
   grid-area: 'bottomButtons';
 }
+
 /* ========================================================================================================= */
-#loadingDiv{
+#loadingDiv {
   grid-area: 'loadingDiv';
 }

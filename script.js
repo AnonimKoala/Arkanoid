@@ -152,7 +152,7 @@ function resetToDefault() {
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
         originalBall.pos.y = platform.pos.y - 10 - originalBall.size.y
 
-        originalBall.speed = 30;
+        originalBall.speed = 20;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
 }
@@ -488,7 +488,7 @@ class Ball {
                 if (enemyBall)
                         this.parent = enemyParent;
 
-                this.speed = 30;
+                this.speed = 20;
                 if (enemyBall)
                         this.speed = 45;
 
@@ -1160,7 +1160,7 @@ class Brick {
 
                                                 let randUpgrade = Math.floor(Math.random() * 8);
                                                 new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), randUpgrade);
-                                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_SKIP);
+                                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLCATCH);
                                         }
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }

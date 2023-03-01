@@ -128,22 +128,7 @@ function nextLevel() {
 
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
-function loadLevel(startFrom = null) {
-        if (localStorage.length == 0) {
-                fetch("generator/basicLevels.json")
-                        .then(function (response) {
-                                return response.json();
-                        })
-                        .then(function (jsonFile) {
-                                jsonFile.forEach((el, i) => {
-                                        // levelList.push(el.id)
-
-                                        // Sprawdza czy poziom jest w localstorage
-                                        if (localStorage.getItem(el.id) == null)
-                                                localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
-                                })
-                        })
-        }
+function generateBricks(startFrom = null) {
         // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
         let json
         if (startFrom != null) {
@@ -168,6 +153,30 @@ function loadLevel(startFrom = null) {
                         parseInt(el.type)
                 )
         })
+
+}
+function loadLevel(startFrom = null) {
+        if (localStorage.length == 0) {
+                fetch("generator/basicLevels.json")
+                        .then(function (response) {
+                                return response.json();
+                        })
+                        .then(function (jsonFile) {
+                                jsonFile.forEach((el, i) => {
+                                        // levelList.push(el.id)
+
+                                        // Sprawdza czy poziom jest w localstorage
+                                        if (localStorage.getItem(el.id) == null)
+                                                localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
+                                })
+                        })
+                        .then(() => {
+                                generateBricks(startFrom)
+                        })
+        } else {
+                generateBricks(startFrom)
+        }
+
 
 
 
@@ -210,7 +219,7 @@ function restartTheGame() {
 
         introScreen.style.display = "grid";
 
-        playerLevel = 1 // FIXME: Może to nie działać
+        playerLevel = 1
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
 
@@ -262,9 +271,8 @@ function restartTheGame() {
         resetToDefault()
 }
 // ==================================================================================================== //
-
-function victory()
-{
+// TODO: funkcja victory
+function victory() {
 
 }
 
@@ -479,8 +487,7 @@ class Ball {
         invertDirX() { this.dir.x *= -1; } // Odwraca nasz kierunek tylko na osi X
         invertDirY() { this.dir.y *= -1; } // Odwraca nasz kierunek tylko na osi Y
 
-        think()
-        {
+        think() {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
                 let el = this;
 
@@ -524,13 +531,11 @@ class Ball {
                 }
 
                 //Kolizja z DOH'em
-                if (!hit && !el.enemyBall)
-                {
+                if (!hit && !el.enemyBall) {
                         DOH.list.forEach((doh) => {
                                 let col = checkCollision(el, doh)
-                                
-                                if (col.hit && el.lastTouchedObj != doh)
-                                {
+
+                                if (col.hit && el.lastTouchedObj != doh) {
                                         if (col.side == 'left' || col.side == 'right')
                                                 el.invertDirX();
                                         else
@@ -545,13 +550,11 @@ class Ball {
                 }
 
                 //Kolizja z MiniDOH'em
-                if (!hit && !el.enemyBall)
-                {
+                if (!hit && !el.enemyBall) {
                         MiniDOH.list.forEach((doh) => {
                                 let col = checkCollision(el, doh)
-                                
-                                if (col.hit && el.lastTouchedObj != doh)
-                                {
+
+                                if (col.hit && el.lastTouchedObj != doh) {
                                         if (col.side == 'left' || col.side == 'right')
                                                 el.invertDirX();
                                         else
@@ -572,8 +575,7 @@ class Ball {
                         let col = checkCollision(el, platform)
 
                         if (col.hit && el.lastTouchedObj != platform) {
-                                if (!el.enemyBall)
-                                {
+                                if (!el.enemyBall) {
                                         if (col.side == 'left' || col.side == 'right')
                                                 el.invertDirX();
                                         else {
@@ -589,7 +591,7 @@ class Ball {
                                         el.power = Ball.ballPower;
                                 } else {
                                         playerHealth--;
-                                        resetToDefault(); 
+                                        resetToDefault();
                                 }
 
                         }
@@ -914,12 +916,10 @@ let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.ran
 
 // ==============================================[ DOH ]=============================================== //
 
-class MiniDOH
-{
+class MiniDOH {
         static list = [];
 
-        constructor(pos, size, parent, hp = 3)
-        {
+        constructor(pos, size, parent, hp = 3) {
                 this.pos = pos;
                 this.size = size;
                 this.hp = hp;
@@ -931,28 +931,24 @@ class MiniDOH
                 MiniDOH.list.push(this);
         }
 
-        draw()
-        {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);      
+        draw() {
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
-        remove()
-        {
+        remove() {
                 MiniDOH.list.forEach((el, index) => {
-                        if (el == this)
-                        {
+                        if (el == this) {
                                 this.parent.minionsNum--;
                                 MiniDOH.list.splice(index, 1);
                         }
-                })  
+                })
         }
 }
 
 class DOH {
         static list = [];
 
-        constructor(pos, size, hp = 20)
-        {
+        constructor(pos, size, hp = 20) {
                 this.pos = pos;
                 this.size = size;
                 this.hp = hp;
@@ -969,8 +965,7 @@ class DOH {
                 DOH.list.push(this);
         }
 
-        think(cTime)
-        {
+        think(cTime) {
                 this.fireBalls.forEach((el) => {
                         if (el != null) el.think();
                 })
@@ -978,8 +973,7 @@ class DOH {
                 if (this.hp <= 0)
                         this.remove();
 
-                if (this.hp <= 10 && !this.summonedMinions)
-                {
+                if (this.hp <= 10 && !this.summonedMinions) {
                         this.summonedMinions = true;
 
                         new MiniDOH(new Vector2D(this.pos.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
@@ -990,19 +984,16 @@ class DOH {
                         this.minionsNum = 4;
                 }
 
-                if (this.fireBalls[0] == null && platform.holdBall == null)
-                {
+                if (this.fireBalls[0] == null && platform.holdBall == null) {
                         this.fireBalls[0] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(0.2, 1), new Vector2D(250, 250), true, this);
                 }
 
-                if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10)
-                {
+                if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10) {
                         this.fireBalls[1] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(-0.2, 1), new Vector2D(250, 250), true, this);
                 }
         }
 
-        draw()
-        {
+        draw() {
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
 
                 this.fireBalls.forEach((el) => {
@@ -1010,11 +1001,9 @@ class DOH {
                 })
         }
 
-        remove()
-        {
+        remove() {
                 DOH.list.forEach((el, index) => {
-                        if (el == this)
-                        {
+                        if (el == this) {
                                 victory();
                                 DOH.list.splice(index, 1);
                         }
@@ -1024,8 +1013,7 @@ class DOH {
 
 
 
-function summonDOH()
-{
+function summonDOH() {
         Brick.list = [];
 
         let width, height;
@@ -1177,7 +1165,6 @@ function gameLoop(cTime) {
                 think(cTime);
                 draw();
 
-                // TODO: Dodac warunek na koniec gry
                 if (!Brick.list.filter(el => el.type != 9).length && playerLevel != 33) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
                         nextLevel()
         } else if (!gamePaused && !gameOvered)
@@ -1327,8 +1314,7 @@ function draw() {
                 context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
 
                 //Pasek życia DOH'a
-                if (DOH.list.length > 0)
-                {
+                if (DOH.list.length > 0) {
                         let doh = DOH.list[0];
 
                         context.fillStyle = '#0e0a24';

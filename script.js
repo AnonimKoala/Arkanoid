@@ -1383,6 +1383,7 @@ function draw() {
                 context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
 
                 // Wyświetla napis koniec gry
+
                 context.font = "bold 540px Arial";
                 context.fillStyle = '#6774eb';
                 context.fillText(`Game over`, 1000, 2500)

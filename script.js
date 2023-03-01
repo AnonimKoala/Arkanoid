@@ -210,7 +210,7 @@ function restartTheGame() {
 
         introScreen.style.display = "grid";
 
-        playerLevel = 1 // FIXME: Może to nie działać
+        playerLevel = 1
 
         // ============[ Wczytuje obraz ekranu startowego ]============ //
 
@@ -260,7 +260,7 @@ function restartTheGame() {
         resetToDefault()
 }
 // ==================================================================================================== //
-
+// TODO: funkcja victory
 function victory()
 {
 
@@ -1177,7 +1177,6 @@ function gameLoop(cTime) {
                 think(cTime);
                 draw();
 
-                // TODO: Dodac warunek na koniec gry
                 if (!Brick.list.filter(el => el.type != 9).length && playerLevel != 33) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
                         nextLevel()
         } else if (!gamePaused && !gameOvered)

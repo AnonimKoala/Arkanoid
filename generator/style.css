@@ -70,7 +70,7 @@ ul li {
   position: absolute;
   bottom: 5%;
   right: 50%;
-  background-color: blue;
+  background-image: url("../img/textures/platform.png");
   transform: translate(50%, 50%);
 }
 

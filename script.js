@@ -8,16 +8,41 @@ const playButton = document.getElementById('playButton')
 const introScreen = document.getElementById('introScreen')
 // ==================================================================================================== //
 
+// ===============================[ Ukrywa ekran startowy ]=========================================== // 
+playButton.addEventListener('click', () => {
+        playSound("clicked")
+        introScreen.style.display = "none";
+        gameStarted = true
+        gameOvered = false
+        gamePaused = false
+        document.addEventListener("keydown", pauseTheGame)
+})
+// ==================================================================================================== //
 
 // ================================[ Otwiera ekran pomocy ]============================================ //
 const helpScreen = document.getElementById('helpScreen')
 helpScreen.addEventListener("click", function () {
+        playSound("clicked")
         helpScreen.style.display = "none"
 })
 function openHelp() {
         helpScreen.style.display = "block"
 }
-document.querySelector("#helpButton").addEventListener("click", openHelp)
+document.querySelector("#helpButton").addEventListener("click", () => {
+        playSound("clicked")
+        openHelp()
+})
+// ==================================================================================================== //
+
+
+// ================================[ Otwiera ekran edytora ]============================================ //
+const loadButton = document.getElementById('loadButton')
+loadButton.addEventListener("click", function () {
+        playSound("clicked")
+        setTimeout(() => {
+                window.open("generator/index.html", "_self")
+        }, 150);
+})
 // ==================================================================================================== //
 
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
@@ -38,9 +63,31 @@ function playSound(sound, type = 0) {
                                 new Audio('audio/goldHitSound.ogg').play() // Silver brick sound
                         else if (type == 8)
                                 new Audio('audio/silverHitSound.ogg').play() // Gold brick sound
+
                         break;
                 case "hitPlatform": // Uderza w platformę
                         new Audio('audio/platformHit.ogg').play()
+                        break;
+                case "hitSmallDOH": // Uderza w małego DOH'a
+                        new Audio('audio/smallDohHit.ogg').play()
+                        break;
+                case "hitDOH": // Uderza w DOH'a
+                        new Audio('audio/dohHit.ogg').play()
+                        break;
+                case "gameOver": // Przegrywa
+                        new Audio('audio/gameOver.ogg').play()
+                        break;
+                case "fallOfScreen": // Upada poza ekran
+                        new Audio('audio/fallOfScreen.ogg').play()
+                        break;
+                case "hitedByEnemy": // Otrzymuje obrażenia od wroga
+                        new Audio('audio/hitedByEnemy.ogg').play()
+                        break;
+                case "clicked":
+                        new Audio('audio/click.ogg').play()
+                        break;
+
+
 
         }
 }
@@ -220,18 +267,6 @@ function restartTheGame() {
         introScreen.style.display = "grid";
 
         playerLevel = 1
-
-        // ============[ Wczytuje obraz ekranu startowego ]============ //
-
-        playButton.addEventListener('click', () => {
-                introScreen.style.display = "none";
-                gameStarted = true
-                gameOvered = false
-                gamePaused = false
-
-                document.addEventListener("keydown", pauseTheGame)
-        })
-        // ============================================================ //
 
         canvas.addEventListener("click", () => {
                 // Uruchamia grę po kliknięciu w obszarze pola canvas
@@ -497,6 +532,8 @@ class Ball {
                         hit = true;
                         el.invertDirX();
                         el.lastTouchedObj = null;
+
+                        playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
                 }
 
                 if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
@@ -504,6 +541,8 @@ class Ball {
                         hit = true;
                         el.invertDirY();
                         el.lastTouchedObj = null;
+
+                        playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
                 }
 
 
@@ -545,6 +584,8 @@ class Ball {
                                                 if (el.power > 0) doh.hp -= el.power; else doh.hp--;
 
                                         el.lastTouchedObj = doh;
+
+                                        playSound('hitDOH'); // Odtwarzanie dźwięku uderzenia w DOHa
                                 }
                         })
                 }
@@ -565,6 +606,8 @@ class Ball {
 
                                         if (doh.hp <= 0)
                                                 doh.remove();
+
+                                        playSound('hitSmallDOH'); // Odtwarzanie dźwięku uderzenia w małego DOHa
                                 }
                         })
                 }
@@ -586,10 +629,14 @@ class Ball {
                                                         platform.holdBall = el;
                                         }
 
+                                        playSound('hitPlatform'); // Odtwarzanie dźwięku uderzenia w platformę
+
                                         hit = true;
                                         el.lastTouchedObj = platform;
                                         el.power = Ball.ballPower;
                                 } else {
+                                        playSound("hitedByEnemy") // Odtwarzanie dźwięku uderzenia w platformę wrogiej piłki
+
                                         playerHealth--;
                                         resetToDefault();
                                 }
@@ -608,6 +655,8 @@ class Ball {
                                         el.dir.x = col.hitFactor * 5;
                                         el.invertDirY();
                                 }
+
+                                playSound('hitPlatform'); // Odtwarzanie dźwięku uderzenia w platformę
 
                                 hit = true;
                                 el.lastTouchedObj = platformClone;
@@ -631,6 +680,7 @@ class Ball {
                 if (el.pos.y > canvas.height / 100 * 96.4 && !el.enemyBall) {
                         if (el == originalBall) {
                                 playerHealth--;
+                                playSound("fallOfScreen") // Odtwarzanie dźwięku upadku piłki poza ekran
                                 resetToDefault();
                         } else {
                                 el.remove();
@@ -1333,9 +1383,12 @@ function draw() {
                 context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
 
                 // Wyświetla napis koniec gry
+
                 context.font = "bold 540px Arial";
                 context.fillStyle = '#6774eb';
                 context.fillText(`Game over`, 1000, 2500)
+
+                playSound("gameOver") // Odtwarza dźwięk końca gry
 
                 // Ustawia flagi pauzy i końca gry
                 gameOvered = true

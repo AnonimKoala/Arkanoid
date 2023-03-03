@@ -130,7 +130,6 @@ function gameOver() {
 
 // ========================================[ Dotyczące gracza ]======================================== //
 let playerLevel = 1
-// let playerLevel = 33;
 let playerHealth = 3
 let playerPoints = 0
 
@@ -153,14 +152,16 @@ function resetToDefault() {
         platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
 
         // Na początku piłka pojawia się nad platformą
-        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
-        originalBall.pos.y = platform.pos.y - 10 - originalBall.size.y
+        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
+        originalBall.pos.y = platform.pos.y - 10 - originalBall.radius * 2
 
         originalBall.speed = 20;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
 
-        updateStaticCanvas();
+        setTimeout(() => {
+                updateStaticCanvas();
+        }, 10)
 }
 // ==================================================================================================== //
 
@@ -501,11 +502,12 @@ class Ball {
         static list = []; // Lista wszystkich piłek
         static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
 
-        constructor(pos, dir, size, enemyBall = false, enemyParent) {
+        constructor(pos, dir, radius, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki
                 this.prevPos = new Vector2D(pos.x, pos.y);
                 this.dir = dir; // Przechowuje kierunek piłki
-                this.size = size; // Przechowuje wielkość piłki
+                // this.size = size; // Przechowuje wielkość piłki
+                this.radius = radius;
                 this.enemyBall = enemyBall;
 
                 if (enemyBall)
@@ -547,65 +549,47 @@ class Ball {
 
         think() {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
-                let el = this;
 
-                //Kolizja z ścianami
-                // if (el.pos.x <= 0 || el.pos.x + el.size.x >= canvas.width) // Kolizja z lewą i prawą ścianą
-                // {
-                //         hit = true;
-                //         el.invertDirX();
-
-                //         playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
-                // }
-
-                // if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
-                // {
-                //         hit = true;
-                //         el.invertDirY();
-
-                //         playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
-                // }
-
-                if (el.pos.x <= 0 && el.lastTouchedObj != 'leftwall') {
-                        el.lastTouchedObj = 'leftwall';
-                        el.invertDirX();
+                if (this.pos.x <= 0 && this.lastTouchedObj != 'leftwall') {
+                        this.lastTouchedObj = 'leftwall';
+                        this.invertDirX();
                         hit = true;
                         playSound("hitEdge")
-                } else if (el.pos.x + el.size.x >= canvas.width && el.lastTouchedObj != 'rightwall') {
-                        el.lastTouchedObj = 'rightwall';
+                } else if (this.pos.x + this.radius * 2 >= canvas.width && this.lastTouchedObj != 'rightwall') {
+                        this.lastTouchedObj = 'rightwall';
+                        this.invertDirX();
                         hit = true;
-                        el.invertDirX();
                         playSound("hitEdge")
-                } else if (el.pos.y <= 0 && el.lastTouchedObj != 'topwall') {
-                        el.lastTouchedObj = 'topwall';
+                } else if (this.pos.y <= 0 && this.lastTouchedObj != 'topwall') {
+                        this.lastTouchedObj = 'topwall';
+                        this.invertDirY();
                         hit = true;
-                        el.invertDirY();
                         playSound("hitEdge")
-                } else if (el.pos.y + el.size.y >= canvas.height && el.lastTouchedObj != 'bottomwall') {
-                        el.lastTouchedObj = 'bottomwall';
+                } else if (this.pos.y + this.radius * 2 >= canvas.height && this.lastTouchedObj != 'bottomwall') {
+                        this.lastTouchedObj = 'bottomwall';
+                        this.invertDirY();
                         hit = true;
-                        el.invertDirY();
                         playSound("hitEdge")
                 }
 
 
 
                 //Kolizja z cegłami
-                if (!hit && !el.enemyBall) {
+                if (!hit && !this.enemyBall) {
                         Brick.list.forEach((brick) => {
-                                if (!hit) {
-                                        let col = checkCollision(el, brick)
+                                if (!hit && this.lastTouchedObj != brick) {
+                                        let col = circXrectCollision(this, brick)
 
-                                        if (col.hit && el.lastTouchedObj != brick) {
-                                                if (el.power > 0 && brick.type != 9 && brick.type != 8)
-                                                        el.power--;
-                                                else if (el.power > 0 && brick.type == 8 && el.power >= brick.health)
-                                                        el.power -= brick.health;
+                                        if (col.hit) {
+                                                if (this.power > 0 && brick.type != 9 && brick.type != 8)
+                                                        this.power--;
+                                                else if (this.power > 0 && brick.type == 8 && this.power >= brick.health)
+                                                        this.power -= brick.health;
                                                 else
-                                                        if (col.side == 'left' || col.side == 'right') el.invertDirX(); else el.invertDirY();
+                                                        if (col.side == 'left' || col.side == 'right') this.invertDirX(); else this.invertDirY();
 
                                                 hit = true;
-                                                el.lastTouchedObj = brick;
+                                                this.lastTouchedObj = brick;
                                                 brick.remove();
                                         }
                                 }
@@ -613,39 +597,41 @@ class Ball {
                 }
 
                 //Kolizja z DOH'em
-                if (!hit && !el.enemyBall) {
+                if (!hit && !this.enemyBall) {
                         DOH.list.forEach((doh) => {
-                                let col = checkCollision(el, doh)
+                                let col = circXrectCollision(this, doh)
 
-                                if (col.hit && el.lastTouchedObj != doh) {
+                                if (col.hit && this.lastTouchedObj != doh) {
                                         if (col.side == 'left' || col.side == 'right')
-                                                el.invertDirX();
+                                                this.invertDirX();
                                         else
-                                                el.invertDirY();
+                                                this.invertDirY();
 
                                         if (doh.minionsNum <= 0)
-                                                if (el.power > 0) doh.hp -= el.power; else doh.hp--;
+                                                if (this.power > 0) doh.hp -= this.power; else doh.hp--;
 
-                                        el.lastTouchedObj = doh;
+                                        this.lastTouchedObj = doh;
 
                                         playSound('hitDOH'); // Odtwarzanie dźwięku uderzenia w DOHa
+
+                                        updateStaticCanvas();
                                 }
                         })
                 }
 
                 //Kolizja z MiniDOH'em
-                if (!hit && !el.enemyBall) {
+                if (!hit && !this.enemyBall) {
                         MiniDOH.list.forEach((doh) => {
-                                let col = checkCollision(el, doh)
+                                let col = circXrectCollision(this, doh)
 
-                                if (col.hit && el.lastTouchedObj != doh) {
+                                if (col.hit && this.lastTouchedObj != doh) {
                                         if (col.side == 'left' || col.side == 'right')
-                                                el.invertDirX();
+                                                this.invertDirX();
                                         else
-                                                el.invertDirY();
+                                                this.invertDirY();
 
-                                        if (el.power > 0) doh.hp -= el.power; else doh.hp--;
-                                        el.lastTouchedObj = doh;
+                                        if (this.power > 0) doh.hp -= this.power; else doh.hp--;
+                                        this.lastTouchedObj = doh;
 
                                         if (doh.hp <= 0)
                                                 doh.remove();
@@ -657,26 +643,26 @@ class Ball {
 
 
                 //Kolizja z platformą
-                if (!hit && platform.holdBall != el && el.lastTouchedObj != platform) {
-                        let col = checkCollision(el, platform)
+                if (!hit && platform.holdBall != this && this.lastTouchedObj != platform) {
+                        let col = circXrectCollision(this, platform)
 
-                        if (col.hit && el.lastTouchedObj != platform) {
-                                if (!el.enemyBall) {
+                        if (col.hit && this.lastTouchedObj != platform) {
+                                if (!this.enemyBall) {
                                         if (col.side == 'left' || col.side == 'right')
-                                                el.invertDirX();
+                                                this.invertDirX();
                                         else {
-                                                el.dir.x = col.hitFactor * 5;
-                                                el.invertDirY();
+                                                this.dir.x = col.hitFactor * 5;
+                                                this.invertDirY();
 
-                                                if (platform.canCatchBall && platform.holdBall == null && col.side == 'bottom')
-                                                        platform.holdBall = el;
+                                                if (platform.canCatchBall && platform.holdBall == null && col.side == 'top')
+                                                        platform.holdBall = this;
                                         }
 
                                         playSound('hitPlatform'); // Odtwarzanie dźwięku uderzenia w platformę
 
                                         hit = true;
-                                        el.lastTouchedObj = platform;
-                                        el.power = Ball.ballPower;
+                                        this.lastTouchedObj = platform;
+                                        this.power = Ball.ballPower;
                                 } else {
                                         playSound("hitedByEnemy") // Odtwarzanie dźwięku uderzenia w platformę wrogiej piłki
 
@@ -688,48 +674,48 @@ class Ball {
                 }
 
                 //Kolizja z klonem platformy
-                if (!hit && platformClone.enabled && el.lastTouchedObj != platformClone && !el.enemyBall) {
-                        let col = checkCollision(el, platformClone)
+                if (!hit && platformClone.enabled && this.lastTouchedObj != platformClone && !this.enemyBall) {
+                        let col = circXrectCollision(this, platformClone)
 
-                        if (col.hit && el.lastTouchedObj != platformClone) {
+                        if (col.hit && this.lastTouchedObj != platformClone) {
                                 if (col.side == 'left' || col.side == 'right')
-                                        el.invertDirX();
+                                        this.invertDirX();
                                 else {
-                                        el.dir.x = col.hitFactor * 5;
-                                        el.invertDirY();
+                                        this.dir.x = col.hitFactor * 5;
+                                        this.invertDirY();
                                 }
 
                                 playSound('hitPlatform'); // Odtwarzanie dźwięku uderzenia w platformę
 
                                 hit = true;
-                                el.lastTouchedObj = platformClone;
-                                el.power = Ball.ballPower;
+                                this.lastTouchedObj = platformClone;
+                                this.power = Ball.ballPower;
                         }
                 }
 
-                if (hit && platform.holdBall != el && !el.enemyBall) {
-                        el.speed += 0.15; //Zwiększamy prędkość piłki po kolizji
+                if (hit && platform.holdBall != this && !this.enemyBall) {
+                        this.speed += 0.15; //Zwiększamy prędkość piłki po kolizji
                         // console.log(el.speed);
                 }
 
                 //Ruch piłek
-                if (platform.holdBall != el) {
-                        el.prevPos.x = el.pos.x;
-                        el.prevPos.y = el.pos.y;
+                if (platform.holdBall != this) {
+                        this.prevPos.x = this.pos.x;
+                        this.prevPos.y = this.pos.y;
 
-                        let len = el.dir.length()
-                        el.pos.x += Math.floor((el.dir.x / len) * el.speed)
-                        el.pos.y += Math.floor((el.dir.y / len) * el.speed)
+                        let len = this.dir.length()
+                        this.pos.x += Math.floor((this.dir.x / len) * this.speed)
+                        this.pos.y += Math.floor((this.dir.y / len) * this.speed)
                 }
 
                 // Sprawdza czy piłka wypadła
-                if (el.pos.y > canvas.height / 100 * 96.4 && !el.enemyBall) {
-                        if (el == originalBall) {
+                if (this.pos.y > canvas.height / 100 * 96.4 && !this.enemyBall) {
+                        if (this == originalBall) {
                                 playerHealth--;
                                 playSound("fallOfScreen") // Odtwarzanie dźwięku upadku piłki poza ekran
                                 resetToDefault();
                         } else {
-                                el.remove();
+                                this.remove();
                         }
 
                 }
@@ -743,7 +729,7 @@ class Ball {
 
                         for (let i = 0; i < this.power; i++) {
                                 context.globalAlpha = 0.75 - (0.75 / (this.power + 1) * (i + 1));
-                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1))), this.size.x, this.size.y)
+                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1))), this.radius * 2, this.radius * 2)
                         }
 
                         context.globalAlpha = 1;
@@ -753,7 +739,7 @@ class Ball {
                 if (this != originalBall && !this.enemyBall)
                         context.globalAlpha = 0.5;
 
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.radius * 2, this.radius * 2)
 
                 context.globalAlpha = 1;
         }
@@ -784,12 +770,12 @@ let originalBall = new Ball(
                 null    // y
         ),
         new Vector2D(0.25, -1), // Kierunek
-        new Vector2D(canvas.width / 27.77, canvas.width / 27.77) // Size
+        canvas.width / 27.22 / 2 // Size
 );
 
 // Na początku piłka pojawia się nad platformą
-originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
-originalBall.pos.y = platform.pos.y - 0 - originalBall.size.y
+originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
+originalBall.pos.y = platform.pos.y - 0 - originalBall.radius * 2
 
 originalBall.prevPos.x = originalBall.pos.x;
 originalBall.prevPos.y = originalBall.pos.y;
@@ -888,6 +874,7 @@ function removeUpgradeEffect(upgrade) {
                         break;
                 case UPGRADE_SKIP:
                         Portal.enabled = false;
+                        updateStaticCanvas();
                         break;
 
                 case UPGRADE_BALLPOWER:
@@ -934,7 +921,7 @@ class Upgrade {
         ]
 
         static nextUpgradePoints = 700; //Punkty do kolejnego upgrade'u
-        static platformSizeIncrease = 250;
+        static platformSizeIncrease = canvas.width / 25;
 
         constructor(pos, type) {
                 this.pos = pos;
@@ -961,18 +948,20 @@ class Upgrade {
                         //Ogólne
                         case UPGRADE_MOREHP:
                                 playerHealth++;
+                                updateStaticCanvas();
                                 break;
                         case UPGRADE_LASER:
                                 Projectile.playerLasers++;
                                 break;
                         case UPGRADE_SKIP:
                                 Portal.enabled = true;
+                                updateStaticCanvas();
                                 break;
 
                         //Piłki
                         case UPGRADE_MOREBALLS:
                                 removeUpgradeEffect(UPGRADE_BALLPOWER);
-                                new Ball(new Vector2D(Math.floor(platform.pos.x + platform.size.x / 2 - canvas.width / 27.77 / 2), platform.pos.y - canvas.width / 27.77), new Vector2D(0.25, 1), new Vector2D(canvas.width / 27.77, canvas.width / 27.77));
+                                new Ball(new Vector2D(Math.floor(platform.pos.x + platform.size.x / 2 - canvas.width / 27.77 / 2), platform.pos.y - canvas.width / 27.77), new Vector2D(0.25, 1), canvas.width / 27.77 / 2);
                                 break;
                         case UPGRADE_BALLPOWER:
                                 removeUpgradeEffect(UPGRADE_MOREBALLS);
@@ -1008,8 +997,6 @@ class Upgrade {
         }
 
         remove() {
-                context.clearRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
-
                 Upgrade.list.forEach((el, index) => {
                         if (el == this)
                                 Upgrade.list.splice(index, 1);
@@ -1036,6 +1023,8 @@ class MiniDOH {
                 this.texture.src = "img/doh.png";
 
                 MiniDOH.list.push(this);
+
+                updateStaticCanvas();
         }
 
         draw() {
@@ -1049,6 +1038,8 @@ class MiniDOH {
                                 MiniDOH.list.splice(index, 1);
                         }
                 })
+
+                updateStaticCanvas();
         }
 }
 
@@ -1070,6 +1061,8 @@ class DOH {
                 this.minionsNum = 0;
 
                 DOH.list.push(this);
+
+                updateStaticCanvas();
         }
 
         think(cTime) {
@@ -1094,20 +1087,16 @@ class DOH {
                 }
 
                 if (this.fireBalls[0] == null && platform.holdBall == null) {
-                        this.fireBalls[0] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(0.2, 1), new Vector2D(canvas.width / 20, canvas.width / 20), true, this);
+                        this.fireBalls[0] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(0.2, 1), canvas.width / 20 / 2, true, this);
                 }
 
                 if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10) {
-                        this.fireBalls[1] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(-0.2, 1), new Vector2D(canvas.width / 20, canvas.width / 20), true, this);
+                        this.fireBalls[1] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(-0.2, 1), canvas.width / 20 / 2, true, this);
                 }
         }
 
         draw() {
                 contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
-
-                this.fireBalls.forEach((el) => {
-                        if (el != null) el.draw();
-                })
         }
 
         remove() {
@@ -1117,6 +1106,8 @@ class DOH {
                                 DOH.list.splice(index, 1);
                         }
                 })
+
+                updateStaticCanvas();
         }
 }
 
@@ -1130,6 +1121,7 @@ function summonDOH() {
         height = canvas.height / 2;
 
         new DOH(new Vector2D(canvas.width / 2 - width / 2, canvas.height / 2 - height / 1.5), new Vector2D(width, height));
+        updateStaticCanvas();
 }
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //
@@ -1198,6 +1190,8 @@ class Brick {
 
 
                 Brick.list.push(this);
+
+                updateStaticCanvas();
         }
 
         // Rysuje cegłe
@@ -1219,7 +1213,7 @@ class Brick {
 
                                                 let randUpgrade = Math.floor(Math.random() * 8);
                                                 new Upgrade(new Vector2D(Math.floor(this.pos.x + this.size.x / 2), Math.floor(this.pos.y + this.size.y / 2)), randUpgrade);
-                                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLCATCH);
+                                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_PLATFORMCLONE);
                                         }
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }
@@ -1232,7 +1226,7 @@ class Brick {
 
 
 
-function checkCollision(obj1, obj2) {
+function rectXrectCollision(obj1, obj2) {
         if (obj1 == null || obj2 == null)
                 return null;
 
@@ -1266,6 +1260,67 @@ function checkCollision(obj1, obj2) {
         colData.hit = hit;
         colData.hitFactor = (obj1.pos.x - (obj2.pos.x + obj2.size.x / 2)) / obj2.size.x
 
+        return colData;
+}
+
+function circXrectCollision(circ, rect)
+{
+        if (circ == null || rect == null)
+                return null;
+
+        let colData = {};
+
+        let testX, testY;
+        testX = circ.pos.x + circ.radius;
+        testY = circ.pos.y + circ.radius;
+    
+        if (circ.pos.x + circ.radius < rect.pos.x)         
+            testX = rect.pos.x;
+        else if (circ.pos.x + circ.radius > rect.pos.x + rect.size.x) 
+            testX = rect.pos.x + rect.size.x;
+        
+        if (circ.pos.y + circ.radius < rect.pos.y)         
+            testY = rect.pos.y;
+        else if (circ.pos.y + circ.radius > rect.pos.y + rect.size.y) 
+            testY = rect.pos.y + rect.size.y;
+    
+        let distX, distY;
+        distX = circ.pos.x + circ.radius - testX;
+        distY = circ.pos.y + circ.radius - testY;
+        
+        let dist = Math.sqrt((distX * distX) + (distY * distY));
+
+        let aboveAC = ((rect.pos.x - (rect.pos.x + rect.size.x)) * ((circ.pos.y + circ.radius) - (rect.pos.y + rect.size.y))   -   (rect.pos.y - (rect.pos.y + rect.size.y)) * ((circ.pos.x + circ.radius) - (rect.pos.x + rect.size.x))) > 0
+        let aboveDB = ((rect.pos.x - (rect.pos.x + rect.size.x)) * ((circ.pos.y + circ.radius) - rect.pos.y)   -   ((rect.pos.y + rect.size.y) - rect.pos.y) * ((circ.pos.x + circ.radius) - (rect.pos.x + rect.size.x))) > 0
+
+        let side = 'none';
+        let hit = false;
+
+        if (dist <= circ.radius)
+        {
+            if (aboveAC)
+            {
+                if (aboveDB)
+                    side = 'top';
+                else
+                    side = 'right';
+            }
+            else
+            {
+                if (aboveDB)
+                    side = 'left';
+                else
+                    side = 'bottom';
+            }
+
+            hit = true;
+        }
+            
+        colData.side = side;
+        colData.hit = hit;
+        // colData.hitFactor = (obj1.pos.x - (obj2.pos.x + obj2.size.x / 2)) / obj2.size.x
+        colData.hitFactor = (circ.pos.x - (rect.pos.x + rect.size.x / 2)) / rect.size.x
+        
         return colData;
 }
 // ==================================================================================================== //
@@ -1321,7 +1376,7 @@ function think(cTime) {
                 //Sprawdzamy kolizje z cegłami jeśli laser jest gracza
                 if (el.isPlayers) {
                         Brick.list.forEach((brick) => {
-                                let col = checkCollision(el, brick);
+                                let col = rectXrectCollision(el, brick);
 
                                 if (col.hit) {
                                         brick.remove();
@@ -1362,14 +1417,14 @@ function think(cTime) {
 
 
                 //Kolizja z platformą
-                let col = checkCollision(el, platform)
+                let col = rectXrectCollision(el, platform)
 
                 if (col.hit)
                         el.collect();
 
                 //Kolizja z klonem platformy
                 if (platformClone.enabled && !col.hit) {
-                        col = checkCollision(el, platformClone);
+                        col = rectXrectCollision(el, platformClone);
 
                         if (col.hit)
                                 el.collect();
@@ -1379,7 +1434,7 @@ function think(cTime) {
         //Logika portali
         if (Portal.enabled)
                 Portal.list.forEach((el) => {
-                        let col = checkCollision(el, platform)
+                        let col = rectXrectCollision(el, platform)
 
                         if (col.hit)
                                 nextLevel();
@@ -1401,12 +1456,12 @@ function draw() {
                 if (platformClone.enabled)
                         platformClone.draw(); //Rysuję klona platformy jeśli mamy jego upgrade
 
-                // DOH.list.forEach((el) => el.draw());
-                // MiniDOH.list.forEach((el) => el.draw());
-
-                // if (Portal.enabled)
-                        // Portal.list.forEach((el) => el.draw());
-
+                //Rysuje fireballe doha
+                DOH.list.forEach((doh) => {
+                        doh.fireBalls.forEach((el) => {
+                                if (el != null) el.draw();
+                        })
+                });
                 // Rysuje każdą piłke
                 Ball.list.forEach((el) => el.draw())
 
@@ -1418,30 +1473,6 @@ function draw() {
 
                 //Rysuje kazdy laser
                 Projectile.list.forEach((el) => el.draw());
-
-
-
-                // Wyświetla statystyki
-                // context.font = `bold ${canvas.height / 18.5}px Arial`;
-                // context.fillStyle = '#0090e1';
-
-                // context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
-
-                // context.fillStyle = '#f8312f';
-                // context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
-
-                // //Pasek życia DOH'a
-                // if (DOH.list.length > 0) {
-                //         let doh = DOH.list[0];
-
-                //         context.fillStyle = '#0e0a24';
-                //         context.fillRect(canvas.width * 0.2, canvas.height / 15.625 - canvas.height / 18.5, canvas.width * 0.6, canvas.height / 18.5);
-
-                //         if (doh.minionsNum > 0) context.fillStyle = '#0089c4'; else context.fillStyle = '#de4f35';
-                //         context.fillRect(canvas.width * 0.2 + 25, canvas.height / 15.625 - canvas.height / 18.5 + 25, (canvas.width * 0.6 - 50) * (doh.hp / 20), canvas.height / 18.5 - 50);
-                // }
-
-
         }
         else {
                 // Wyświetla zdobyte punkty

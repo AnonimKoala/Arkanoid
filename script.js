@@ -551,6 +551,8 @@ class Ball {
         think() {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
 
+                console.log(this.lastTouchedObj)
+
                 if (this.pos.x <= 0 && this.lastTouchedObj != 'leftwall') {
                         this.lastTouchedObj = 'leftwall';
                         this.invertDirX();
@@ -563,11 +565,6 @@ class Ball {
                         playSound("hitEdge")
                 } else if (this.pos.y <= 0 && this.lastTouchedObj != 'topwall') {
                         this.lastTouchedObj = 'topwall';
-                        this.invertDirY();
-                        hit = true;
-                        playSound("hitEdge")
-                } else if (this.pos.y + this.radius * 2 >= canvas.height && this.lastTouchedObj != 'bottomwall') {
-                        this.lastTouchedObj = 'bottomwall';
                         this.invertDirY();
                         hit = true;
                         playSound("hitEdge")

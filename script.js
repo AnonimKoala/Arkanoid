@@ -203,7 +203,7 @@ function generateBricks(startFrom = null) {
         allBricks.forEach((el, i) => {
                 new Brick(
                         new Vector2D(parseInt(el.x), parseInt(el.y)),
-                        new Vector2D(499.9, 249.9),
+                        new Vector2D(99.9, 49.9),
                         parseInt(el.type)
                 )
         })

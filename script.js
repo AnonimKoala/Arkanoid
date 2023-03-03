@@ -158,6 +158,7 @@ function resetToDefault() {
         originalBall.speed = 4;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
+        originalBall.lastTouchedObj = null;
 
         setTimeout(() => {
                 updateStaticCanvas();
@@ -554,6 +555,8 @@ class Ball {
         think() {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
 
+                console.log(this.lastTouchedObj)
+
                 if (this.pos.x <= 0 && this.lastTouchedObj != 'leftwall') {
                         this.lastTouchedObj = 'leftwall';
                         this.invertDirX();
@@ -566,11 +569,6 @@ class Ball {
                         playSound("hitEdge")
                 } else if (this.pos.y <= 0 && this.lastTouchedObj != 'topwall') {
                         this.lastTouchedObj = 'topwall';
-                        this.invertDirY();
-                        hit = true;
-                        playSound("hitEdge")
-                } else if (this.pos.y + this.radius * 2 >= canvas.height && this.lastTouchedObj != 'bottomwall') {
-                        this.lastTouchedObj = 'bottomwall';
                         this.invertDirY();
                         hit = true;
                         playSound("hitEdge")
@@ -733,7 +731,7 @@ class Ball {
 
                         for (let i = 0; i < this.power; i++) {
                                 context.globalAlpha = 0.75 - (0.75 / (this.power + 1) * (i + 1));
-                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1))), this.radius * 2, this.radius * 2)
+                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.radius * 2 / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.radius * 2 / 4) * (i + 1))), this.radius * 2, this.radius * 2)
                         }
 
                         context.globalAlpha = 1;

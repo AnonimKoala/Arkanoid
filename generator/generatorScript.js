@@ -20,17 +20,17 @@ const clearButton = document.querySelector("#clearButton")
 // ==================================================================================================== //
 function setPalette() {
     let brickX = -0.1
-    let brickY = 500
+    let brickY = 100
     allBricks.forEach((el, i) => {
         el.dataset.x = brickX
         el.dataset.y = brickY
 
-        if (brickX > 4400) {
+        if (brickX > 880) {
             brickX = -0.1
-            brickY += 250
+            brickY += 50
         }
         else
-            brickX += 500
+            brickX += 100
     })
 }
 // ==================================================================================================== //
@@ -150,8 +150,10 @@ loadButton.addEventListener("click", e => {
         levelNameInput.value = levelName
 
         let level = JSON.parse(localStorage.getItem(levelName))
+        // console.log(level);
         level.forEach((el, i) => {
             allBricks.forEach((el2, i2) => {
+                console.log(el.x, el2.dataset.x);
                 if (el.x == el2.dataset.x && el.y == el2.dataset.y) {
                     el2.dataset.type = el.type
                     switch (parseInt(el.type)) {

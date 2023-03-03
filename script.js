@@ -48,8 +48,8 @@ loadButton.addEventListener("click", function () {
 // ==================================================================================================== //
 
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
-canvas.width = 5000
-canvas.height = 5000
+canvas.width = 1000
+canvas.height = 1000
 staticCanvas.width = canvas.width;
 staticCanvas.height = canvas.height;
 // ==================================================================================================== //

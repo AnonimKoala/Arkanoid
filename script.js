@@ -158,6 +158,7 @@ function resetToDefault() {
         originalBall.speed = 4;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
+        originalBall.lastTouchedObj = null;
 
         setTimeout(() => {
                 updateStaticCanvas();
@@ -729,7 +730,7 @@ class Ball {
 
                         for (let i = 0; i < this.power; i++) {
                                 context.globalAlpha = 0.75 - (0.75 / (this.power + 1) * (i + 1));
-                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1))), this.radius * 2, this.radius * 2)
+                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.radius * 2 / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.radius * 2 / 4) * (i + 1))), this.radius * 2, this.radius * 2)
                         }
 
                         context.globalAlpha = 1;

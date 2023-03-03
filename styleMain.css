@@ -6,8 +6,14 @@ canvas {
     border: 1px solid black;
     height: 100%;
     width: 100%;
-    background-image: url("img/background.jpg");
     background-size: 100%;
+}
+
+#staticCanvas {
+    background-image: url("img/background.jpg");
+    position: absolute;
+    top: 0;
+    z-index: -1;
 }
 
 #div {

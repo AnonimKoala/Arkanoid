@@ -1,6 +1,8 @@
 // ========================================[ Ustawia pole gry ]======================================== //
 const canvas = document.getElementById('canvas');
+const staticCanvas = document.getElementById('staticCanvas');
 const context = canvas.getContext('2d');
+const contextStatic = staticCanvas.getContext('2d');
 // ==================================================================================================== //
 
 // ========================================= [ Ustawia guziki ] ======================================= //
@@ -48,6 +50,8 @@ loadButton.addEventListener("click", function () {
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
 canvas.width = 5000
 canvas.height = 5000
+staticCanvas.width = canvas.width;
+staticCanvas.height = canvas.height;
 // ==================================================================================================== //
 
 // ========================================[ Odtwarza dźwięk ]======================================== // 
@@ -125,8 +129,8 @@ function gameOver() {
 
 
 // ========================================[ Dotyczące gracza ]======================================== //
-// let playerLevel = 1
-let playerLevel = 33;
+let playerLevel = 1
+// let playerLevel = 33;
 let playerHealth = 3
 let playerPoints = 0
 
@@ -155,6 +159,8 @@ function resetToDefault() {
         originalBall.speed = 20;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
+
+        updateStaticCanvas();
 }
 // ==================================================================================================== //
 
@@ -223,11 +229,6 @@ function loadLevel(startFrom = null) {
         } else {
                 generateBricks(startFrom)
         }
-
-
-
-
-
 }
 // ==================================================================================================== //
 
@@ -363,6 +364,7 @@ class Vector2D {
 let platform = {
         size: new Vector2D(canvas.width / 4.54, canvas.height / 100 * 2.5), // Długość i szerokość platformy
         pos: null, // Pozycja platformy
+        prevPos: null, //Poprzednia pozycja
         move: canvas.width / 100 * 5,
         holdBall: null, //Czy nasza platforma trzyma piłke
         timesIncreased: 0, //Ile razy nasza platforma została powiększona upgradem
@@ -377,7 +379,8 @@ let platform = {
         }
 }
 
-platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
+platform.pos = new Vector2D(Math.floor(canvas.width / 2 - platform.size.x / 2), Math.floor(canvas.height - platform.size.y * 2.5));
+platform.prevPos = new Vector2D(platform.pos.x, platform.pos.y);
 
 //Klon platformy używany do upgrade'u
 let platformClone = {
@@ -400,30 +403,44 @@ document.addEventListener("keydown", e => {
         // Ruch platformą strzałkami
         if (e.key == "ArrowLeft") {
                 if (platform.pos.x > 0) {
+                        platform.prevPos.x = platform.pos.x;
+
                         platform.pos.x -= platform.move;
+                        platform.pos.x = Math.floor(platform.pos.x);
 
                         if (platformClone.enabled) {
-                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                                platformClone.prevPos.x = platformClone.pos.x;
+                                platformClone.pos.x = Math.floor(canvas.width - platform.pos.x - platformClone.size.x);
                         }
 
                         if (platform.holdBall != null) {
                                 let ballDiff = platform.holdBall.pos.x - oldPlatformPosX;
 
-                                platform.holdBall.pos.x = platform.pos.x + ballDiff;
+                                platform.holdBall.prevPos.x = platform.holdBall.pos.x;
+                                platform.holdBall.prevPos.y = platform.holdBall.pos.y;
+
+                                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff);
                         }
                 }
         } else if (e.key == "ArrowRight") {
                 if (platform.pos.x + platform.size.x < canvas.width) {
+                        platform.prevPos.x = platform.pos.x;
+
                         platform.pos.x += platform.move;
+                        platform.pos.x = Math.floor(platform.pos.x)
 
                         if (platformClone.enabled) {
-                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                                platformClone.prevPos.x = platformClone.pos.x;
+                                platformClone.pos.x = Math.floor(canvas.width - platform.pos.x - platformClone.size.x);
                         }
 
                         if (platform.holdBall != null) {
                                 let ballDiff = platform.holdBall.pos.x - oldPlatformPosX;
 
-                                platform.holdBall.pos.x = platform.pos.x + ballDiff;
+                                platform.holdBall.prevPos.x = platform.holdBall.pos.x;
+                                platform.holdBall.prevPos.y = platform.holdBall.pos.y;
+
+                                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff);
                         }
                 }
         }
@@ -449,18 +466,23 @@ canvas.addEventListener("mousemove", e => {
                 (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 > 0 &&
                 (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2 + platform.size.x < canvas.width
         ) {
-                platform.pos.x = (e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2
+                platform.prevPos.x = platform.pos.x;
+                platform.pos.x = Math.floor((e.clientX - canvas.getBoundingClientRect().left) * (canvas.width / canvas.getBoundingClientRect().width) - platform.size.x / 2);
         }
 
         if (platformClone.enabled) {
-                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                platformClone.prevPos.x = platformClone.pos.x;
+                platformClone.pos.x = Math.floor(canvas.width - platform.pos.x - platformClone.size.x);
         }
 
         // Odpowiada za przesuwanie piłki trzymanje przez platformę
         if (platform.holdBall != null) {
                 let ballDiff = platform.holdBall.pos.x - oldPlatformPosX;
 
-                platform.holdBall.pos.x = platform.pos.x + ballDiff;
+                platform.holdBall.prevPos.x = platform.holdBall.pos.x;
+                platform.holdBall.prevPos.y = platform.holdBall.pos.y;
+
+                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff);
         }
 
 })
@@ -481,6 +503,7 @@ class Ball {
 
         constructor(pos, dir, size, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki
+                this.prevPos = new Vector2D(pos.x, pos.y);
                 this.dir = dir; // Przechowuje kierunek piłki
                 this.size = size; // Przechowuje wielkość piłki
                 this.enemyBall = enemyBall;
@@ -527,22 +550,42 @@ class Ball {
                 let el = this;
 
                 //Kolizja z ścianami
-                if (el.pos.x <= 0 || el.pos.x + el.size.x >= canvas.width) // Kolizja z lewą i prawą ścianą
-                {
+                // if (el.pos.x <= 0 || el.pos.x + el.size.x >= canvas.width) // Kolizja z lewą i prawą ścianą
+                // {
+                //         hit = true;
+                //         el.invertDirX();
+
+                //         playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
+                // }
+
+                // if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
+                // {
+                //         hit = true;
+                //         el.invertDirY();
+
+                //         playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
+                // }
+
+                if (el.pos.x <= 0 && el.lastTouchedObj != 'leftwall') {
+                        el.lastTouchedObj = 'leftwall';
+                        el.invertDirX();
+                        hit = true;
+                        playSound("hitEdge")
+                } else if (el.pos.x + el.size.x >= canvas.width && el.lastTouchedObj != 'rightwall') {
+                        el.lastTouchedObj = 'rightwall';
                         hit = true;
                         el.invertDirX();
-                        el.lastTouchedObj = null;
-
-                        playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
-                }
-
-                if (el.pos.y <= 0 || el.pos.y + el.size.y >= canvas.height) // Kolizja z górną i dolną ścianą
-                {
+                        playSound("hitEdge")
+                } else if (el.pos.y <= 0 && el.lastTouchedObj != 'topwall') {
+                        el.lastTouchedObj = 'topwall';
                         hit = true;
                         el.invertDirY();
-                        el.lastTouchedObj = null;
-
-                        playSound("hitEdge") // Odtwarzanie dźwięku odbicia od ściany
+                        playSound("hitEdge")
+                } else if (el.pos.y + el.size.y >= canvas.height && el.lastTouchedObj != 'bottomwall') {
+                        el.lastTouchedObj = 'bottomwall';
+                        hit = true;
+                        el.invertDirY();
+                        playSound("hitEdge")
                 }
 
 
@@ -671,9 +714,12 @@ class Ball {
 
                 //Ruch piłek
                 if (platform.holdBall != el) {
+                        el.prevPos.x = el.pos.x;
+                        el.prevPos.y = el.pos.y;
+
                         let len = el.dir.length()
-                        el.pos.x += (el.dir.x / len) * el.speed
-                        el.pos.y += (el.dir.y / len) * el.speed
+                        el.pos.x += Math.floor((el.dir.x / len) * el.speed)
+                        el.pos.y += Math.floor((el.dir.y / len) * el.speed)
                 }
 
                 // Sprawdza czy piłka wypadła
@@ -697,7 +743,7 @@ class Ball {
 
                         for (let i = 0; i < this.power; i++) {
                                 context.globalAlpha = 0.75 - (0.75 / (this.power + 1) * (i + 1));
-                                context.drawImage(this.texture, this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1)), this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1)), this.size.x, this.size.y)
+                                context.drawImage(this.texture, Math.floor(this.pos.x - ((this.dir.x / len) * (this.size.x / 4) * (i + 1))), Math.floor(this.pos.y - ((this.dir.y / len) * (this.size.y / 4) * (i + 1))), this.size.x, this.size.y)
                         }
 
                         context.globalAlpha = 1;
@@ -738,12 +784,15 @@ let originalBall = new Ball(
                 null    // y
         ),
         new Vector2D(0.25, -1), // Kierunek
-        new Vector2D(180, 180) // Size
+        new Vector2D(canvas.width / 27.77, canvas.width / 27.77) // Size
 );
 
 // Na początku piłka pojawia się nad platformą
 originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.size.x / 2
 originalBall.pos.y = platform.pos.y - 0 - originalBall.size.y
+
+originalBall.prevPos.x = originalBall.pos.x;
+originalBall.prevPos.y = originalBall.pos.y;
 // ==================================================================================================== //
 
 // =========================================[ Ulepszenia ]========================================= //
@@ -752,10 +801,11 @@ class Projectile {
         static list = [];
         static playerLasers = 0;
         static nextPlayerFire = 0;
-        static playerLaserSize = new Vector2D(100, 250);
+        static playerLaserSize = new Vector2D(canvas.width / 50, canvas.height / 20);
 
         constructor(pos, dir, size, speed, player, texture = "img/laserProjectile.png") {
                 this.pos = pos;
+                this.prevPos = new Vector2D(pos.x, pos.y);
                 this.dir = dir;
                 this.size = size;
                 this.speed = speed;
@@ -801,7 +851,7 @@ class Portal {
         }
 
         draw() {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
         remove() {
@@ -812,7 +862,10 @@ class Portal {
         }
 }
 
-new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - 400 + 25, canvas.height - canvas.height * 0.025 - 500), new Vector2D(400, 500));
+let portalW, portalH;
+portalW = canvas.width / 12.5;
+portalH = canvas.height / 10;
+new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - portalW + 25, canvas.height - canvas.height * 0.025 - portalH), new Vector2D(portalW, portalH));
 
 
 let prevUpgrade;
@@ -885,6 +938,7 @@ class Upgrade {
 
         constructor(pos, type) {
                 this.pos = pos;
+                this.prevPos = new Vector2D(pos.x, pos.y);
                 this.velY = 16;
                 this.type = type;
                 this.size = new Vector2D(canvas.width / 10 - 0.1, canvas.width / 10 - 0.1);
@@ -918,7 +972,7 @@ class Upgrade {
                         //Piłki
                         case UPGRADE_MOREBALLS:
                                 removeUpgradeEffect(UPGRADE_BALLPOWER);
-                                new Ball(new Vector2D(platform.pos.x + platform.size.x / 2 - 180 / 2, platform.pos.y - 180), new Vector2D(0.25, 1), new Vector2D(180, 180));
+                                new Ball(new Vector2D(Math.floor(platform.pos.x + platform.size.x / 2 - canvas.width / 27.77 / 2), platform.pos.y - canvas.width / 27.77), new Vector2D(0.25, 1), new Vector2D(canvas.width / 27.77, canvas.width / 27.77));
                                 break;
                         case UPGRADE_BALLPOWER:
                                 removeUpgradeEffect(UPGRADE_MOREBALLS);
@@ -942,6 +996,7 @@ class Upgrade {
                                 removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
                                 platform.size.x += Upgrade.platformSizeIncrease;
                                 platform.pos.x -= Upgrade.platformSizeIncrease / 2;
+                                platform.pos.x = Math.floor(platform.pos.x);
 
                                 platform.timesIncreased++;
                                 break;
@@ -953,6 +1008,8 @@ class Upgrade {
         }
 
         remove() {
+                context.clearRect(this.pos.x, this.pos.y, this.size.x, this.size.y);
+
                 Upgrade.list.forEach((el, index) => {
                         if (el == this)
                                 Upgrade.list.splice(index, 1);
@@ -982,7 +1039,7 @@ class MiniDOH {
         }
 
         draw() {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
         remove() {
@@ -1026,25 +1083,27 @@ class DOH {
                 if (this.hp <= 10 && !this.summonedMinions) {
                         this.summonedMinions = true;
 
-                        new MiniDOH(new Vector2D(this.pos.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
-                        new MiniDOH(new Vector2D(this.pos.x + 400, this.pos.y + this.size.y), new Vector2D(400, 720), this);
-                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 800, this.pos.y + this.size.y), new Vector2D(400, 720), this);
-                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - 200, this.pos.y + this.size.y * 0.95), new Vector2D(400, 720), this);
+                        new MiniDOH(new Vector2D(this.pos.x - canvas.width / 25, this.pos.y + this.size.y * 0.95), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
+                        new MiniDOH(new Vector2D(this.pos.x + canvas.width / 12.5, this.pos.y + this.size.y), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
+                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - canvas.width / 6.25, this.pos.y + this.size.y), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
+                        new MiniDOH(new Vector2D(this.pos.x + this.size.x - canvas.width / 25, this.pos.y + this.size.y * 0.95), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
 
                         this.minionsNum = 4;
+
+                        updateStaticCanvas();
                 }
 
                 if (this.fireBalls[0] == null && platform.holdBall == null) {
-                        this.fireBalls[0] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(0.2, 1), new Vector2D(250, 250), true, this);
+                        this.fireBalls[0] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(0.2, 1), new Vector2D(canvas.width / 20, canvas.width / 20), true, this);
                 }
 
                 if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10) {
-                        this.fireBalls[1] = new Ball(new Vector2D(this.pos.x + this.size.x * 0.35, this.pos.y + this.size.y * 0.6), new Vector2D(-0.2, 1), new Vector2D(250, 250), true, this);
+                        this.fireBalls[1] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(-0.2, 1), new Vector2D(canvas.width / 20, canvas.width / 20), true, this);
                 }
         }
 
         draw() {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
 
                 this.fireBalls.forEach((el) => {
                         if (el != null) el.draw();
@@ -1067,8 +1126,8 @@ function summonDOH() {
         Brick.list = [];
 
         let width, height;
-        width = 2000;
-        height = 2500;
+        width = canvas.width / 2.5;
+        height = canvas.height / 2;
 
         new DOH(new Vector2D(canvas.width / 2 - width / 2, canvas.height / 2 - height / 1.5), new Vector2D(width, height));
 }
@@ -1143,7 +1202,7 @@ class Brick {
 
         // Rysuje cegłe
         draw() {
-                context.drawImage(this.texture, this.pos.x, this.pos.y, canvas.width / 10 - 0.1, canvas.height / 20 - 0.1);
+                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, canvas.width / 10 - 0.1, canvas.height / 20 - 0.1);
         }
 
         // Usuwa cegłe
@@ -1159,13 +1218,15 @@ class Brick {
                                                 nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 51);
 
                                                 let randUpgrade = Math.floor(Math.random() * 8);
-                                                new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), randUpgrade);
+                                                new Upgrade(new Vector2D(Math.floor(this.pos.x + this.size.x / 2), Math.floor(this.pos.y + this.size.y / 2)), randUpgrade);
                                                 // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_BALLCATCH);
                                         }
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }
                         })
                 }
+
+                updateStaticCanvas();
         }
 }
 
@@ -1243,13 +1304,13 @@ function think(cTime) {
                 Projectile.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
 
                 for (let i = 0; i < Projectile.playerLasers; i++) {
-                        let el = new Projectile(new Vector2D((platform.pos.x + (platform.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2, platform.pos.y - Projectile.playerLaserSize.y), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
+                        let el = new Projectile(new Vector2D(Math.floor((platform.pos.x + (platform.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platform.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
                         el.dir.x = (el.pos.x + el.size.x / 2 - (platform.pos.x + platform.size.x / 2)) / platform.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                 }
 
                 if (platformClone.enabled) {
                         for (let i = 0; i < Projectile.playerLasers; i++) {
-                                let el = new Laser(new Vector2D((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2, platformClone.pos.y - Projectile.playerLaserSize.y), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
+                                let el = new Laser(new Vector2D(Math.floor((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platformClone.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
                                 el.dir.x = (el.pos.x + el.size.x / 2 - (platformClone.pos.x + platformClone.size.x / 2)) / platformClone.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                         }
                 }
@@ -1277,9 +1338,12 @@ function think(cTime) {
                         el.pos.y > canvas.height
                 ) el.remove();
 
+                el.prevPos.x = el.pos.x;
+                el.prevPos.y = el.pos.y;
+
                 let len = el.dir.length();
-                el.pos.x += (el.dir.x / len) * el.speed;
-                el.pos.y += (el.dir.y / len) * el.speed;
+                el.pos.x += Math.floor((el.dir.x / len) * el.speed);
+                el.pos.y += Math.floor((el.dir.y / len) * el.speed);
         })
 
         // Logika upgrade'ów
@@ -1287,7 +1351,10 @@ function think(cTime) {
                 if (el.velY > -42)
                         el.velY -= 0.35;
 
+                el.prevPos.y = el.pos.y;
+
                 el.pos.y -= el.velY * 0.75;
+                el.pos.y = Math.floor(el.pos.y);
 
                 //Wyjście poza ekran
                 if (el.pos.y > canvas.height)
@@ -1334,17 +1401,17 @@ function draw() {
                 if (platformClone.enabled)
                         platformClone.draw(); //Rysuję klona platformy jeśli mamy jego upgrade
 
-                DOH.list.forEach((el) => el.draw());
-                MiniDOH.list.forEach((el) => el.draw());
+                // DOH.list.forEach((el) => el.draw());
+                // MiniDOH.list.forEach((el) => el.draw());
 
-                if (Portal.enabled)
-                        Portal.list.forEach((el) => el.draw());
+                // if (Portal.enabled)
+                        // Portal.list.forEach((el) => el.draw());
 
                 // Rysuje każdą piłke
                 Ball.list.forEach((el) => el.draw())
 
                 // Rysuje każdą cegłe
-                Brick.list.forEach((el) => el.draw());
+                // Brick.list.forEach((el) => el.draw());
 
                 //Rysuje każdy upgrade
                 Upgrade.list.forEach((el) => el.draw());
@@ -1355,24 +1422,24 @@ function draw() {
 
 
                 // Wyświetla statystyki
-                context.font = `bold ${canvas.height / 18.5}px Arial`;
-                context.fillStyle = '#0090e1';
+                // context.font = `bold ${canvas.height / 18.5}px Arial`;
+                // context.fillStyle = '#0090e1';
 
-                context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
+                // context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
 
-                context.fillStyle = '#f8312f';
-                context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
+                // context.fillStyle = '#f8312f';
+                // context.fillText(`${playerHealth}❤️`, canvas.width - canvas.width / 9, canvas.height / 15.625) // Życie
 
-                //Pasek życia DOH'a
-                if (DOH.list.length > 0) {
-                        let doh = DOH.list[0];
+                // //Pasek życia DOH'a
+                // if (DOH.list.length > 0) {
+                //         let doh = DOH.list[0];
 
-                        context.fillStyle = '#0e0a24';
-                        context.fillRect(canvas.width * 0.2, canvas.height / 15.625 - canvas.height / 18.5, canvas.width * 0.6, canvas.height / 18.5);
+                //         context.fillStyle = '#0e0a24';
+                //         context.fillRect(canvas.width * 0.2, canvas.height / 15.625 - canvas.height / 18.5, canvas.width * 0.6, canvas.height / 18.5);
 
-                        if (doh.minionsNum > 0) context.fillStyle = '#0089c4'; else context.fillStyle = '#de4f35';
-                        context.fillRect(canvas.width * 0.2 + 25, canvas.height / 15.625 - canvas.height / 18.5 + 25, (canvas.width * 0.6 - 50) * (doh.hp / 20), canvas.height / 18.5 - 50);
-                }
+                //         if (doh.minionsNum > 0) context.fillStyle = '#0089c4'; else context.fillStyle = '#de4f35';
+                //         context.fillRect(canvas.width * 0.2 + 25, canvas.height / 15.625 - canvas.height / 18.5 + 25, (canvas.width * 0.6 - 50) * (doh.hp / 20), canvas.height / 18.5 - 50);
+                // }
 
 
         }
@@ -1398,9 +1465,45 @@ function draw() {
 
         context.stroke(); //Kończy rysować nową klatke
 }
+
+
+
+function updateStaticCanvas()
+{
+        contextStatic.clearRect(0, 0, staticCanvas.width, staticCanvas.height);
+
+        if (playerHealth > 0)
+        {
+                DOH.list.forEach((el) => el.draw());
+                MiniDOH.list.forEach((el) => el.draw());
+
+                if (Portal.enabled)
+                        Portal.list.forEach((el) => el.draw());
+
+                Brick.list.forEach((el) => el.draw());
+
+                // Wyświetla statystyki
+                contextStatic.font = `bold ${staticCanvas.height / 18.5}px Arial`;
+                contextStatic.fillStyle = '#0090e1';
+
+                contextStatic.fillText(`${playerPoints}💎`, staticCanvas.width / 50, staticCanvas.height / 15.625) // Punkty
+
+                contextStatic.fillStyle = '#f8312f';
+                contextStatic.fillText(`${playerHealth}❤️`, staticCanvas.width - staticCanvas.width / 9, staticCanvas.height / 15.625) // Życie
+
+                //Pasek życia DOH'a
+                if (DOH.list.length > 0) {
+                        let doh = DOH.list[0];
+
+                        contextStatic.fillStyle = '#0e0a24';
+                        contextStatic.fillRect(staticCanvas.width * 0.2, staticCanvas.height / 15.625 - staticCanvas.height / 18.5, staticCanvas.width * 0.6, staticCanvas.height / 18.5);
+
+                        if (doh.minionsNum > 0) contextStatic.fillStyle = '#0089c4'; else contextStatic.fillStyle = '#de4f35';
+                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 25, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 50);
+                }
+        }
+
+        contextStatic.stroke();
+}
 // ==================================================================================================== //
 gameLoop(0) //Zaczyna nasz game loop
-
-
-
-

@@ -155,7 +155,7 @@ function resetToDefault() {
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
         originalBall.pos.y = platform.pos.y - 10 - originalBall.radius * 2
 
-        originalBall.speed = 20;
+        originalBall.speed = 4;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
 
@@ -513,9 +513,9 @@ class Ball {
                 if (enemyBall)
                         this.parent = enemyParent;
 
-                this.speed = 20;
+                this.speed = 4;
                 if (enemyBall)
-                        this.speed = 45;
+                        this.speed = 9;
 
                 this.texture = new Image(); // Tekstura piłki
 
@@ -694,7 +694,7 @@ class Ball {
                 }
 
                 if (hit && platform.holdBall != this && !this.enemyBall) {
-                        this.speed += 0.15; //Zwiększamy prędkość piłki po kolizji
+                        this.speed += 0.1; //Zwiększamy prędkość piłki po kolizji
                         // console.log(el.speed);
                 }
 
@@ -926,7 +926,7 @@ class Upgrade {
         constructor(pos, type) {
                 this.pos = pos;
                 this.prevPos = new Vector2D(pos.x, pos.y);
-                this.velY = 16;
+                this.velY = 3.2;
                 this.type = type;
                 this.size = new Vector2D(canvas.width / 10 - 0.1, canvas.width / 10 - 0.1);
 
@@ -1359,13 +1359,13 @@ function think(cTime) {
                 Projectile.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
 
                 for (let i = 0; i < Projectile.playerLasers; i++) {
-                        let el = new Projectile(new Vector2D(Math.floor((platform.pos.x + (platform.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platform.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
+                        let el = new Projectile(new Vector2D(Math.floor((platform.pos.x + (platform.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platform.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 13, true);
                         el.dir.x = (el.pos.x + el.size.x / 2 - (platform.pos.x + platform.size.x / 2)) / platform.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                 }
 
                 if (platformClone.enabled) {
                         for (let i = 0; i < Projectile.playerLasers; i++) {
-                                let el = new Laser(new Vector2D(Math.floor((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platformClone.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 65, true);
+                                let el = new Laser(new Vector2D(Math.floor((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platformClone.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 13, true);
                                 el.dir.x = (el.pos.x + el.size.x / 2 - (platformClone.pos.x + platformClone.size.x / 2)) / platformClone.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                         }
                 }
@@ -1403,8 +1403,8 @@ function think(cTime) {
 
         // Logika upgrade'ów
         Upgrade.list.forEach((el) => {
-                if (el.velY > -42)
-                        el.velY -= 0.35;
+                if (el.velY > -8.4)
+                        el.velY -= 0.07;
 
                 el.prevPos.y = el.pos.y;
 

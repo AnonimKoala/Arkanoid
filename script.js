@@ -309,9 +309,13 @@ function restartTheGame() {
         resetToDefault()
 }
 // ==================================================================================================== //
-// TODO: funkcja victory
+// Wyświetla ekran końcowy i restartuje grę
 function victory() {
-
+        document.querySelector("#victory").style.display = "grid";
+        document.querySelector("#victory").addEventListener("click", () => {
+                document.querySelector("#victory").style.display = "none";
+                restartTheGame()
+        })
 }
 
 
@@ -1261,8 +1265,7 @@ function rectXrectCollision(obj1, obj2) {
         return colData;
 }
 
-function circXrectCollision(circ, rect)
-{
+function circXrectCollision(circ, rect) {
         if (circ == null || rect == null)
                 return null;
 
@@ -1271,54 +1274,51 @@ function circXrectCollision(circ, rect)
         let testX, testY;
         testX = circ.pos.x + circ.radius;
         testY = circ.pos.y + circ.radius;
-    
-        if (circ.pos.x + circ.radius < rect.pos.x)         
-            testX = rect.pos.x;
-        else if (circ.pos.x + circ.radius > rect.pos.x + rect.size.x) 
-            testX = rect.pos.x + rect.size.x;
-        
-        if (circ.pos.y + circ.radius < rect.pos.y)         
-            testY = rect.pos.y;
-        else if (circ.pos.y + circ.radius > rect.pos.y + rect.size.y) 
-            testY = rect.pos.y + rect.size.y;
-    
+
+        if (circ.pos.x + circ.radius < rect.pos.x)
+                testX = rect.pos.x;
+        else if (circ.pos.x + circ.radius > rect.pos.x + rect.size.x)
+                testX = rect.pos.x + rect.size.x;
+
+        if (circ.pos.y + circ.radius < rect.pos.y)
+                testY = rect.pos.y;
+        else if (circ.pos.y + circ.radius > rect.pos.y + rect.size.y)
+                testY = rect.pos.y + rect.size.y;
+
         let distX, distY;
         distX = circ.pos.x + circ.radius - testX;
         distY = circ.pos.y + circ.radius - testY;
-        
+
         let dist = Math.sqrt((distX * distX) + (distY * distY));
 
-        let aboveAC = ((rect.pos.x - (rect.pos.x + rect.size.x)) * ((circ.pos.y + circ.radius) - (rect.pos.y + rect.size.y))   -   (rect.pos.y - (rect.pos.y + rect.size.y)) * ((circ.pos.x + circ.radius) - (rect.pos.x + rect.size.x))) > 0
-        let aboveDB = ((rect.pos.x - (rect.pos.x + rect.size.x)) * ((circ.pos.y + circ.radius) - rect.pos.y)   -   ((rect.pos.y + rect.size.y) - rect.pos.y) * ((circ.pos.x + circ.radius) - (rect.pos.x + rect.size.x))) > 0
+        let aboveAC = ((rect.pos.x - (rect.pos.x + rect.size.x)) * ((circ.pos.y + circ.radius) - (rect.pos.y + rect.size.y)) - (rect.pos.y - (rect.pos.y + rect.size.y)) * ((circ.pos.x + circ.radius) - (rect.pos.x + rect.size.x))) > 0
+        let aboveDB = ((rect.pos.x - (rect.pos.x + rect.size.x)) * ((circ.pos.y + circ.radius) - rect.pos.y) - ((rect.pos.y + rect.size.y) - rect.pos.y) * ((circ.pos.x + circ.radius) - (rect.pos.x + rect.size.x))) > 0
 
         let side = 'none';
         let hit = false;
 
-        if (dist <= circ.radius)
-        {
-            if (aboveAC)
-            {
-                if (aboveDB)
-                    side = 'top';
-                else
-                    side = 'right';
-            }
-            else
-            {
-                if (aboveDB)
-                    side = 'left';
-                else
-                    side = 'bottom';
-            }
+        if (dist <= circ.radius) {
+                if (aboveAC) {
+                        if (aboveDB)
+                                side = 'top';
+                        else
+                                side = 'right';
+                }
+                else {
+                        if (aboveDB)
+                                side = 'left';
+                        else
+                                side = 'bottom';
+                }
 
-            hit = true;
+                hit = true;
         }
-            
+
         colData.side = side;
         colData.hit = hit;
         // colData.hitFactor = (obj1.pos.x - (obj2.pos.x + obj2.size.x / 2)) / obj2.size.x
         colData.hitFactor = (circ.pos.x - (rect.pos.x + rect.size.x / 2)) / rect.size.x
-        
+
         return colData;
 }
 // ==================================================================================================== //
@@ -1338,9 +1338,7 @@ function gameLoop(cTime) {
         if (gamePaused && !gameOvered && gameStarted) {
                 let texture = new Image()
                 texture.src = "img/gamePaused.png"
-                context.clearRect(796, canvas.height - 1500, 3408, 852) // FIXME: Jeśli chcieć zrobić bez dublowania brodera napisu, ale pilke (texture) moze ucinac
-                context.drawImage(texture, 796, canvas.height - 1500, 3408, 852)
-                // TODO: Naprawić border
+                context.drawImage(texture, 159.2, canvas.height - 300, 681, 170.4)
         }
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
@@ -1497,12 +1495,10 @@ function draw() {
 
 
 
-function updateStaticCanvas()
-{
+function updateStaticCanvas() {
         contextStatic.clearRect(0, 0, staticCanvas.width, staticCanvas.height);
 
-        if (playerHealth > 0)
-        {
+        if (playerHealth > 0) {
                 DOH.list.forEach((el) => el.draw());
                 MiniDOH.list.forEach((el) => el.draw());
 
@@ -1518,17 +1514,21 @@ function updateStaticCanvas()
                 contextStatic.fillText(`${playerPoints}💎`, staticCanvas.width / 50, staticCanvas.height / 15.625) // Punkty
 
                 contextStatic.fillStyle = '#f8312f';
-                contextStatic.fillText(`${playerHealth}❤️`, staticCanvas.width - staticCanvas.width / 9, staticCanvas.height / 15.625) // Życie
+                if (playerHealth < 10)
+                        contextStatic.fillText(`${playerHealth}❤️`, staticCanvas.width - staticCanvas.width / 9, staticCanvas.height / 15.625) // Życie
+                else
+                        contextStatic.fillText(`${playerHealth}❤️`, staticCanvas.width - staticCanvas.width / 7.6, staticCanvas.height / 15.625) // Życie
 
                 //Pasek życia DOH'a
                 if (DOH.list.length > 0) {
                         let doh = DOH.list[0];
 
                         contextStatic.fillStyle = '#0e0a24';
-                        contextStatic.fillRect(staticCanvas.width * 0.2, staticCanvas.height / 15.625 - staticCanvas.height / 18.5, staticCanvas.width * 0.6, staticCanvas.height / 18.5);
+                        contextStatic.fillRect(staticCanvas.width * 0.2 + 8, staticCanvas.height / 15.625 - staticCanvas.height / 18.5, staticCanvas.width * 0.6 - 15, staticCanvas.height / 18.5);
 
                         if (doh.minionsNum > 0) contextStatic.fillStyle = '#0089c4'; else contextStatic.fillStyle = '#de4f35';
-                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 25, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 50);
+
+                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 10, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 20);
                 }
         }
 

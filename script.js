@@ -147,7 +147,7 @@ function resetToDefault() {
 
         // Na początku piłka pojawia się nad platformą
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
-        originalBall.pos.y = platform.pos.y - 10 - originalBall.radius * 2
+        originalBall.pos.y = platform.pos.y - 4 - originalBall.radius * 2
 
         originalBall.speed = 4.5;
         originalBall.dir.x = 0.25;

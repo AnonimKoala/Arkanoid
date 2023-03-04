@@ -90,6 +90,8 @@ function playSound(sound, type = 0) {
                 case "clicked":                                     // Dźwięk kliknięcia
                         new Audio('audio/click.ogg').play()
                         break;
+                case "victory":                                   // Dźwięk wygranej gry
+                        new Audio('audio/soundOfVictory.mp3').play()
 
 
 
@@ -113,7 +115,8 @@ function pauseTheGame(e) {                              // Funkcja pauzy gry
 // =============================[ Uruchamiane po stracie wszystkich żyć ]============================== //
 function gameOver() {                                                   // Funkcja kończąca grę
         context.clearRect(0, 0, canvas.width, canvas.height)           // Czyści canvas
-
+        document.querySelector("#staticCanvas").style.backgroundImage = "url(./img/background.jpg)" // Ustawia tło na domyślne
+        document.querySelector("#canvas").style.cursor = "none"       // Ukrywa kursor
         document.removeEventListener("click", gameOver)              // Usuwa event listenera z documentu
         restartTheGame()                                            // Uruchamia funkcję restartującą grę
 }
@@ -299,7 +302,10 @@ function victory() { // Wyświetla ekran końcowy i restartuje grę po przejści
         gameStarted = false            // Zatrzymuje grę
         document.querySelector("#victory").style.display = "grid"; // Pokazuje ekran końcowy
 
+        playSound("victory") // Odtwarza dźwięk zwycięstwa
+
         document.querySelector("#victory").addEventListener("click", () => { // Po kliknięciu w ekran końcowy
+                playSound("clicked") // Odtwarza dźwięk kliknięcia
                 document.querySelector("#victory").style.display = "none";  // Ukrywa ekran końcowy
                 restartTheGame() // Restartuje grę
         })
@@ -494,7 +500,7 @@ canvas.addEventListener("mousedown", e => {
 class Ball {
         static list = []; // Lista wszystkich piłek
         static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
-        static ballSpeedIncrease = 0.005; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
+        static ballSpeedIncrease = 0.012; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
 
         constructor(pos, dir, radius, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki
@@ -964,6 +970,7 @@ class Upgrade {
         }
 
         collect() { //Zbieranie
+                playSound("clicked") //Dźwięk
                 prevUpgrade = curUpgrade;
                 curUpgrade = this.type;
 
@@ -1129,7 +1136,8 @@ class DOH {
         remove() { //Usuwanie po śmierci
                 DOH.list.forEach((el, index) => {
                         if (el == this) {
-                                victory(); //Wywołuje funkcję zwycięstwa
+                                if (playerHealth > 0)
+                                        victory(); //Wywołuje funkcję zwycięstwa
                                 DOH.list.splice(index, 1); //Usuwa z listy DOH'a
                         }
                 })
@@ -1529,9 +1537,8 @@ function draw() { // Funkcja odpowiadająca za całą grafikę gry
 
 
                 // -----------[ Wyświetla napis koniec gry i odtwarza dźwięk ]----------- //
-                context.font = "bold 540px Arial";               // Ustawia czcionkę
-                context.fillStyle = '#6774eb';                  // Ustawia kolor
-                context.fillText(`Game over`, 1000, 2500)      // Napis
+                document.querySelector("#staticCanvas").style.backgroundImage = "url(./img/gameOverScreen.png)" // Zmienia tło statycznego canvasa na obrazek końca gry
+                document.querySelector("#canvas").style.cursor = "pointer" // Zmienia kursor na strzałkę
                 playSound("gameOver")                         // Odtwarza dźwięk końca gry
                 // ------------------------------------------------------------------ //
 
@@ -1582,12 +1589,12 @@ function updateStaticCanvas() { //Odświeża statyczny canvas - canvas dla obiek
                         let doh = DOH.list[0]; //Pobiera pierwszego doha
 
                         contextStatic.fillStyle = '#0e0a24'; // Ustawia kolor tła paska życia
-                        
+
                         contextStatic.fillRect(staticCanvas.width * 0.2 + 8, staticCanvas.height / 15.625 - staticCanvas.height / 18.5, staticCanvas.width * 0.6 - 15, staticCanvas.height / 18.5); // Rysuje tło paska życia
                         if (doh.minionsNum > 0) contextStatic.fillStyle = '#0089c4'; else contextStatic.fillStyle = '#de4f35'; // Ustawia kolor paska życia zależnie od obecności minionów
 
                         // Rysuje pasek życia - jego szerokość zależy od ilości życia doha
-                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 10, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 20); 
+                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 10, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 20);
                 }
                 // ------------------------------------------------------------------ //
         }

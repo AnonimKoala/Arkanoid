@@ -1,12 +1,9 @@
-canvas:hover {
-    cursor: none;
-}
-
 canvas {
     border: 1px solid black;
     height: 100%;
     width: 100%;
     background-size: 100%;
+    cursor: none;
 }
 
 #staticCanvas {

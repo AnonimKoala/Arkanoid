@@ -19,6 +19,7 @@ const clearButton = document.querySelector("#clearButton")
 // ==================================================================================================== //\
 const helpScreen = document.querySelector("#help")
 document.querySelector("#help .buttonTheme").addEventListener("click", e => { // Zamyka ekran pomocy
+    playSound("clicked")
     helpScreen.style.animation = "flyToLeft 2s ease-in-out forwards"
     setTimeout(() => {
         helpScreen.style.display = "none"

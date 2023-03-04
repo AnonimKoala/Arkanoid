@@ -583,16 +583,25 @@ class Ball {
                                         let col = circXrectCollision(this, brick)
 
                                         if (col.hit) {
-                                                if (this.power > 0 && brick.type != 9 && brick.type != 8)
-                                                        this.power--;
-                                                else if (this.power > 0 && brick.type == 8 && this.power >= brick.health)
-                                                        this.power -= brick.health;
-                                                else
-                                                        if (col.side == 'left' || col.side == 'right') this.invertDirX(); else this.invertDirY();
+                                                //Zabezpieczenie by piłka nie zbijała dwóch cegieł na raz
+                                                if ((col.side == 'left' && this.dir.x > 0) || (col.side == 'right' && this.dir.x < 0)) {
+                                                        hit = true;
+                                                } else if ((col.side == 'top' && this.dir.y > 0) || (col.side == 'bottom' && this.dir.y < 0)) {
+                                                        hit = true;
+                                                }
 
-                                                hit = true;
-                                                this.lastTouchedObj = brick;
-                                                brick.remove();
+                                                if (hit)
+                                                {
+                                                        if (this.power > 0 && brick.type != 9 && brick.type != 8)
+                                                                this.power--;
+                                                        else if (this.power > 0 && brick.type == 8 && this.power >= brick.health)
+                                                                this.power -= brick.health;
+                                                        else
+                                                                if (col.side == 'left' || col.side == 'right') this.invertDirX(); else this.invertDirY();
+
+                                                        this.lastTouchedObj = brick;
+                                                        brick.remove();
+                                                }
                                         }
                                 }
                         })
@@ -791,7 +800,7 @@ class Projectile {
         static nextPlayerFire = 0;
         static playerLaserSize = new Vector2D(canvas.width / 50, canvas.height / 20);
 
-        constructor(pos, dir, size, speed, player, texture = "img/laserProjectile.svg") {
+        constructor(pos, dir, size, speed, player, texture = "img/laserProjectile.png") {
                 this.pos = pos;
                 this.prevPos = new Vector2D(pos.x, pos.y);
                 this.dir = dir;

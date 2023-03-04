@@ -26,6 +26,17 @@ helpScreen.addEventListener("click", e => { // Zamyka ekran pomocy
 })
 
 
+// ==================================================================================================== //
+// Wyjście z generatora
+// ==================================================================================================== //
+const exitButton = document.querySelector("#exit")
+exitButton.addEventListener("click", e => {
+    playSound("clicked")
+    setTimeout(() => {
+        location.href = "../index.html"
+    }, 500)
+})
+
 // ========================================[ Odtwarza dźwięk ]======================================== // 
 function playSound(sound, type = 0) {
     switch (sound) {

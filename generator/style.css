@@ -590,3 +590,27 @@ section.buttonTheme:hover {
   background-color: rgba(137, 43, 226, 0.522);
   cursor: pointer;
 }
+/* ============================================================== */
+#exit {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background-color: rgba(76, 17, 170, 0.695);
+  border: 6px solid rgba(56, 0, 161, 0.7);
+  width: 120px;
+  height: 120px;
+  transition: .5s ease-in-out background-color;
+  display: grid;
+  place-items: center;
+  border-radius: 20px;
+  box-shadow: 0 0 5px rgba(59, 59, 59, 0.764);
+}
+#exit img{
+  width: 60%;
+  height: 60%;
+}
+#exit:hover {
+  background-color: rgba(111, 57, 209, 0.8);
+  cursor: pointer;
+  outline: 1px solid rgba(56, 0, 161, 0.7);
+}

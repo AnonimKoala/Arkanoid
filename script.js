@@ -494,6 +494,7 @@ canvas.addEventListener("mousedown", e => {
 class Ball {
         static list = []; // Lista wszystkich piłek
         static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
+        static ballSpeedIncrease = 0.1; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
 
         constructor(pos, dir, radius, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki
@@ -698,7 +699,7 @@ class Ball {
                 }
 
                 if (hit && platform.holdBall != this && !this.enemyBall) {
-                        this.speed += 0.1; //Zwiększamy prędkość piłki po kolizji
+                        this.speed += Ball.ballSpeedIncrease; //Zwiększamy prędkość piłki po kolizji
                 }
 
                 //Ruch piłek

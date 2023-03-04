@@ -470,6 +470,7 @@ button {
   border: rgba(56, 0, 161, 0.7) 6px solid;
   border-bottom: none;
   color: rgba(72, 5, 173, 0.799);
+  font-family: Tahoma;
 }
 
 #help>article>section {
@@ -485,6 +486,8 @@ button {
 
 #help>article>section>h2 {
   font-size: 2rem;
+  font-family: 'Lucida Sans Unicode';
+  
 }
 
 #help>article>section>ul {
@@ -497,7 +500,9 @@ button {
   /* font-weight: bold; */
   /* color: rgb(4, 150, 209); */
 }
-
+#help>article>section>ul li{
+  font-family: 'Trebuchet MS', sans-serif;
+}
 /* ============================================================== */
 section.clearTheme {
   background-color: rgba(255, 208, 202, 0.7);

@@ -149,7 +149,7 @@ function resetToDefault() {
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
         originalBall.pos.y = platform.pos.y - 10 - originalBall.radius * 2
 
-        originalBall.speed = 4;
+        originalBall.speed = 4.5;
         originalBall.dir.x = 0.25;
         originalBall.dir.y = -1;
         originalBall.lastTouchedObj = null;
@@ -494,7 +494,7 @@ canvas.addEventListener("mousedown", e => {
 class Ball {
         static list = []; // Lista wszystkich piłek
         static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
-        static ballSpeedIncrease = 0.1; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
+        static ballSpeedIncrease = 0.005; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
 
         constructor(pos, dir, radius, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki
@@ -506,7 +506,7 @@ class Ball {
                 if (enemyBall)
                         this.parent = enemyParent; // Rodzic fireballa
 
-                this.speed = 4; // Szybkość
+                this.speed = 4.5; // Szybkość
                 if (enemyBall)
                         this.speed = 9; // Fireball jest szybszy
 

@@ -551,7 +551,7 @@ class Ball {
         think() {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
 
-                console.log(this.lastTouchedObj)
+                // console.log(this.lastTouchedObj)
 
                 if (this.pos.x <= 0 && this.lastTouchedObj != 'leftwall') {
                         this.lastTouchedObj = 'leftwall';
@@ -787,7 +787,7 @@ class Projectile {
         static nextPlayerFire = 0;
         static playerLaserSize = new Vector2D(canvas.width / 50, canvas.height / 20);
 
-        constructor(pos, dir, size, speed, player, texture = "img/laserProjectile.png") {
+        constructor(pos, dir, size, speed, player, texture = "img/laserProjectile.svg") {
                 this.pos = pos;
                 this.prevPos = new Vector2D(pos.x, pos.y);
                 this.dir = dir;
@@ -1363,7 +1363,7 @@ function think(cTime) {
 
                 if (platformClone.enabled) {
                         for (let i = 0; i < Projectile.playerLasers; i++) {
-                                let el = new Laser(new Vector2D(Math.floor((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platformClone.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 13, true);
+                                let el = new Projectile(new Vector2D(Math.floor((platformClone.pos.x + (platformClone.size.x / (Projectile.playerLasers + 1)) * (i + 1)) - Projectile.playerLaserSize.x / 2), Math.floor(platformClone.pos.y - Projectile.playerLaserSize.y)), new Vector2D(0, -1), Projectile.playerLaserSize, 13, true);
                                 el.dir.x = (el.pos.x + el.size.x / 2 - (platformClone.pos.x + platformClone.size.x / 2)) / platformClone.size.x //Zmieniamy kierunek wzgłedem położenia platformy - identycznie jak piłke gdy się odbija od niej
                         }
                 }

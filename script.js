@@ -1,93 +1,93 @@
 // ========================================[ Ustawia pole gry ]======================================== //
-const canvas = document.getElementById('canvas');
-const staticCanvas = document.getElementById('staticCanvas');
-const context = canvas.getContext('2d');
-const contextStatic = staticCanvas.getContext('2d');
+const canvas = document.getElementById('canvas');                 // Pole gry - obiekty dynamiczne
+const staticCanvas = document.getElementById('staticCanvas');    // Pole gry - obiekty statyczne
+const context = canvas.getContext('2d');                        // Ustawia kontekst canvasa na 2d
+const contextStatic = staticCanvas.getContext('2d');           // Ustawia kontekst canvasa statycznego na 2d
 // ==================================================================================================== //
 
 // ========================================= [ Ustawia guziki ] ======================================= //
-const playButton = document.getElementById('playButton')
-const introScreen = document.getElementById('introScreen')
+const playButton = document.getElementById('playButton') // Przycisk startu gry
+const introScreen = document.getElementById('introScreen') // Ekran startowy
 // ==================================================================================================== //
 
 // ===============================[ Ukrywa ekran startowy ]=========================================== // 
-playButton.addEventListener('click', () => {
-        playSound("clicked")
-        introScreen.style.display = "none";
-        gameStarted = true
-        gameOvered = false
-        gamePaused = false
-        document.addEventListener("keydown", pauseTheGame)
+playButton.addEventListener('click', () => {                    // Po kliknięciu w przycisk startu gry
+        playSound("clicked")                                    // Odtwarza dźwięk kliknięcia
+        introScreen.style.display = "none";                     // Ukrywa ekran startowy
+        gameStarted = true                                      // Ustawia grę jako rozpoczętą
+        gameOvered = false                                      // Ustawia grę jako nie zakończoną
+        gamePaused = false                                      // Ustawia grę jako nie zatrzymaną
+
+        document.addEventListener("keydown", pauseTheGame) // Dodaje event listenera pozwalający na pauzy gry
 })
 // ==================================================================================================== //
 
 // ================================[ Otwiera ekran pomocy ]============================================ //
-const helpScreen = document.getElementById('helpScreen')
-helpScreen.addEventListener("click", function () {
-        playSound("clicked")
-        helpScreen.style.display = "none"
+const helpScreen = document.getElementById('helpScreen')        // Ekran pomocy
+helpScreen.addEventListener("click", function () {              // Po kliknięciu w ekran pomocy
+        playSound("clicked")                                    // Odtwarza dźwięk kliknięcia
+        helpScreen.style.display = "none"                       // Ukrywa ekran pomocy
 })
-function openHelp() {
+function openHelp() {                                          // Funkcja otwierająca ekran pomocy
         helpScreen.style.display = "block"
 }
-document.querySelector("#helpButton").addEventListener("click", () => {
-        playSound("clicked")
-        openHelp()
+document.querySelector("#helpButton").addEventListener("click", () => { // Po kliknięciu w przycisk pomoc 
+        playSound("clicked")                                            // Odtwarza dźwięk kliknięcia
+        openHelp()                                                      // Otwiera ekran pomocy
 })
 // ==================================================================================================== //
 
 
 // ================================[ Otwiera ekran edytora ]============================================ //
-const loadButton = document.getElementById('loadButton')
-loadButton.addEventListener("click", function () {
-        playSound("clicked")
+const loadButton = document.getElementById('loadButton')                 // Przycisk do "WCZYTAJ" w menu głównym
+loadButton.addEventListener("click", function () {                      // Po kliknięciu w przycisk "WCZYTAJ"
+        playSound("clicked")                                           // Odtwarza dźwięk kliknięcia
         setTimeout(() => {
-                window.open("generator/index.html", "_self")
+                window.open("generator/index.html", "_self")         // Otwiera ekran edytora po 150ms - częściowo zapobiega błędom wczytywania
         }, 150);
 })
 // ==================================================================================================== //
 
 // ============================[ Ustawianie rozdzielczości okienka canvas ]============================ //
-canvas.width = 1000
-canvas.height = 1000
-staticCanvas.width = canvas.width;
-staticCanvas.height = canvas.height;
+canvas.width = 1000                             // Ustawia szerokość canvasa na 1000px
+canvas.height = 1000                           // Ustawia wysokość canvasa na 1000px
+staticCanvas.width = canvas.width;            // Ustawia szerokość canvasa statycznego na 1000px
+staticCanvas.height = canvas.height;         // Ustawia wysokość canvasa statycznego na 1000px
 // ==================================================================================================== //
 
 // ========================================[ Odtwarza dźwięk ]======================================== // 
 function playSound(sound, type = 0) {
         switch (sound) {
-                case 'hitEdge': // Uderza w krawędź canvas
+                case 'hitEdge':                                            // Dźwięk uderzenia w krawędź      
                         new Audio('audio/balHitEdge.ogg').play()
                         break;
-                case "brickHit": // Uderza w cegłę
+                case "brickHit":                                            // Dźwięk uderzenia w cegłę 
                         if (type != 8 && type != 9)
-                                new Audio('audio/brickHit.ogg').play()
+                                new Audio('audio/brickHit.ogg').play() // Domyślny dźwięk uderzenia w cegłę
                         else if (type == 9)
-                                new Audio('audio/goldHitSound.ogg').play() // Silver brick sound
+                                new Audio('audio/goldHitSound.ogg').play() // Dźwięk srebrnej cegły
                         else if (type == 8)
-                                new Audio('audio/silverHitSound.ogg').play() // Gold brick sound
-
+                                new Audio('audio/silverHitSound.ogg').play() // Dźwięk złotej cegły
                         break;
-                case "hitPlatform": // Uderza w platformę
+                case "hitPlatform":                                         // Dźwięk uderzenia w platformę
                         new Audio('audio/platformHit.ogg').play()
                         break;
-                case "hitSmallDOH": // Uderza w małego DOH'a
+                case "hitSmallDOH":                                       // Dźwięk uderzenia w małego DOH'a
                         new Audio('audio/smallDohHit.ogg').play()
                         break;
-                case "hitDOH": // Uderza w DOH'a
+                case "hitDOH":                                          // Dźwięk uderzenia w DOH'a
                         new Audio('audio/dohHit.ogg').play()
                         break;
-                case "gameOver": // Przegrywa
+                case "gameOver":                                        // Dźwięk przegranej gry
                         new Audio('audio/gameOver.ogg').play()
                         break;
-                case "fallOfScreen": // Upada poza ekran
+                case "fallOfScreen":                                   // Dźwięk spadnięcia piłki poza ekran
                         new Audio('audio/fallOfScreen.ogg').play()
                         break;
-                case "hitedByEnemy": // Otrzymuje obrażenia od wroga
+                case "hitedByEnemy":                                 // Dźwięk uderzenia pocisku przeciwnika w platformę
                         new Audio('audio/hitedByEnemy.ogg').play()
                         break;
-                case "clicked":
+                case "clicked":                                     // Dźwięk kliknięcia
                         new Audio('audio/click.ogg').play()
                         break;
 
@@ -102,61 +102,64 @@ let gameStarted = false // Przechowuje stan czy gra jest uruchomiona
 let gamePaused = false // Czy gra się zatrzymana
 let gameOvered = false // Czy gra jest zakończona
 
-function pauseTheGame(e) {
-        if (e.key == 'Escape' && gameStarted) {
-                gamePaused = !gamePaused
-        }
+function pauseTheGame(e) {                              // Funkcja pauzy gry
+        if (e.key == 'Escape' && gameStarted) {        // Jeśli naciśnięto klawisz "Escape" i gra jest uruchomiona
+                gamePaused = !gamePaused              // Zmienia stan pauzy gry na jej przeciwny
+        }                                            // Jeśli gra jest zatrzymana, to ją wznawia, a jeśli jest wznowiona, to ją zatrzymuje
 }
 // ==================================================================================================== //
 
 
 // =============================[ Uruchamiane po stracie wszystkich żyć ]============================== //
-function gameOver() {
-        context.clearRect(0, 0, canvas.width, canvas.height) // Czyści ekran
+function gameOver() {                                                   // Funkcja kończąca grę
+        context.clearRect(0, 0, canvas.width, canvas.height)           // Czyści canvas
 
-        document.removeEventListener("click", gameOver)
-        restartTheGame()
+        document.removeEventListener("click", gameOver)              // Usuwa event listenera z documentu
+        restartTheGame()                                            // Uruchamia funkcję restartującą grę
 }
 // ==================================================================================================== //
 
 
 // ========================================[ Dotyczące gracza ]======================================== //
-let playerLevel = 1
-let playerHealth = 3
-let playerPoints = 0
-
+let playerLevel = 1     // Poziom gracza
+let playerHealth = 3   // Życie gracza
+let playerPoints = 0  // Punkty gracza
 // ==================================================================================================== //
 
 
 // =============[ Ustawia domyśle wartości pozycji i piłki po uruchominiu nowego poziomu ]============= //
 function resetToDefault() {
-        //Usuwa upgrade'y
-        prevUpgrade = curUpgrade;
-        curUpgrade = null;
-        removeAllUpgrades();
-        Upgrade.list = [];
+        // -------------------------- [ Usuwa upgrade'y ] -------------------------- //
+        prevUpgrade = curUpgrade;        //Zapisuje obecny upgrade jako poprzedni
+        curUpgrade = null;              //Usuwa obecny upgrade
+        removeAllUpgrades();           //Usuwa wszystkie upgrade'y
+        Upgrade.list = [];            //Usuwa wszystkie upgrade'y z listy
+        // ----------------------------------------------------------------------- //
 
-        //Usuwa lasery i fireballe
-        Projectile.list = [];
+        // ---------------------[ Usuwa lasery i fireballe ]--------------------- //
+        Projectile.list = [];                   //Usuwa wszystkie pociski z listy
         DOH.list.forEach((el) => {
-                el.fireBalls = [null, null];
+                el.fireBalls = [null, null];    //Usuwa fireballe DOH'a
         })
+        // --------------------------------------------------------------------- //
 
-        platform.holdBall = originalBall;
-        platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5)
+        // ----------------------------[ Platforma ]----------------------------- //
+        platform.holdBall = originalBall; //Przywraca trzymanie piłki przez platformę
+        platform.pos = new Vector2D(canvas.width / 2 - platform.size.x / 2, canvas.height - platform.size.y * 2.5) //Przywraca pozycję platformy na środek ekranu
+        // --------------------------------------------------------------------- //
 
-        // Na początku piłka pojawia się nad platformą
-        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
-        originalBall.pos.y = platform.pos.y - 4 - originalBall.radius * 2
+        // ----------------------------[ Piłka ]-------------------------------- //
+        originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius         // Ustawia pozycję piłki na środku platformy
+        originalBall.pos.y = platform.pos.y - 4 - originalBall.radius * 2                      // Ustawia pozycję piłki nad platformą
 
-        originalBall.speed = 4.5;
-        originalBall.dir.x = 0.25;
-        originalBall.dir.y = -1;
-        originalBall.lastTouchedObj = null;
-
+        originalBall.speed = 4.5;                 // Ustawia prędkość piłki na domyślną - 4.5
+        originalBall.dir.x = 0.25;               // Ustawia kierunek X piłki na 0.25
+        originalBall.dir.y = -1;                // Ustawia kierunek Y piłki na -1
+        originalBall.lastTouchedObj = null;    // Ustawia ostatnio dotknięty obiekt na null
+        // --------------------------------------------------------------------- //
         setTimeout(() => {
-                updateStaticCanvas();
-        }, 10)
+                updateStaticCanvas(); //Aktualizuje canvas statyczny po 50ms
+        }, 50)
 }
 // ==================================================================================================== //
 
@@ -164,66 +167,66 @@ function resetToDefault() {
 
 // ====================================[ Uruchami kolejny poziom ]===================================== //
 function nextLevel() {
-        playerLevel++
+        playerLevel++           // Zwiększa poziom gracza o 1
 
-        if (playerLevel == 33)
-                summonDOH(); //Level z DOH'em
-        else
-                loadLevel();
+        if (playerLevel == 33)  // Jeżeli poziom gracza jest równy 33
+                summonDOH();   // Uruchamia poziom z DOH'em
+        else                  // Jeżeli nie 
+                loadLevel(); // Wczytuje kolejny poziom
 
-        resetToDefault()
+        resetToDefault()   // Ustawia domyśle wartości pozycji i piłki po uruchominiu nowego poziomu   
+}
+// ==================================================================================================== //
+
+
+// ====================================[ Generuje pozycje cegieł ]===================================== //
+function generateBricks(startFrom = null) { // Funkcja generująca cegiełki
+        let json
+        if (startFrom != null) {                                // Jeżeli wybrano poziomu od którego zacząć
+                json = localStorage.getItem(startFrom)         // Wczytuje do json poziom z localStorage
+                introScreen.style.display = "none";           // Ukrywa ekran startowy
+
+
+                if (startFrom.includes("Poziom"))                                       // Jeżeli jest to zwykły poziom to wpisuje jego numer do playerLevel
+                        playerLevel = parseInt(startFrom.replace("Poziom ", ""))        // Wpisuje numer poziomu do playerLevel
+
+        } else                                                          // Jeżeli nie wybrano poziomu od którego zacząć
+                json = localStorage.getItem(`Poziom ${playerLevel}`)   // Wczytuje do json I poziom z localStorage
+
+        let allBricks = JSON.parse(json) // Parsuje json z localStorage do tablicy cegieł
+
+        Brick.list = []; // Usuwa wszystkie cegiełki z listy
+
+        allBricks.forEach((el, i) => { // Tworzy nowe cegły korzystając z tablicy allBricks
+                new Brick(
+                        new Vector2D(parseInt(el.x), parseInt(el.y)), // Pozycja cegły
+                        new Vector2D(99.9, 49.9),                    // Rozmiar cegły
+                        parseInt(el.type)                           // Typ cegły
+                )
+        })
 }
 // ==================================================================================================== //
 
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
-function generateBricks(startFrom = null) {
-        // Wczytywanie poziomu z localStorage wg tego co jest w playerLevel
-        let json
-        if (startFrom != null) {
-                json = localStorage.getItem(startFrom) // Wczytuje poziom z localStorage
-                introScreen.style.display = "none"; // Ukrywa ekran startowy
-
-
-                if (startFrom.includes("Poziom")) // Jeżeli jest to zwykły poziom to wpisuje jego numer do playerLevel
-                        playerLevel = parseInt(startFrom.replace("Poziom ", "")) // Wpisuje numer poziomu do playerLevel
-
-        } else
-                json = localStorage.getItem(`Poziom ${playerLevel}`) // Wczytuje poziom z localStorage
-
-        let allBricks = JSON.parse(json)
-
-        Brick.list = [];
-
-        allBricks.forEach((el, i) => {
-                new Brick(
-                        new Vector2D(parseInt(el.x), parseInt(el.y)),
-                        new Vector2D(99.9, 49.9),
-                        parseInt(el.type)
-                )
-        })
-
-}
-function loadLevel(startFrom = null) {
-        if (localStorage.length == 0) {
-                fetch("generator/basicLevels.json")
+function loadLevel(startFrom = null) {                                  // Funkcja wczytująca poziom
+        if (localStorage.length == 0) {                                // Jeżeli localstorage jest pusty
+                fetch("generator/basicLevels.json")                   // Wczytuje plik json zawierający poziomy
                         .then(function (response) {
                                 return response.json();
                         })
                         .then(function (jsonFile) {
-                                jsonFile.forEach((el, i) => {
-                                        // levelList.push(el.id)
-
-                                        // Sprawdza czy poziom jest w localstorage
-                                        if (localStorage.getItem(el.id) == null)
-                                                localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
+                                jsonFile.forEach((el, i) => {                                            // Dla każdego poziomu w pliku json
+                                        if (localStorage.getItem(el.id) == null)                        // Jeśli nie ma go w localStorage
+                                                localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Dodaje go do localStorage
                                 })
                         })
                         .then(() => {
-                                generateBricks(startFrom)
+                                generateBricks(startFrom) // Generuje cegły z parametru startFrom - domyślnie null
                         })
-        } else {
-                generateBricks(startFrom)
+
+        } else {                           // Jeżeli localstorage nie jest pusty
+                generateBricks(startFrom) // Generuje cegły z parametru startFrom - domyślnie null
         }
 }
 // ==================================================================================================== //
@@ -231,73 +234,85 @@ function loadLevel(startFrom = null) {
 
 
 // ====================================[ Generuje pozycje cegieł ]===================================== //
-function generateBricksPos() {
-        Brick.list = []
+// function generateBricksPos() {
+//         Brick.list = []
 
-        let allBricks = [] // Tablica wszystkich cegieł
-        for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // Generuje cegły w poziomie [poz. początkowa, poz. końcowa. długość cegły]
-                let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
-                for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
-                        bricksV.push(
-                                new Brick(
-                                        new Vector2D(forX, forY),
-                                        new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1),
-                                        Math.floor(Math.random() * (9 - 0 + 1)) // Losuje rodzaj cegły
-                                )
-                        )
-                }
-                allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
-        }
-}
+//         let allBricks = [] // Tablica wszystkich cegieł
+//         for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // Generuje cegły w poziomie [poz. początkowa, poz. końcowa. długość cegły]
+//                 let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
+//                 for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
+//                         bricksV.push(
+//                                 new Brick(
+//                                         new Vector2D(forX, forY),
+//                                         new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1),
+//                                         Math.floor(Math.random() * (9 - 0 + 1)) // Losuje rodzaj cegły
+//                                 )
+//                         )
+//                 }
+//                 allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
+//         }
+// }
 // ==================================================================================================== //
 
 
 // =========================================[ Restartuje gre ]========================================= //
 function restartTheGame() {
-        gameStarted = false
-        gameOvered = false
-        gamePaused = false
+        // ------------------------------[ Flagi ]------------------------------- //
+        gameStarted = false       // Zatrzymuje grę
+        gameOvered = false       // Ustawia stan gry na "nie przegrana"
+        gamePaused = false      // Ustawia stan gry na "nie wstrzymana"
+        // ---------------------------------------------------------------------- //
 
-        introScreen.style.display = "grid";
 
-        playerLevel = 1
+        // -------------------------[ Listener canvas ]-------------------------- //
+        canvas.addEventListener("click", () => { // Uruchamia grę po kliknięciu w obszarze pola canvas
+                gameStarted = true              // Uruchamia grę
+                gameOvered = false             // Ustawia stan gry na "nie przegrana"
+                gamePaused = false            // Ustawia stan gry na "nie wstrzymana"
 
-        canvas.addEventListener("click", () => {
-                // Uruchamia grę po kliknięciu w obszarze pola canvas
-                gameStarted = true
-                gameOvered = false
-                gamePaused = false
+                document.addEventListener("keydown", pauseTheGame) // Dodaje event listener do pauzowania gry
+        })
+        // ---------------------------------------------------------------------- //
 
-                document.addEventListener("keydown", pauseTheGame)
+
+        // -------------------------------[ DOH ]-------------------------------- //
+        DOH.list.forEach((el) => {      // Dla każdego DOH'a
+                el.remove();            // Usuwa wszystkie jego pociski
         })
 
-        DOH.list.forEach((el) => {
-                el.remove();
-        })
-
-        MiniDOH.list = [];
+        MiniDOH.list = [];             // Usuwa wszystkie MiniDOH'y
+        // ---------------------------------------------------------------------- //
 
 
-        playerPoints = 0
-        playerLevel = 1
-        playerHealth = 3
+        // ------------------------------[ Gracz ]------------------------------- //
+        playerPoints = 0               // Ustawia punkty gracza na 0
+        playerLevel = 1               // Ustawia poziom gracza na 1
+        playerHealth = 3             // Ustawia życie gracza na 3
+        // ---------------------------------------------------------------------- //
 
-        // Wczytuje pierwszy poziom
+
+        // ---------------------[ Wczytuje pierwszy poziom ]--------------------- //
         if (localStorage.getItem("_startFrom") != null) { // Wczytuje poziom wybrany przez gracza w edytorze
-                gameStarted = true
-                gameOvered = false
-                gamePaused = false
+                gameStarted = true       // Uruchamia grę
+                gameOvered = false      // Ustawia stan gry na "nie przegrana"
+                gamePaused = false     // Ustawia stan gry na "nie wstrzymana"
 
-                if (localStorage.getItem("_startFrom") != "Poziom 1")
-                        playerLevel = 0
+                if (localStorage.getItem("_startFrom") != "Poziom 1")    // Jeśli wybrany poziom nie jest pierwszym
+                        playerLevel = 0                                 // Ustawia poziom gracza na 0
 
-                loadLevel(localStorage.getItem("_startFrom"))
-                localStorage.removeItem("_startFrom")
+                loadLevel(localStorage.getItem("_startFrom"))         // Wczytuje wybrany poziom
+                localStorage.removeItem("_startFrom")                // Usuwa zmienną tymczasową z localStorage
         } else
                 loadLevel() // Wczytuje pierwszy poziom jeśli nie ma wybranego przez gracza
+        // ---------------------------------------------------------------------- //
 
 
-        resetToDefault()
+        // -------------------------------[ Inne ]------------------------------- //
+        playerLevel = 1                           // Ustawia poziom gracza na 1
+        introScreen.style.display = "grid";      // Pokazuje ekran startowy
+        resetToDefault()                        // Resetuje wszystkie ustawienia do wartości domyślnych
+        // ---------------------------------------------------------------------- //
+
 }
 // ==================================================================================================== //
 // Wyświetla ekran końcowy i restartuje grę
@@ -581,8 +596,7 @@ class Ball {
                                                         hit = true;
                                                 }
 
-                                                if (hit)
-                                                {
+                                                if (hit) {
                                                         //Jeśli piłka ma wystarczającą moc to nie odbija się
                                                         if (this.power > 0 && brick.type != 9 && brick.type != 8)
                                                                 this.power--;
@@ -923,7 +937,7 @@ class Upgrade {
                 "img/upgrades/upgrade_skip.svg"
         ]
 
-        static nextUpgradePoints = 700; //Punkty do kolejnego upgrade'u
+        static nextUpgradePoints = 1200; //Punkty do kolejnego upgrade'u
         static platformSizeIncrease = canvas.width / 25; //Ilość wydłużenia platformy
 
         constructor(pos, type) {
@@ -1007,7 +1021,7 @@ class Upgrade {
         }
 }
 
-let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 51);
+let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 501);
 
 // ==================================================================================================== //
 

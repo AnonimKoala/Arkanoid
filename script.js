@@ -572,6 +572,11 @@ class Ball {
                         this.invertDirY();
                         hit = true;
                         playSound("hitEdge")
+                } else if (this.pos.y + this.radius * 2 >= canvas.height && this.enemyBall) {
+                        this.invertDirY();
+                        this.lastTouchedObj = 'bottomwall';
+                        hit = true;
+                        playSound("hitEdge");
                 }
 
 
@@ -1132,7 +1137,10 @@ function summonDOH() {
         height = canvas.height / 2;
 
         new DOH(new Vector2D(canvas.width / 2 - width / 2, canvas.height / 2 - height / 1.5), new Vector2D(width, height));
-        updateStaticCanvas();
+
+        setTimeout(() => {
+                updateStaticCanvas();
+        }, 10)
 }
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //

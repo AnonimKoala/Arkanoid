@@ -423,6 +423,7 @@ button {
   z-index: 5;
   border-radius: 20px;
   animation: flyFromLeft 2s ease-in-out .1s forwards;
+  max-height: 100vh;
 }
 
 @keyframes flyFromLeft {
@@ -629,6 +630,11 @@ section.buttonTheme:hover {
   body>* {
     transform: scale(0.9);
   }
+
+  #help {
+    width: 90vw;
+    transform: scale(0.9), translate(-50%, -50%);
+  }
 }
 
 @media only screen and (max-width: 1200px) {
@@ -639,4 +645,12 @@ section.buttonTheme:hover {
   body {
     min-width: 1160px;
   }
+
+  #help {
+    width: 95vw;
+    scale: 0.7;
+    transform: translate(-65%, -80%);
+    
+  }
+
 }

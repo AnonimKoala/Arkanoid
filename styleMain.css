@@ -132,3 +132,56 @@ body {
 #victory{
     z-index: 4;    
 }
+
+
+/* ====================================================================== */
+/* Responsywność */
+/* ====================================================================== */
+@media only screen and (max-width: 1000px) {
+    #div {
+        width: 95vw;
+        height: 95vw;
+    }
+
+    
+#buttons {
+    grid-gap: 10px;
+    transform: scale(0.95);
+}
+
+
+}
+@media only screen and (max-width: 890px) {
+    #buttons {
+        transform: scale(0.9);
+    }
+    #logo {
+        top: 10%;
+        transform: scale(0.8);
+    }
+}
+@media only screen and (max-width: 760px) {
+    #buttons {
+        transform: scale(0.7);
+    }
+}
+@media only screen and (max-width: 700px) {
+    #buttons {
+        top: 30%;
+        transform: scale(0.7);
+    }
+    #logo {
+        top: 7%;
+        transform: scale(0.7);
+    }
+}
+@media only screen and (max-width: 600px) {
+    #buttons {
+        top: 25%;
+        transform: scale(0.6);
+    }
+    #logo {
+        top: 5%;
+        transform: scale(0.6);
+    }
+}

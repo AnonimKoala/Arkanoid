@@ -426,3 +426,167 @@ button {
 #loadingDiv {
   grid-area: 'loadingDiv';
 }
+
+
+#help {
+  position: absolute;
+  display: block;
+  top: 50%;
+  left: -100%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  box-shadow: 0 0 20px rgb(59, 59, 59);
+  background-color: rgba(154, 215, 255, 0.867);
+  z-index: 5;
+  border-radius: 20px;
+  animation: flyFromLeft 2s ease-in-out .1s forwards;
+}
+@keyframes flyFromLeft {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 50%;
+  }
+}
+@keyframes flyToLeft {
+  0% {
+    left: 50%;
+  }
+  100% {
+    left: -100%;
+  }
+}
+#help>header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  color: rgb(255, 255, 255);
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-radius: 20px 20px 0 0;
+  background-color: rgba(163, 129, 255, 0.7);
+  border: rgba(56, 0, 161, 0.7) 6px solid;
+  border-bottom: none;
+  color: rgba(72, 5, 173, 0.799);
+}
+
+#help>article>section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  font-size: 1.2rem;
+  /* font-weight: bold; */
+  /* color: rgb(0, 41, 146); */
+}
+
+#help>article>section>h2 {
+  font-size: 2rem;
+}
+
+#help>article>section>ul {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  font-size: 1.4rem;
+  /* font-weight: bold; */
+  /* color: rgb(4, 150, 209); */
+}
+
+/* ============================================================== */
+section.clearTheme {
+  background-color: rgba(255, 208, 202, 0.7);
+  border: rgb(146, 0, 0, 0.7) 6px solid;
+}
+
+section.clearTheme>h2 {
+  color: rgb(146, 0, 0);
+}
+
+section.clearTheme>ul {
+  color: rgb(198, 73, 54);
+}
+
+/* ============================================================== */
+section.createTheme {
+  background-color: rgba(149, 199, 243, 0.7);
+  border: rgba(0, 68, 170, 0.7) 6px solid;
+}
+
+section.createTheme>h2 {
+  color: rgb(0, 55, 136);
+}
+
+section.createTheme>ul {
+  color: rgba(7, 65, 152, 0.737);
+}
+
+/* ============================================================== */
+section.editTheme {
+  background-color: rgba(255, 194, 147, 0.7);
+  border: rgba(170, 60, 0, 0.7) 6px solid;
+}
+
+section.editTheme>h2 {
+  color: rgb(179, 84, 33);
+}
+
+section.editTheme>ul {
+  color: rgb(200, 102, 49);
+}
+
+/* ============================================================== */
+section.playTheme {
+  background-color: rgba(255, 239, 118, 0.7);
+  border: rgba(164, 150, 0, 0.7) 6px solid;
+}
+
+section.playTheme>h2 {
+  color: rgb(184, 169, 0);
+}
+
+section.playTheme>ul {
+  color: rgb(161, 148, 1);
+}
+
+/* ============================================================== */
+section.deleteTheme {
+  background-color: rgba(135, 212, 118, 0.7);
+  border: rgba(7, 111, 0, 0.7) 6px solid;
+}
+
+section.deleteTheme>h2 {
+  color: rgb(0, 102, 0);
+}
+
+section.deleteTheme>ul {
+  color: rgb(0, 102, 0);
+}
+
+/* ============================================================== */
+section.buttonTheme {
+  border-radius: 0 0 20px 20px;
+  background-color: rgba(163, 129, 255, 0.7);
+  border: rgba(56, 0, 161, 0.7) 6px solid;
+  border-top-width: 0px;
+  transition: .5s ease-in-out background-color;
+}
+
+section.buttonTheme:hover>h2 {
+  color: rgb(143, 1, 168);
+}
+
+section.buttonTheme>h2 {
+  color: rgb(98, 28, 190);
+  transition: .5s ease-in-out color;
+}
+
+section.buttonTheme:hover {
+  background-color: rgba(137, 43, 226, 0.522);
+  cursor: pointer;
+}

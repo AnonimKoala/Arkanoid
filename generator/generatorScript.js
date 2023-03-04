@@ -14,6 +14,17 @@ const playButton = document.querySelector("#play")
 const deleteButton = document.querySelector("#deleteButton")
 const clearButton = document.querySelector("#clearButton")
 
+// ==================================================================================================== //
+// Menu pomoc
+// ==================================================================================================== //\
+const helpScreen = document.querySelector("#help")
+helpScreen.addEventListener("click", e => { // Zamyka ekran pomocy
+    helpScreen.style.animation = "flyToLeft 2s ease-in-out forwards"
+    setTimeout(() => {
+        helpScreen.style.display = "none"
+    }, 3000)
+})
+
 
 // ========================================[ Odtwarza dźwięk ]======================================== // 
 function playSound(sound, type = 0) {

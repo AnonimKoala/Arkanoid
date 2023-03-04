@@ -1088,11 +1088,11 @@ class DOH {
                 }
 
                 if (this.fireBalls[0] == null && platform.holdBall == null) {
-                        this.fireBalls[0] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(0.2, 1), canvas.width / 20 / 2, true, this);
+                        this.fireBalls[0] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(0.75, 1), canvas.width / 20 / 2, true, this);
                 }
 
                 if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10) {
-                        this.fireBalls[1] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(-0.2, 1), canvas.width / 20 / 2, true, this);
+                        this.fireBalls[1] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(-0.75, 1), canvas.width / 20 / 2, true, this);
                 }
         }
 
@@ -1125,7 +1125,7 @@ function summonDOH() {
 
         setTimeout(() => {
                 updateStaticCanvas();
-        }, 10)
+        }, 15)
 }
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //

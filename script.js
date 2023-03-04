@@ -1150,8 +1150,7 @@ function summonDOH() {
 
 class Brick {
         static list = [];
-
-        // static playerPoints = 0
+        static nextFreeHealth = 20000 // Punkty do zdobycia do następnego darmowego życia
 
         constructor(pos, size, type) {
                 this.pos = pos;
@@ -1229,6 +1228,12 @@ class Brick {
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
                                         playerPoints += this.value // Dodaje pkt po rozbiciu cegły
+
+                                        // Jeśli zdobyto wystarczającą ilość punktów to dodaje graczowi życie
+                                        if (playerPoints >= Brick.nextFreeHealth) {
+                                                Brick.nextFreeHealth += 60000
+                                                playerHealth++
+                                        }
 
                                         if (this.type != 8 && this.type != 9 && playerPoints >= nextUpgrade) {
                                                 nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 51);

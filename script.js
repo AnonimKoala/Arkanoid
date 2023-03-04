@@ -545,29 +545,27 @@ class Ball {
 
 
                 //Kolizja ze ścianami
-                if (this.pos.x <= 0 && this.lastTouchedObj != 'leftwall') {
+                if (this.pos.x <= 0) {
+                        if (this.lastTouchedObj != 'leftwall') playSound("hitEdge");
                         this.lastTouchedObj = 'leftwall';
-                        this.invertDirX();
+                        this.dir.x = Math.abs(this.dir.x);
                         hit = true;
-                        playSound("hitEdge")
-                } else if (this.pos.x + this.radius * 2 >= canvas.width && this.lastTouchedObj != 'rightwall') {
+                } else if (this.pos.x + this.radius * 2 >= canvas.width) {
+                        if (this.lastTouchedObj != 'rightwall') playSound("hitEdge");
                         this.lastTouchedObj = 'rightwall';
-                        this.invertDirX();
+                        this.dir.x = -Math.abs(this.dir.x);
                         hit = true;
-                        playSound("hitEdge")
-                } else if (this.pos.y <= 0 && this.lastTouchedObj != 'topwall') {
+                } else if (this.pos.y <= 0) {
+                        if (this.lastTouchedObj != 'topwall') playSound("hitEdge");
                         this.lastTouchedObj = 'topwall';
-                        this.invertDirY();
+                        this.dir.y = Math.abs(this.dir.y);
                         hit = true;
-                        playSound("hitEdge")
                 } else if (this.pos.y + this.radius * 2 >= canvas.height && this.enemyBall) {
-                        this.invertDirY();
+                        if (this.lastTouchedObj != 'bottomwall') playSound("hitEdge");
                         this.lastTouchedObj = 'bottomwall';
+                        this.dir.y = -Math.abs(this.dir.y);
                         hit = true;
-                        playSound("hitEdge");
                 }
-
-
 
                 //Kolizja z cegłami
                 if (!hit && !this.enemyBall) {

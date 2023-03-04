@@ -232,29 +232,6 @@ function loadLevel(startFrom = null) {                                  // Funkc
 // ==================================================================================================== //
 
 
-
-// ====================================[ Generuje pozycje cegieł ]===================================== //
-// function generateBricksPos() {
-//         Brick.list = []
-
-//         let allBricks = [] // Tablica wszystkich cegieł
-//         for (let forX = -0.1; forX < canvas.width - 1; forX += canvas.width / 10) { // Generuje cegły w poziomie [poz. początkowa, poz. końcowa. długość cegły]
-//                 let bricksV = [] // Przechowuje tymczasowo pionowy rząd cegieł
-//                 for (let forY = canvas.height / 10; forY < canvas.height / 10 * 6; forY += canvas.height / 20) { // Generuje cegły w pionie [wysokość początkowa, wysokość końcowa. wysokość cegły]
-//                         bricksV.push(
-//                                 new Brick(
-//                                         new Vector2D(forX, forY),
-//                                         new Vector2D(canvas.width / 10 - 0.1, canvas.height / 20 - 0.1),
-//                                         Math.floor(Math.random() * (9 - 0 + 1)) // Losuje rodzaj cegły
-//                                 )
-//                         )
-//                 }
-//                 allBricks.push(bricksV) // Wkłada tablicę pionowego rzędu cegieł do wszystkich cegieł
-//         }
-// }
-// ==================================================================================================== //
-
-
 // =========================================[ Restartuje gre ]========================================= //
 function restartTheGame() {
         // ------------------------------[ Flagi ]------------------------------- //
@@ -315,15 +292,16 @@ function restartTheGame() {
 
 }
 // ==================================================================================================== //
-// Wyświetla ekran końcowy i restartuje grę
-function victory() {
-        playerHealth = 99
-        gameStarted = false
-        document.querySelector("#victory").style.display = "grid";
 
-        document.querySelector("#victory").addEventListener("click", () => {
-                document.querySelector("#victory").style.display = "none";
-                restartTheGame()
+// ========================================[ Funkcja victory ]========================================= //
+function victory() { // Wyświetla ekran końcowy i restartuje grę po przejściu gry
+        playerHealth = 99               // Ustawia życie gracza na 99
+        gameStarted = false            // Zatrzymuje grę
+        document.querySelector("#victory").style.display = "grid"; // Pokazuje ekran końcowy
+
+        document.querySelector("#victory").addEventListener("click", () => { // Po kliknięciu w ekran końcowy
+                document.querySelector("#victory").style.display = "none";  // Ukrywa ekran końcowy
+                restartTheGame() // Restartuje grę
         })
 }
 
@@ -331,51 +309,50 @@ function victory() {
 // ================================[ Klasa wektorów ]========================= //
 // Pomogą nam w lepszej organizacji dwunumerycznych list                       //
 class Vector2D {
-        constructor(x, y) {
-                this.x = x;
-                this.y = y;
+        constructor(x, y) {   // Konstruktor wektora
+                this.x = x;  // Wartość x
+                this.y = y; // Wartość y
         }
 
-        //Dodaje do siebie drugi wektor
-        add(vec) {
-                this.x += vec.x;
-                this.y += vec.y;
+
+        add(vec) {                 // Dodaje wektoru
+                this.x += vec.x;  // Dodaje do siebie wartości x
+                this.y += vec.y; // Dodaje do siebie wartości y
         }
 
-        //Mnoży wektor
-        mul(num) {
-                this.x *= num;
-                this.y *= num;
+
+        mul(num) {               // Mnoży wektory
+                this.x *= num;  // Mnoży wartości x
+                this.y *= num; // Mnoży wartości y
         }
 
-        //Zwraca długość wektora
-        length() {
-                return Math.sqrt((this.x * this.x) + (this.y * this.y))
+
+        length() {                                                       // Zwraca długość wektora
+                return Math.sqrt((this.x * this.x) + (this.y * this.y)) // Zwraca pierwiastek z sumy kwadratów wartości x i y
         }
 
-        //Zwraca dystans do podanego wektora
-        dist(vec) {
-                // return new Vector2D(Math.sqrt(Math.pow(this.x - vec.x)), Math.sqrt(Math.pow(this.y - vec.y)))
-                return new Vector2D(this.x - vec.x, this.y - vec.y);
+        dist(vec) {                                                    // Zwraca dystans do podanego wektora
+                return new Vector2D(this.x - vec.x, this.y - vec.y);  // Zwraca wektor z wartościami różnicy wartości x i y
         }
 
-        //Zwraca swoją znormalizowaną wersje (czyli liczby w zakresie 0-1)
-        normalized() {
-                let len = this.length();
-                return new Vector2D(this.x / len, this.y / len)
+        normalized() {                                                  // Zwraca znormalizowany wektor (liczby w zakresie 0-1)
+                let len = this.length();                               // Zapisuje długość wektora
+                return new Vector2D(this.x / len, this.y / len)       // Zwraca wektor z wartościami podzielonymi przez długość wektora
         }
 
-        //Zamienia wektor na znormalizowany (czyli w zakresie liczb 0-1)
-        normalize() {
-                let norm = this.normalized();
-                this.x = norm.x;
-                this.y = norm.y;
+
+        normalize() {                              // Zwraca znormalizowany wektor (liczby w zakresie 0-1)                                
+                let norm = this.normalized();     // Zapisuje znormalizowany wektor do norm
+                this.x = norm.x;                 // Nadpisuje wartości x i y znormalizowanymi wersjami
+                this.y = norm.y;                // Nadpisuje wartości x i y znormalizowanymi wersjami
         }
 }
 // =========================================================================== //
 
 
 // ================================[ Odpowiada za działanie platformy ]================================ //
+
+// ------------------------------[ Obiekt ]------------------------------ //
 let platform = {
         size: new Vector2D(canvas.width / 4.54, canvas.height / 100 * 2.5), // Długość i szerokość platformy
         pos: null, // Pozycja platformy
@@ -386,74 +363,78 @@ let platform = {
         canCatchBall: false, //Czy może złapać piłke (upgrade łapania)
         texture: new Image(), //Tekstura platformy
 
-        // Funkcja do rysowania platformy
-        draw() {
+        draw() { // Funkcja rysująca platformę
+                // Jeśli platforma może złapać piłkę to zmienia teksturę na sticky
                 if (this.canCatchBall) this.texture.src = "img/textures/platform_sticky.png"; else this.texture.src = "img/textures/platform.png";
-                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y)
-
+                context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y) // Rysuje platformę
         }
 }
+// ---------------------------------------------------------------------- //
 
-platform.pos = new Vector2D(Math.floor(canvas.width / 2 - platform.size.x / 2), Math.floor(canvas.height - platform.size.y * 2.5));
-platform.prevPos = new Vector2D(platform.pos.x, platform.pos.y);
 
-//Klon platformy używany do upgrade'u
-let platformClone = {
-        ...platform,
+// -----------------------------[ Pozycje ]------------------------------ //
+platform.pos = new Vector2D(Math.floor(canvas.width / 2 - platform.size.x / 2), Math.floor(canvas.height - platform.size.y * 2.5)); // Ustawia pozycję platformy na środku
+platform.prevPos = new Vector2D(platform.pos.x, platform.pos.y); // Ustawia poprzednią pozycję platformy na tą samą jak aktualna
+// ---------------------------------------------------------------------- //
+
+
+// -------------------------------[ Klon ]------------------------------- //
+let platformClone = { //Klon platformy używany do upgrade'u
+        ...platform, //Klonuje platformę
 }
 
-platformClone.enabled = false; //Klon platformy jest zawsze wyłączony na starcie
-platformClone.texture.src = "img/textures/platform.png";
-platformClone.draw = () => {
-        context.globalAlpha = 0.5; //Klon platformy jest przeźroczysty
-        context.drawImage(platformClone.texture, platformClone.pos.x, platformClone.pos.y, platformClone.size.x, platformClone.size.y)
-        context.globalAlpha = 1;
+platformClone.enabled = false;                                    //Klon platformy jest zawsze wyłączony na starcie
+platformClone.texture.src = "img/textures/platform.png";         //Tekstura klonu platformy
+platformClone.draw = () => {                                    //Funkcja rysująca klon platformy
+        context.globalAlpha = 0.5;                             //Klon platformy jest przeźroczysty
+        context.drawImage(platformClone.texture, platformClone.pos.x, platformClone.pos.y, platformClone.size.x, platformClone.size.y) // Rysuje klon platformy
+        context.globalAlpha = 1;                             //Przywraca normalną przezroczystość
 }
+// ---------------------------------------------------------------------- //
 
-// Naciskanie klawiszy
-document.addEventListener("keydown", e => {
-        // Ruch platformą strzałkami
-        if (e.key == "ArrowLeft") {
-                if (platform.pos.x > 0) {
+// ---------------------[ Sterowanie - klawiatura ]---------------------- //
+document.addEventListener("keydown", e => {                     // Sterowanie platformą za pomocą klawiatury
+        if (e.key == "ArrowLeft") {                            // Ruch w lewo - strzałka w lewo
+                if (platform.pos.x > 0) {                     // Jeśli platforma nie jest w lewej krawędzi
                         platform.prevPos.x = platform.pos.x; //Stara pozycja platformy która będzie używana do obliczenia pozycji złapanej piłki
 
-                        platform.pos.x -= platform.move;
-                        platform.pos.x = Math.floor(platform.pos.x);
+                        platform.pos.x -= platform.move;                // Przesuwa platformę w lewo
+                        platform.pos.x = Math.floor(platform.pos.x);   // Zaokrągla pozycję platformy
 
-                        if (platformClone.enabled) {
-                                platformClone.prevPos.x = platformClone.pos.x;
+                        if (platformClone.enabled) {                                                                      //Jeśli klon platformy jest włączony
+                                platformClone.prevPos.x = platformClone.pos.x;                                           // Zapisuje poprzednią pozycję klonu platformy
                                 platformClone.pos.x = Math.floor(canvas.width - platform.pos.x - platformClone.size.x); //Ustawiamy klona po przeciwnej stronie
                         }
 
-                        if (platform.holdBall != null) {
+                        if (platform.holdBall != null) {                                                //Jeśli platforma trzyma piłkę
                                 //Pozycja trzymanej piłki jest responsywna do nowej pozycji platformy
-                                let ballDiff = platform.holdBall.pos.x - platform.prevPos.x;
+                                let ballDiff = platform.holdBall.pos.x - platform.prevPos.x;            //Oblicza różnicę między pozycją piłki a platformy
 
-                                platform.holdBall.prevPos.x = platform.holdBall.pos.x;
-                                platform.holdBall.prevPos.y = platform.holdBall.pos.y;
+                                platform.holdBall.prevPos.x = platform.holdBall.pos.x;              //Zapisuje poprzednią pozycję piłki x
+                                platform.holdBall.prevPos.y = platform.holdBall.pos.y;             //Zapisuje poprzednią pozycję piłki y
 
-                                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff);
+                                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff); //Ustawia pozycję piłki na nową
                         }
                 }
-        } else if (e.key == "ArrowRight") {
-                if (platform.pos.x + platform.size.x < canvas.width) {
-                        platform.prevPos.x = platform.pos.x;
+        } else if (e.key == "ArrowRight") { // Ruch w prawo - strzałka w prawo
+                if (platform.pos.x + platform.size.x < canvas.width) {                  // Jeśli platforma nie jest w prawej krawędzi
+                        platform.prevPos.x = platform.pos.x;                            //Zapisuje poprzednią pozycję platformy
 
-                        platform.pos.x += platform.move;
-                        platform.pos.x = Math.floor(platform.pos.x)
+                        platform.pos.x += platform.move;                                // Przesuwa platformę w prawo   
+                        platform.pos.x = Math.floor(platform.pos.x)                     // Zaokrągla pozycję platformy
 
-                        if (platformClone.enabled) {
-                                platformClone.prevPos.x = platformClone.pos.x;
-                                platformClone.pos.x = Math.floor(canvas.width - platform.pos.x - platformClone.size.x);
+                        if (platformClone.enabled) {                                    //Jeśli klon platformy jest włączony
+                                platformClone.prevPos.x = platformClone.pos.x;          //Zapisuje poprzednią pozycję klonu platformy
+                                platformClone.pos.x = Math.floor(canvas.width - platform.pos.x - platformClone.size.x); //Ustawiamy klona po przeciwnej stronie
                         }
 
-                        if (platform.holdBall != null) {
-                                let ballDiff = platform.holdBall.pos.x - platform.prevPos.x;
+                        if (platform.holdBall != null) {                                            //Jeśli platforma trzyma piłkę
+                                let ballDiff = platform.holdBall.pos.x - platform.prevPos.x;       //Oblicza różnicę między pozycją piłki a platformy
 
-                                platform.holdBall.prevPos.x = platform.holdBall.pos.x;
-                                platform.holdBall.prevPos.y = platform.holdBall.pos.y;
+                                platform.holdBall.prevPos.x = platform.holdBall.pos.x;           //Zapisuje poprzednią pozycję piłki x
+                                platform.holdBall.prevPos.y = platform.holdBall.pos.y;          //Zapisuje poprzednią pozycję piłki y
 
-                                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff);
+                                platform.holdBall.pos.x = Math.floor(platform.pos.x + ballDiff); //Ustawia pozycję piłki na nową
                         }
                 }
         }
@@ -466,7 +447,9 @@ document.addEventListener("keydown", e => {
         }
 
 })
+// ---------------------------------------------------------------------- //
 
+// ---------------------[ Sterowanie - myszka ]---------------------- //
 // Odpowiada za ruch platformy za pomocą myszki
 canvas.addEventListener("mousemove", e => {
 
@@ -503,6 +486,8 @@ canvas.addEventListener("mousedown", e => {
                 platform.holdBall = null;
         }
 })
+// ---------------------------------------------------------------------- //
+
 // ==================================================================================================== //
 
 // ==========================================[ Klasa piłek ]=========================================== //
@@ -555,6 +540,7 @@ class Ball {
         invertDirX() { this.dir.x *= -1; } // Odwraca nasz kierunek tylko na osi X
         invertDirY() { this.dir.y *= -1; } // Odwraca nasz kierunek tylko na osi Y
 
+        // Logika i działanie piłki
         think() {
                 let hit = false; //Jeśli coś dotkneliśmy, nie sprawdzamy kolizji innych rzeczy
 
@@ -760,7 +746,7 @@ class Ball {
                 context.globalAlpha = 1;
         }
 
-        remove() {
+        remove() {      // Usuwa piłkę
                 if (!this.enemyBall)
                         Ball.list.forEach((el, index) => {
                                 if (el == this)
@@ -773,14 +759,15 @@ class Ball {
                         })
         }
 
-        static refreshBallPower() {
+        static refreshBallPower() {     // Odświeża moc piłki
                 Ball.list.forEach((el) => {
                         el.power = Ball.ballPower;
                 })
         }
 }
 
-let originalBall = new Ball(
+// ---------------------------[ Piłka główna ]--------------------------- //
+let originalBall = new Ball( // Tworzy piłkę
         new Vector2D( // Ustawia pozycje
                 null,   // x
                 null    // y
@@ -788,19 +775,25 @@ let originalBall = new Ball(
         new Vector2D(0.25, -1), // Kierunek
         canvas.width / 27.22 / 2 // Size
 );
+// --------------------------------------------------------------------- //
 
-// Na początku piłka pojawia się nad platformą
+
+// -----------[ Na początku piłka pojawia się nad platformą ]------------ //
 originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius
 originalBall.pos.y = platform.pos.y - 0 - originalBall.radius * 2
 
 originalBall.prevPos.x = originalBall.pos.x;
 originalBall.prevPos.y = originalBall.pos.y;
+// --------------------------------------------------------------------- //
+
 // ==================================================================================================== //
+
 
 // =========================================[ Ulepszenia ]========================================= //
 
+// ---------------------------[ Klasa lasera ]--------------------------- //
 class Projectile {
-        static list = [];
+        static list = []; //Lista wszystkich
         static playerLasers = 0; //Ilość doładowań lasera gracza
         static nextPlayerFire = 0; //Czas następnego wystrzału lasera
         static playerLaserSize = new Vector2D(canvas.width / 50, canvas.height / 20); //Wielkość lasera gracza
@@ -819,7 +812,7 @@ class Projectile {
                 Projectile.list.push(this);
         }
 
-        draw() {
+        draw() { //Rysowanie
                 context.save()
                 //Obracamy teksture względem kierunku
                 context.translate(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2)
@@ -829,19 +822,22 @@ class Projectile {
                 context.restore()
         }
 
-        remove() {
+        remove() { //Usuwanie
                 Projectile.list.forEach((el, index) => {
                         if (el == this)
                                 Projectile.list.splice(index, 1);
                 })
         }
 }
+// --------------------------------------------------------------------- //
 
-class Portal {
-        static list = [];
+
+// --------------------------[ Klasa portali ]--------------------------- //
+class Portal { //Portal
+        static list = []; //Lista wszystkich
         static enabled = false; //Czy portal jest włączony
 
-        constructor(pos, size) {
+        constructor(pos, size) { //Tworzenie
                 this.pos = pos;
                 this.size = size;
 
@@ -851,24 +847,29 @@ class Portal {
                 Portal.list.push(this);
         }
 
-        draw() {
+        draw() { //Rysowanie
                 contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
-        remove() {
+        remove() { //Usuwanie
                 Portal.list.forEach((el, index) => {
                         if (el == this)
-                                Portal.list.splice(index, 1);
+                                Portal.list.splice(index, 1); //Usuwa portal z listy
                 })
         }
 }
-
-let portalW, portalH;
-portalW = canvas.width / 12.5;
-portalH = canvas.height / 10;
-new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - portalW + 25, canvas.height - canvas.height * 0.025 - portalH), new Vector2D(portalW, portalH)); //Nasz portal będzie po prawej stronie
+// --------------------------------------------------------------------- //
 
 
+// ------------------------[ Ustawienia portalu ]------------------------ //
+let portalW, portalH; //Wielkość portalu
+portalW = canvas.width / 12.5; // Szerokość portalu
+portalH = canvas.height / 10; // Wysokość portalu
+new Portal(new Vector2D(canvas.width - canvas.width * 0.0005 - portalW + 25, canvas.height - canvas.height * 0.025 - portalH), new Vector2D(portalW, portalH)); // Portal będzie po prawej stronie
+// --------------------------------------------------------------------- //
+
+
+// ------------------------[ Ustawienia ulepszeń ]----------------------- //
 let prevUpgrade;
 let curUpgrade = null;
 
@@ -881,52 +882,57 @@ const UPGRADE_PLATFORMCLONE = 4; // Klon platformy
 const UPGRADE_PLATFORMSIZE = 5; // Powiększenie platformy
 const UPGRADE_LASER = 6; // Laser
 const UPGRADE_SKIP = 7; // Przejście do następnego poziomu
+// --------------------------------------------------------------------- //
 
-//Usuwa efekt ulepszenia
+// ----------------------[ Usuwa efekt ulepszenia ]---------------------- //
 function removeUpgradeEffect(upgrade) {
-        switch (upgrade) {
-                case UPGRADE_LASER:
+        switch (upgrade) { //Usuwa efekt ulepszenia
+                case UPGRADE_LASER: //Laser
                         Projectile.playerLasers = 0;
                         break;
-                case UPGRADE_SKIP:
+                case UPGRADE_SKIP: //Przejście do następnego poziomu
                         Portal.enabled = false;
                         updateStaticCanvas();
                         break;
 
-                case UPGRADE_BALLPOWER:
+                case UPGRADE_BALLPOWER: //Większa siła piłki
                         Ball.ballPower = 0;
                         Ball.refreshBallPower();
                         break;
-                case UPGRADE_MOREBALLS:
+                case UPGRADE_MOREBALLS: //Więcej piłek
                         Ball.list.splice(1);
                         break;
 
-                case UPGRADE_BALLCATCH:
+                case UPGRADE_BALLCATCH: //Tryb chwytania piłki
                         platform.canCatchBall = false;
                         break;
-                case UPGRADE_PLATFORMSIZE:
+                case UPGRADE_PLATFORMSIZE: //Powiększenie platformy
                         platform.size.x -= Upgrade.platformSizeIncrease * platform.timesIncreased;
                         platform.pos.x += Upgrade.platformSizeIncrease * platform.timesIncreased / 2;
                         platform.timesIncreased = 0;
                         break;
-                case UPGRADE_PLATFORMCLONE:
+                case UPGRADE_PLATFORMCLONE: //Klon platformy
                         platformClone.enabled = false;
                         break;
                 default:
                         break;
         }
 }
+// --------------------------------------------------------------------- //
 
-//Usuwa wszystkie efekty ulepszeń
+// -----------------[ Usuwa wszystkie efekty ulepszeń ]------------------ //
 function removeAllUpgrades() {
         for (let i = 0; i <= 7; i++) {
                 removeUpgradeEffect(i);
         }
 }
+// --------------------------------------------------------------------- //
 
+
+// ----------------------[ Klasa ulepszeń - byty ]----------------------- //
 class Upgrade {
-        static list = [];
-        static typeToTexture = [
+        static list = []; //Lista wszystkich
+        static typeToTexture = [ //Tekstury ulepszeń
                 "img/upgrades/upgrade_hp.svg",
                 "img/upgrades/upgrade_strength.svg",
                 "img/upgrades/upgrade_moreballs.svg",
@@ -940,221 +946,232 @@ class Upgrade {
         static nextUpgradePoints = 1200; //Punkty do kolejnego upgrade'u
         static platformSizeIncrease = canvas.width / 25; //Ilość wydłużenia platformy
 
-        constructor(pos, type) {
-                this.pos = pos;
-                this.prevPos = new Vector2D(pos.x, pos.y);
+        constructor(pos, type) { //Tworzenie
+                this.pos = pos; //Pozycja
+                this.prevPos = new Vector2D(pos.x, pos.y); //Poprzednia pozycja
                 this.velY = 3.2; // Szybkość w płaszczyźnie Y, zaczynamy od 3.2 by dodać efekt "podskoczenia" przy pojawieniu się ulepszenia
-                this.type = type;
-                this.size = new Vector2D(canvas.width / 10 - 0.1, canvas.width / 10 - 0.1);
+                this.type = type; //Typ
+                this.size = new Vector2D(canvas.width / 10 - 0.1, canvas.width / 10 - 0.1); //Wielkość
 
-                this.texture = new Image();
-                this.texture.src = Upgrade.typeToTexture[this.type];
+                this.texture = new Image(); //Tekstura
+                this.texture.src = Upgrade.typeToTexture[this.type]; //Tekstura - źródło
 
-                Upgrade.list.push(this);
+                Upgrade.list.push(this); //Dodaje do listy
         }
 
-        draw() {
+        draw() { //Rysowanie
                 context.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
         }
 
-        collect() {
+        collect() { //Zbieranie
                 prevUpgrade = curUpgrade;
                 curUpgrade = this.type;
 
                 switch (curUpgrade) {
                         //Ogólne
-                        case UPGRADE_MOREHP:
+                        case UPGRADE_MOREHP: //Więcej życia
                                 playerHealth++;
                                 updateStaticCanvas();
                                 break;
-                        case UPGRADE_LASER:
+                        case UPGRADE_LASER: //Laser
                                 Projectile.playerLasers++;
                                 break;
-                        case UPGRADE_SKIP:
+                        case UPGRADE_SKIP: //Przejście do następnego poziomu
                                 Portal.enabled = true;
                                 updateStaticCanvas();
                                 break;
 
                         //Piłki
-                        case UPGRADE_MOREBALLS:
-                                removeUpgradeEffect(UPGRADE_BALLPOWER);
+                        case UPGRADE_MOREBALLS: //Więcej piłek
+                                removeUpgradeEffect(UPGRADE_BALLPOWER); //Usuwa efekt większej siły piłki
                                 new Ball(new Vector2D(Math.floor(platform.pos.x + platform.size.x / 2 - canvas.width / 27.77 / 2), platform.pos.y - canvas.width / 27.77), new Vector2D(0.25, 1), canvas.width / 27.77 / 2);
                                 break;
-                        case UPGRADE_BALLPOWER:
-                                removeUpgradeEffect(UPGRADE_MOREBALLS);
-                                Ball.ballPower++;
-                                Ball.refreshBallPower();
+                        case UPGRADE_BALLPOWER: //Większa siła piłki
+                                removeUpgradeEffect(UPGRADE_MOREBALLS); //Usuwa efekt większej ilości piłek
+                                Ball.ballPower++; //Zwiększa siłę piłki
+                                Ball.refreshBallPower(); //Odświeża siłę piłki
                                 break;
 
                         //Platforma
-                        case UPGRADE_BALLCATCH:
-                                removeUpgradeEffect(UPGRADE_PLATFORMSIZE);
-                                removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
+                        case UPGRADE_BALLCATCH: //Tryb chwytania piłki
+                                removeUpgradeEffect(UPGRADE_PLATFORMSIZE); //Usuwa efekt powiększenia platformy
+                                removeUpgradeEffect(UPGRADE_PLATFORMCLONE); //Usuwa efekt klonu platformy
 
-                                platform.canCatchBall = true;
+                                platform.canCatchBall = true; //Włącza tryb chwytania piłki
                                 break;
-                        case UPGRADE_PLATFORMCLONE:
-                                removeUpgradeEffect(UPGRADE_PLATFORMSIZE);
-                                platformClone.enabled = true;
-                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x;
+                        case UPGRADE_PLATFORMCLONE: //Klon platformy 
+                                removeUpgradeEffect(UPGRADE_PLATFORMSIZE); //Usuwa efekt powiększenia platformy
+                                platformClone.enabled = true; //Włącza klon platformy
+                                platformClone.pos.x = canvas.width - platform.pos.x - platformClone.size.x; //Ustawia pozycję klonowi platformy
                                 break;
-                        case UPGRADE_PLATFORMSIZE:
-                                removeUpgradeEffect(UPGRADE_PLATFORMCLONE);
-                                platform.size.x += Upgrade.platformSizeIncrease;
-                                platform.pos.x -= Upgrade.platformSizeIncrease / 2;
-                                platform.pos.x = Math.floor(platform.pos.x);
+                        case UPGRADE_PLATFORMSIZE: //Powiększenie platformy
+                                removeUpgradeEffect(UPGRADE_PLATFORMCLONE); //Usuwa efekt klonu platformy
+                                platform.size.x += Upgrade.platformSizeIncrease; //Powiększa platformę
+                                platform.pos.x -= Upgrade.platformSizeIncrease / 2; //Przesuwa platformę w lewo
+                                platform.pos.x = Math.floor(platform.pos.x); //Zaokrągla pozycję platformy
 
-                                platform.timesIncreased++;
+                                platform.timesIncreased++; //Zwiększa licznik powiększeń platformy
                                 break;
                         default:
                                 break;
                 }
 
-                this.remove();
+                this.remove(); //Usuwa ulepszenie
         }
 
-        remove() {
-                Upgrade.list.forEach((el, index) => {
+        remove() { //Usuwanie
+                Upgrade.list.forEach((el, index) => { //Przeszukuje listę
                         if (el == this)
-                                Upgrade.list.splice(index, 1);
+                                Upgrade.list.splice(index, 1); //Usuwa z listy
                 })
         }
 }
+// --------------------------------------------------------------------- //
 
-let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 501);
-
+let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 501); // Punkty do następnego ulepszenia
 // ==================================================================================================== //
 
 // ==============================================[ DOH ]=============================================== //
 
-class MiniDOH {
-        static list = [];
+// --------------------------[ Klasa MiniDOH ]--------------------------- //
+class MiniDOH { //Klasa mini DOH
+        static list = []; //Lista mini DOH
 
-        constructor(pos, size, parent, hp = 3) {
-                this.pos = pos;
-                this.size = size;
-                this.hp = hp;
-                this.parent = parent;
+        constructor(pos, size, parent, hp = 3) { //Tworzenie
+                this.pos = pos; //Pozycja
+                this.size = size; //Wielkość
+                this.hp = hp; //Życie
+                this.parent = parent; //Rodzic
 
-                this.texture = new Image();
-                this.texture.src = "img/doh.png";
+                this.texture = new Image(); //Tekstura
+                this.texture.src = "img/doh.png"; //Tekstura - źródło
 
-                MiniDOH.list.push(this);
+                MiniDOH.list.push(this); //Dodaje do listy
 
-                updateStaticCanvas();
+                updateStaticCanvas(); //Odświeża canvas statyczny
         }
 
-        draw() {
-                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+        draw() { //Rysowanie
+                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y); //Rysuje mini DOH
         }
 
-        remove() {
+        remove() { //Usuwanie
                 MiniDOH.list.forEach((el, index) => {
                         if (el == this) {
                                 this.parent.minionsNum--;
-                                MiniDOH.list.splice(index, 1);
+                                MiniDOH.list.splice(index, 1); //Usuwa z listy
                         }
                 })
 
-                updateStaticCanvas();
+                updateStaticCanvas(); //Odświeża canvas statyczny
         }
 }
+// --------------------------------------------------------------------- //
 
+
+// ----------------------------[ Klasa DOH ]----------------------------- //
 class DOH {
-        static list = [];
+        static list = []; //Lista DOH
 
-        constructor(pos, size, hp = 20) {
-                this.pos = pos;
-                this.size = size;
-                this.hp = hp;
+        constructor(pos, size, hp = 20) { //Tworzenie
+                this.pos = pos; //Pozycja
+                this.size = size; //Wielkość
+                this.hp = hp; //Życie
 
-                this.texture = new Image();
-                this.texture.src = "img/doh.png";
+                this.texture = new Image(); //Tekstura
+                this.texture.src = "img/doh.png"; //Tekstura - źródło
 
                 this.summonedMinions = false; //Czy przywołał mini-dohy?
                 this.fireBalls = [null, null]; //Lista fireballi
                 this.minionsNum = 0; //Ilość mini-dohów
 
-                DOH.list.push(this);
+                DOH.list.push(this); //Dodaje do listy  
 
-                updateStaticCanvas();
+                updateStaticCanvas(); //Odświeża canvas statyczny
         }
 
-        think(cTime) {
-                this.fireBalls.forEach((el) => {
-                        if (el != null) el.think();
+        think(cTime) { // Logika i działanie
+                this.fireBalls.forEach((el) => { //Przeszukuje listę fireballi
+                        if (el != null) el.think(); //Jeżeli fireball istnieje, to go porusza
                 })
 
-                if (this.hp <= 0)
-                        this.remove();
+                if (this.hp <= 0) this.remove(); //Jeżeli hp jest mniejsze lub równe 0, to usuwa
 
-                if (this.hp <= 10 && !this.summonedMinions) {
-                        this.summonedMinions = true;
+                if (this.hp <= 10 && !this.summonedMinions) { //Jeżeli hp jest mniejsze lub równe 10 i nie przywołał mini-dohów
+                        this.summonedMinions = true; // Zmienia wartość flagi na true
 
+                        //Przywołał mini-dohy
                         new MiniDOH(new Vector2D(this.pos.x - canvas.width / 25, this.pos.y + this.size.y * 0.95), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
                         new MiniDOH(new Vector2D(this.pos.x + canvas.width / 12.5, this.pos.y + this.size.y), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
                         new MiniDOH(new Vector2D(this.pos.x + this.size.x - canvas.width / 6.25, this.pos.y + this.size.y), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
                         new MiniDOH(new Vector2D(this.pos.x + this.size.x - canvas.width / 25, this.pos.y + this.size.y * 0.95), new Vector2D(canvas.width / 12.5, canvas.height / 6.94), this);
 
-                        this.minionsNum = 4;
+                        this.minionsNum = 4; //Ustawia ilość mini-dohów na 4
 
-                        updateStaticCanvas();
+                        updateStaticCanvas(); //Odświeża canvas statyczny
                 }
 
-                if (this.fireBalls[0] == null && platform.holdBall == null) {
+                if (this.fireBalls[0] == null && platform.holdBall == null) { //Jeżeli nie ma fireballa i platforma nie trzyma piłki
+                        // Tworzy fireballa
                         this.fireBalls[0] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(0.75, 1), canvas.width / 20 / 2, true, this);
                 }
 
-                if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10) {
+                if (this.fireBalls[1] == null && platform.holdBall == null && this.hp <= 10) { //Jeżeli nie ma fireballa i platforma nie trzyma piłki i hp jest mniejsze lub równe 10
+                        // Tworzy fireballa
                         this.fireBalls[1] = new Ball(new Vector2D(Math.floor(this.pos.x + this.size.x * 0.35), Math.floor(this.pos.y + this.size.y * 0.6)), new Vector2D(-0.75, 1), canvas.width / 20 / 2, true, this);
                 }
         }
 
-        draw() {
-                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y);
+        draw() { //Rysowanie
+                contextStatic.drawImage(this.texture, this.pos.x, this.pos.y, this.size.x, this.size.y); //Rysuje texture DOH'a
         }
 
-        remove() {
+        remove() { //Usuwanie po śmierci
                 DOH.list.forEach((el, index) => {
                         if (el == this) {
-                                victory();
-                                DOH.list.splice(index, 1);
+                                victory(); //Wywołuje funkcję zwycięstwa
+                                DOH.list.splice(index, 1); //Usuwa z listy DOH'a
                         }
                 })
 
-                updateStaticCanvas();
+                updateStaticCanvas(); //Odświeża canvas statyczny
         }
 }
+// --------------------------------------------------------------------- //
 
-
-//Przywołuje DOH'a przy poziome 33
+// -----------------[ Przywołuje DOH'a przy poziome 33 ]----------------- //
 function summonDOH() {
-        Brick.list = [];
+        Brick.list = []; //Usuwa cegiełki
 
-        let width, height;
-        width = canvas.width / 2.5;
-        height = canvas.height / 2;
+        let width, height; // Szerokość i wysokość
+        width = canvas.width / 2.5; //Ustawia szerokość
+        height = canvas.height / 2; //Ustawia wysokość
 
+        // Tworzy DOH'a
         new DOH(new Vector2D(canvas.width / 2 - width / 2, canvas.height / 2 - height / 1.5), new Vector2D(width, height));
 
         setTimeout(() => {
-                updateStaticCanvas();
-        }, 15)
+                updateStaticCanvas(); //Odświeża canvas statyczny 
+        }, 45)
 }
+// --------------------------------------------------------------------- //
+// ==================================================================================================== //
+
 
 // =================================[ Odpowiada za rysowanie cegieł ]================================== //
 
+// ---------------------------[ Klasa cegieł ]--------------------------- //
 class Brick {
-        static list = [];
+        static list = []; //Lista cegieł
         static nextFreeHealth = 20000 // Punkty do zdobycia do następnego darmowego życia
 
-        constructor(pos, size, type) {
-                this.pos = pos;
-                this.size = size;
+        constructor(pos, size, type) { //Konstruktor
+                this.pos = pos; //Pozycja
+                this.size = size; //Rozmiar
 
-                this.health = 1
+                this.health = 1 // Życie cegły
 
-                this.texture = new Image();
+                this.texture = new Image(); //Tekstura cegły
 
                 this.type = type // Rodzaj cegły
 
@@ -1162,53 +1179,51 @@ class Brick {
                 // - teksturę
                 // - wartość punktową
                 // - opcjonalnie życie
-                if (this.type == 0) {
+                if (this.type == 0) {  // Biała cegła
                         this.texture.src = "img/bricks/whiteBrick.jpg"
                         this.value = 50
                 }
-                else if (this.type == 1) {
+                else if (this.type == 1) { // Pomarańczowa cegła
                         this.texture.src = "img/bricks/orangeBrick.jpg"
                         this.value = 60
                 }
-                else if (this.type == 2) {
+                else if (this.type == 2) { // Cyjanowa cegła
                         this.texture.src = "img/bricks/cyanBrick.jpg";
                         this.value = 70
                 }
-                else if (this.type == 3) {
+                else if (this.type == 3) { // Zielona cegła
                         this.texture.src = "img/bricks/greenBrick.jpg"
                         this.value = 80
                 }
-                else if (this.type == 4) {
+                else if (this.type == 4) { // Czerwona cegła
                         this.texture.src = "img/bricks/redBrick.jpg"
                         this.value = 90
                 }
-                else if (this.type == 5) {
+                else if (this.type == 5) { // Niebieska cegła
                         this.texture.src = "img/bricks/blueBrick.jpg"
                         this.value = 100
                 }
-                else if (this.type == 6) {
+                else if (this.type == 6) { // Różowa cegła
                         this.texture.src = "img/bricks/pinkBrick.jpg"
                         this.value = 110
                 }
-                else if (this.type == 7) {
+                else if (this.type == 7) { // Żółta cegła
                         this.texture.src = "img/bricks/yellowBrick.jpg"
                         this.value = 120
                 }
-                else if (this.type == 8) {
+                else if (this.type == 8) { // Srebrna cegła
                         this.texture.src = "img/bricks/silverBrick.jpg"
                         this.value = 50 * playerLevel
                         this.health = parseInt(playerLevel / 8) + 2
                 }
-                else if (this.type == 9) {
+                else if (this.type == 9) { // Złota cegła
                         this.texture.src = "img/bricks/goldBrick.jpg"
-                        this.health = -1
+                        this.health = -1 // Życie - nieśmeieralna
                 }
 
+                Brick.list.push(this); //Dodaje do listy cegieł
 
-
-                Brick.list.push(this);
-
-                updateStaticCanvas();
+                updateStaticCanvas(); //Odświeża canvas statyczny
         }
 
         // Rysuje cegłe
@@ -1218,9 +1233,9 @@ class Brick {
 
         // Usuwa cegłe
         remove() {
-                playSound("brickHit", this.type)
+                playSound("brickHit", this.type) // Odtwarza dźwięk uderzenia w cegłę
                 this.health-- // Odejmuje życie cegły
-                if (this.health == 0) {
+                if (this.health == 0) { // Jeśli cegła nie ma już życia
                         Brick.list.forEach((el, index) => {
                                 if (el == this) {
                                         playerPoints += this.value // Dodaje pkt po rozbiciu cegły
@@ -1236,20 +1251,19 @@ class Brick {
 
                                                 let randUpgrade = Math.floor(Math.random() * 8);
                                                 new Upgrade(new Vector2D(Math.floor(this.pos.x + this.size.x / 2), Math.floor(this.pos.y + this.size.y / 2)), randUpgrade);
-                                                // new Upgrade(new Vector2D(this.pos.x + this.size.x / 2, this.pos.y + this.size.y / 2), UPGRADE_PLATFORMCLONE);
                                         }
                                         Brick.list.splice(index, 1);    // Wyrzuca cegłe z listy wszystkich cegieł
                                 }
                         })
                 }
 
-                updateStaticCanvas();
+                updateStaticCanvas(); //Odświeża canvas statyczny
         }
 }
+// --------------------------------------------------------------------- //
 
 
-
-//Kolizja prostokąta z prostokątem
+// -----------------[ Kolizja prostokąta z prostokątem ]----------------- //
 function rectXrectCollision(obj1, obj2) {
         if (obj1 == null || obj2 == null)
                 return null;
@@ -1286,8 +1300,10 @@ function rectXrectCollision(obj1, obj2) {
 
         return colData;
 }
+// --------------------------------------------------------------------- //
 
-// Kolizja kółka z prostokątem
+
+// -----------------[ Kolizja kółka z prostokątem ]--------------------- //
 function circXrectCollision(circ, rect) {
         if (circ == null || rect == null)
                 return null;
@@ -1343,36 +1359,45 @@ function circXrectCollision(circ, rect) {
 
         return colData;
 }
+// --------------------------------------------------------------------- //
+
 // ==================================================================================================== //
 
 // =======================================[ Funkcje cykliczne ]======================================== //
-function gameLoop(cTime) {
-        if (gameStarted && !gamePaused && !gameOvered) {
-                think(cTime);
-                draw();
+function gameLoop(cTime) { // Funkcja cykliczna odpowiadająca za całą grę
 
-                if (!Brick.list.filter(el => el.type != 9).length && playerLevel != 33) // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
-                        nextLevel()
-        } else if (!gamePaused && !gameOvered)
-                restartTheGame();
+        // ---------------------------[ Cykliczność ]---------------------------- //
+        if (gameStarted && !gamePaused && !gameOvered) {  // Jeżeli gra jest rozpoczęta i nie jest wstrzymana to wykonuje się cała logika gry
+                think(cTime);                            // Wywołuje funkcję logiki gry
+                draw();                                 // Wywołuje funkcję rysowania gry
 
-        // Rysuije napis pauzy jeśli gra jest wstrzymana
-        if (gamePaused && !gameOvered && gameStarted) {
-                let texture = new Image()
-                texture.src = "img/gamePaused.png"
-                context.drawImage(texture, 159.2, canvas.height - 300, 681, 170.4)
+                if (!Brick.list.filter(el => el.type != 9).length && playerLevel != 33)    // Jeżeli nie ma już żadnych cegieł poza złotymi to przechodzi do następnego poziomu
+                        nextLevel()                                                       // Wywołuje funkcję przechodzenia do następnego poziomu
+        } else if (!gamePaused && !gameOvered)                                           // Jeżeli gra nie jest wstrzymana i nie jest przegrana to rysuje napis rozpoczęcia gry
+                restartTheGame();                                                       // Wywołuje funkcję rysującą napis rozpoczęcia gry
+        // --------------------------------------------------------------------- //
+
+
+        // ---------------------------[ Napis pauzy ]---------------------------- //
+        if (gamePaused && !gameOvered && gameStarted) {                               // Jeżeli gra jest wstrzymana i nie jest przegrana i rozpoczęta to rysuje napis pauzy
+                let texture = new Image()                                            // Tworzy obiekt obrazu
+                texture.src = "img/gamePaused.png"                                  // Ustawia źródło obrazu
+                context.drawImage(texture, 159.2, canvas.height - 300, 681, 170.4) // Rysuje obraz na ekranie
         }
+        // --------------------------------------------------------------------- //
 
         window.requestAnimationFrame(gameLoop) // Kontynuacja game loopa
 }
 
-// Funkcja mająca na celu zająć się logiką gry
-function think(cTime) {
 
-        //Wywołuje funkcję logiki u DOH'a
+function think(cTime) { // Funkcja odpowiadająca za całą logikę gry
+
+        // -----------------[ Wywołuje funkcję logiki u DOH'a ]------------------ //
         DOH.list.forEach((el) => el.think(cTime));
+        // --------------------------------------------------------------------- //
 
-        //Strzela laserami z platformy
+
+        // -------------------[ Strzela laserami z platformy ]------------------- //
         if (Projectile.playerLasers > 0 && Projectile.nextPlayerFire < cTime) {
                 Projectile.nextPlayerFire = cTime + 2500; //Następny strzał laserami - 2,5s
 
@@ -1388,8 +1413,10 @@ function think(cTime) {
                         }
                 }
         }
+        // --------------------------------------------------------------------- //
 
-        // Logika laserów
+
+        // -------------------------[ Logika laserów ]------------------------- //
         Projectile.list.forEach((el) => {
                 //Sprawdzamy kolizje z cegłami jeśli laser jest gracza
                 if (el.isPlayers) {
@@ -1418,8 +1445,10 @@ function think(cTime) {
                 el.pos.x += Math.floor((el.dir.x / len) * el.speed);
                 el.pos.y += Math.floor((el.dir.y / len) * el.speed);
         })
+        // ------------------------------------------------------------------ //
 
-        // Logika upgrade'ów
+
+        // ------------------------[ Logika upgrade'ów ]------------------------- //
         Upgrade.list.forEach((el) => {
                 if (el.velY > -8.4)
                         el.velY -= 0.07;
@@ -1448,27 +1477,29 @@ function think(cTime) {
                                 el.collect();
                 }
         })
+        // ------------------------------------------------------------------ //
 
-        //Logika portali
+        // --------------------------[ Logika portali ]-------------------------- //
         if (Portal.enabled)
-                Portal.list.forEach((el) => {
-                        let col = rectXrectCollision(el, platform)
+                Portal.list.forEach((el) => { //Rysuje każdy portal
+                        let col = rectXrectCollision(el, platform) //Kolizja z platformą
 
-                        if (col.hit)
-                                nextLevel();
+                        if (col.hit) // Jeśli się w niego wejdzie
+                                nextLevel(); // Przejście do następnego poziomu
                 })
+        // ------------------------------------------------------------------ //
 
-
-        // System kolizji piłki
+        // -----------------------[ System kolizji piłki ]----------------------- //
         Ball.list.forEach((el, index) => {
                 el.think();
         })
+        // ------------------------------------------------------------------ //
 }
 
-function draw() {
+function draw() { // Funkcja odpowiadająca za całą grafikę gry
         context.clearRect(0, 0, canvas.width, canvas.height) //Usuwa poprzednią klatke
 
-        if (playerHealth > 0) {
+        if (playerHealth > 0) { //Jeśli gracz ma życia
                 platform.draw(); // Rysuje platformę
 
                 if (platformClone.enabled)
@@ -1490,69 +1521,78 @@ function draw() {
                 Projectile.list.forEach((el) => el.draw());
         }
         else {
-                // Wyświetla zdobyte punkty
-                context.font = `bold ${canvas.height / 18.5}px Arial`;
-                context.fillStyle = '#0090e1';
-                context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Punkty
+                // ---------------------[ Wyświetla zdobyte punkty ]--------------------- //
+                context.font = `bold ${canvas.height / 18.5}px Arial`;   // Ustawia czcionkę
+                context.fillStyle = '#0090e1';                          // Ustawia kolor
+                context.fillText(`${playerPoints}💎`, canvas.width / 50, canvas.height / 15.625) // Wypisuje punkty
+                // ------------------------------------------------------------------ //
 
-                // Wyświetla napis koniec gry
 
-                context.font = "bold 540px Arial";
-                context.fillStyle = '#6774eb';
-                context.fillText(`Game over`, 1000, 2500)
+                // -----------[ Wyświetla napis koniec gry i odtwarza dźwięk ]----------- //
+                context.font = "bold 540px Arial";               // Ustawia czcionkę
+                context.fillStyle = '#6774eb';                  // Ustawia kolor
+                context.fillText(`Game over`, 1000, 2500)      // Napis
+                playSound("gameOver")                         // Odtwarza dźwięk końca gry
+                // ------------------------------------------------------------------ //
 
-                playSound("gameOver") // Odtwarza dźwięk końca gry
 
-                // Ustawia flagi pauzy i końca gry
-                gameOvered = true
-                document.removeEventListener("keydown", pauseTheGame)
-                document.addEventListener("click", gameOver)
+                // -----------------[ Ustawia flagi pauzy i końca gry ]------------------ //
+                gameOvered = true                                       // Ustawia flagę końca gry
+                document.removeEventListener("keydown", pauseTheGame)  // Usuwa event listenera pauzy
+                document.addEventListener("click", gameOver)          // Dodaje event listenera gameOver do documetu
+                // ------------------------------------------------------------------ //
         }
 
         context.stroke(); //Kończy rysować nową klatke
 }
 
 
+function updateStaticCanvas() { //Odświeża statyczny canvas - canvas dla obiektów które rzadko mają potrzebę odświeżania
+        contextStatic.clearRect(0, 0, staticCanvas.width, staticCanvas.height); //Usuwa poprzednią klatke
 
-//Odświeża statyczny canvas - canvas dla obiektów które rzadko mają potrzebę odświeżania
-function updateStaticCanvas() {
-        contextStatic.clearRect(0, 0, staticCanvas.width, staticCanvas.height);
+        if (playerHealth > 0) { //Jeśli gracz ma życia
+                DOH.list.forEach((el) => el.draw()); //Rysuje każdego doha
+                MiniDOH.list.forEach((el) => el.draw()); //Rysuje każdego mini doha
 
-        if (playerHealth > 0) {
-                DOH.list.forEach((el) => el.draw());
-                MiniDOH.list.forEach((el) => el.draw());
+                if (Portal.enabled)                              //Jeśli portal jest włączony
+                        Portal.list.forEach((el) => el.draw()); //Rysuje każdy portal
 
-                if (Portal.enabled)
-                        Portal.list.forEach((el) => el.draw());
+                Brick.list.forEach((el) => el.draw()); //Rysuje każdą cegłę
 
-                Brick.list.forEach((el) => el.draw());
 
-                // Wyświetla statystyki
+                // -------------------------[ Wyświetla punkty ]------------------------- //
                 contextStatic.font = `bold ${staticCanvas.height / 18.5}px Arial`;
                 contextStatic.fillStyle = '#0090e1';
 
                 contextStatic.fillText(`${playerPoints}💎`, staticCanvas.width / 50, staticCanvas.height / 15.625) // Punkty
+                // ------------------------------------------------------------------ //
 
+
+                // ------------------------[ Wyświetla życie ]------------------------- //
                 contextStatic.fillStyle = '#f8312f';
                 if (playerHealth < 10)
                         contextStatic.fillText(`${playerHealth}❤️`, staticCanvas.width - staticCanvas.width / 9, staticCanvas.height / 15.625) // Życie
                 else
                         contextStatic.fillText(`${playerHealth}❤️`, staticCanvas.width - staticCanvas.width / 7.6, staticCanvas.height / 15.625) // Życie
+                // ------------------------------------------------------------------ //
 
-                //Pasek życia DOH'a
-                if (DOH.list.length > 0) {
-                        let doh = DOH.list[0];
 
-                        contextStatic.fillStyle = '#0e0a24';
-                        contextStatic.fillRect(staticCanvas.width * 0.2 + 8, staticCanvas.height / 15.625 - staticCanvas.height / 18.5, staticCanvas.width * 0.6 - 15, staticCanvas.height / 18.5);
+                // ------------------------[ Pasek życia DOH'a ]------------------------- //
+                if (DOH.list.length > 0) { //Jeśli jest jakiś doh
+                        let doh = DOH.list[0]; //Pobiera pierwszego doha
 
-                        if (doh.minionsNum > 0) contextStatic.fillStyle = '#0089c4'; else contextStatic.fillStyle = '#de4f35';
+                        contextStatic.fillStyle = '#0e0a24'; // Ustawia kolor tła paska życia
+                        
+                        contextStatic.fillRect(staticCanvas.width * 0.2 + 8, staticCanvas.height / 15.625 - staticCanvas.height / 18.5, staticCanvas.width * 0.6 - 15, staticCanvas.height / 18.5); // Rysuje tło paska życia
+                        if (doh.minionsNum > 0) contextStatic.fillStyle = '#0089c4'; else contextStatic.fillStyle = '#de4f35'; // Ustawia kolor paska życia zależnie od obecności minionów
 
-                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 10, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 20);
+                        // Rysuje pasek życia - jego szerokość zależy od ilości życia doha
+                        contextStatic.fillRect(staticCanvas.width * 0.2 + 25, staticCanvas.height / 15.625 - staticCanvas.height / 18.5 + 10, (staticCanvas.width * 0.6 - 50) * (doh.hp / 20), staticCanvas.height / 18.5 - 20); 
                 }
+                // ------------------------------------------------------------------ //
         }
 
-        contextStatic.stroke();
+        contextStatic.stroke(); //Kończy rysować nową klatke
 }
 // ==================================================================================================== //
-gameLoop(0) //Zaczyna nasz game loop
+gameLoop(0) //Zaczyna game loop

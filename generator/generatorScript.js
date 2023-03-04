@@ -15,6 +15,50 @@ const deleteButton = document.querySelector("#deleteButton")
 const clearButton = document.querySelector("#clearButton")
 
 
+// ========================================[ Odtwarza dźwięk ]======================================== // 
+function playSound(sound, type = 0) {
+    switch (sound) {
+        case 'hitEdge': // Uderza w krawędź canvas
+            new Audio('../audio/balHitEdge.ogg').play()
+            break;
+        case "brickHit": // Uderza w cegłę
+            if (type != 8 && type != 9)
+                new Audio('../audio/brickHit.ogg').play()
+            else if (type == 9)
+                new Audio('../audio/goldHitSound.ogg').play() // Silver brick sound
+            else if (type == 8)
+                new Audio('../audio/silverHitSound.ogg').play() // Gold brick sound
+
+            break;
+        case "hitPlatform": // Uderza w platformę
+            new Audio('../audio/platformHit.ogg').play()
+            break;
+        case "hitSmallDOH": // Uderza w małego DOH'a
+            new Audio('../audio/smallDohHit.ogg').play()
+            break;
+        case "hitDOH": // Uderza w DOH'a
+            new Audio('../audio/dohHit.ogg').play()
+            break;
+        case "gameOver": // Przegrywa
+            new Audio('../audio/gameOver.ogg').play()
+            break;
+        case "fallOfScreen": // Upada poza ekran
+            new Audio('../audio/fallOfScreen.ogg').play()
+            break;
+        case "hitedByEnemy": // Otrzymuje obrażenia od wroga
+            new Audio('../audio/hitedByEnemy.ogg').play()
+            break;
+        case "clicked":
+            new Audio('../audio/click.ogg').play()
+            break;
+
+
+
+    }
+}
+// ==================================================================================================== //
+
+
 // ==================================================================================================== //
 // Ustawia paletę pozycji cegieł
 // ==================================================================================================== //
@@ -51,6 +95,13 @@ function startGenerator() {
             el.classList.add("picked")
             pickedImage = e.target.dataset.image
             pickedType = i
+
+            if (pickedType == 8)
+                playSound("brickHit", 8)
+            else if (pickedType == 9)
+                playSound("brickHit", 9)
+            else
+                playSound("clicked")
         })
     })
     // Wczytuje img do klocków
@@ -58,6 +109,8 @@ function startGenerator() {
         el.addEventListener("click", e => {
             e.target.style.backgroundImage = `url(../img/bricks/${pickedImage}.jpg)`
             e.target.dataset.type = pickedType
+
+            playSound("clicked")
         })
     })
 
@@ -89,35 +142,35 @@ function startGenerator() {
                 // })
 
             })
-    } 
+    }
     // Wczytuje poziomy z localstorage do levelList nie zaczynające się od "_" (nr rozpoczęcia poziomu do rozpoczynania gry)
-        for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i)
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i)
 
-            if (key[0] != "_")
-                levelList.push(key)
-        }
+        if (key[0] != "_")
+            levelList.push(key)
+    }
 
-        // Sortuje levelList po id
-        levelList.sort((a, b) => {
-            if (parseInt(a.slice(7)) > parseInt(b.slice(7)))
-                return 1
-            else if (parseInt(a.slice(7)) < parseInt(b.slice(7)))
-                return -1
-            else
-                return 0
-        })
+    // Sortuje levelList po id
+    levelList.sort((a, b) => {
+        if (parseInt(a.slice(7)) > parseInt(b.slice(7)))
+            return 1
+        else if (parseInt(a.slice(7)) < parseInt(b.slice(7)))
+            return -1
+        else
+            return 0
+    })
 
 
-        // Wczytuje poziomy do selecta
-        levelList.forEach((el, i) => {
-            let option = document.createElement("option")
-            option.value = el
-            option.innerText = el
-            selectLevel.appendChild(option)
+    // Wczytuje poziomy do selecta
+    levelList.forEach((el, i) => {
+        let option = document.createElement("option")
+        option.value = el
+        option.innerText = el
+        
+        selectLevel.appendChild(option)
+    })
 
-        })
-    
 
 
 
@@ -134,6 +187,7 @@ function clearEditor() {
 }
 clearButton.addEventListener("click", () => {
     if (confirm("Czy na pewno chcesz wyczyścić edytor?"))
+        playSound("clicked")
         clearEditor()
 })
 
@@ -143,6 +197,7 @@ clearButton.addEventListener("click", () => {
 loadButton.addEventListener("click", e => {
     if (selectLevel.value != 0 && confirm("Upewnij się, że Twoja praca została zapisana przed wczytaniem nowego poziomu! \nW przeciwnym wypadku dane zostaną utracone.")) {
         clearEditor()
+        playSound("clicked")
 
         let levelName = selectLevel.value
         levelNameInput.value = levelName
@@ -251,6 +306,7 @@ function saveLevel(saveButton = false) {
 
 saveButton.addEventListener("click", () => {
     saveLevel(true)
+    playSound("clicked")
 })
 // ==================================================================================================== //
 // Usuwanie poziomu
@@ -261,6 +317,8 @@ deleteButton.addEventListener("click", e => {
             let levelName = selectLevel.value
             localStorage.removeItem(levelName)
             selectLevel.removeChild(selectLevel.querySelector(`option[value="${levelName}"]`))
+        
+            playSound("clicked")
         }
     }
 })
@@ -275,8 +333,12 @@ playButton.addEventListener("click", e => {
         let level = JSON.parse(localStorage.getItem(levelName))
         localStorage.setItem("_startFrom", levelName)
 
+        playSound("clicked")
+
         // Owtórz link z poziomem w tej samej karcie
-        window.open(`../index.html`, "_self")
+        setTimeout(() => {
+            window.open(`../index.html`, "_self")
+        }, 100)
 
 
     }

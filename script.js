@@ -311,7 +311,10 @@ function restartTheGame() {
 // ==================================================================================================== //
 // Wyświetla ekran końcowy i restartuje grę
 function victory() {
+        playerHealth = 99
+        gameStarted = false
         document.querySelector("#victory").style.display = "grid";
+
         document.querySelector("#victory").addEventListener("click", () => {
                 document.querySelector("#victory").style.display = "none";
                 restartTheGame()

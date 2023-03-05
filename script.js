@@ -1048,7 +1048,7 @@ class Upgrade {
 }
 // --------------------------------------------------------------------- //
 
-let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 501); // Punkty do następnego ulepszenia
+let nextUpgrade = playerPoints + Upgrade.nextUpgradePoints + Math.floor(Math.random() * 501) + playerLevel * 200; // Punkty do następnego ulepszenia
 // ==================================================================================================== //
 
 // ==============================================[ DOH ]=============================================== //

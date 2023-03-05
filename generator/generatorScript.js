@@ -141,7 +141,8 @@ function startGenerator() {
     // Czyta poziomy z pliku JSON
     let levelList = []
     // Jesli nie ma poziomów w localstorage to wczytuje domyślne
-    if (localStorage.length == 0) {
+    if (localStorage.length < 10) {
+        localStorage.clear()
         fetch("basicLevels.json")
             .then(function (response) {
                 return response.json();
@@ -154,25 +155,24 @@ function startGenerator() {
                     if (localStorage.getItem(el.id) == null)
                         localStorage.setItem(el.id, JSON.stringify(el.bricks)) // Jeśli nie ma to dodaje
                 })
-                // // Wczytuje poziomy do selecta
-                // levelList.forEach((el, i) => {
-                //     let option = document.createElement("option")
-                //     option.value = el
-                //     // console.log(el);
-                //     option.innerText = el
-                //     selectLevel.appendChild(option)
-
-                // })
-
             })
     }
     // Wczytuje poziomy z localstorage do levelList nie zaczynające się od "_" (nr rozpoczęcia poziomu do rozpoczynania gry)
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i)
 
-        if (key[0] != "_")
+        if (key[0] != "_" && localStorage.getItem(key)[0] == '[')
             levelList.push(key)
     }
+
+    if(!levelList){                                            // Zabezpieczenie przeciwko błędom wczytywania
+        localStorage.clear()                                  // Czyści localstorage
+        alert("Błąd wczytywania. Spróbuj odświeżyć stronę.") // Wyświetla komunikat
+        location.reload()                                   // Odświeża stronę
+    }
+
+
+
 
     // Sortuje levelList po id
     levelList.sort((a, b) => {

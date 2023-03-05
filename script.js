@@ -198,6 +198,13 @@ function generateBricks(startFrom = null) { // Funkcja generująca cegiełki
 
         let allBricks = JSON.parse(json) // Parsuje json z localStorage do tablicy cegieł
 
+        if (!allBricks) {                                              // Zabezpieczenie przeciwko błędom wczytywania
+                localStorage.clear()                                  // Czyści localstorage
+                alert("Błąd wczytywania. Spróbuj odświeżyć stronę.") // Wyświetla komunikat
+                location.reload()                                   // Odświeża stronę
+        }
+
+
         Brick.list = []; // Usuwa wszystkie cegiełki z listy
 
         allBricks.forEach((el, i) => { // Tworzy nowe cegły korzystając z tablicy allBricks
@@ -213,7 +220,8 @@ function generateBricks(startFrom = null) { // Funkcja generująca cegiełki
 
 // ======================================[ Wczytuje nowy poziom ]====================================== //
 function loadLevel(startFrom = null) {                                  // Funkcja wczytująca poziom
-        if (localStorage.length == 0) {                                // Jeżeli localstorage jest pusty
+        if (localStorage.length < 10) {                                // Jeżeli localstorage jest pusty lub zawiera mniej niż 10 poziomów
+                localStorage.clear();                                 // Czyści localstorage
                 fetch("generator/basicLevels.json")                   // Wczytuje plik json zawierający poziomy
                         .then(function (response) {
                                 return response.json();

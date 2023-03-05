@@ -1,3 +1,7 @@
+// =======================[ Należy zmienić w zależoności od wydajności sprzętu ]======================= //
+const ballSpeed = 4.5 // Prędkość piłki (domyślnie 4.5) - im większa wartość tym szybciej piłka porusza się po ekranie
+// ==================================================================================================== //
+
 // ========================================[ Ustawia pole gry ]======================================== //
 const canvas = document.getElementById('canvas');                 // Pole gry - obiekty dynamiczne
 const staticCanvas = document.getElementById('staticCanvas');    // Pole gry - obiekty statyczne
@@ -155,7 +159,7 @@ function resetToDefault() {
         originalBall.pos.x = platform.pos.x + platform.size.x / 2 - originalBall.radius         // Ustawia pozycję piłki na środku platformy
         originalBall.pos.y = platform.pos.y - 4 - originalBall.radius * 2                      // Ustawia pozycję piłki nad platformą
 
-        originalBall.speed = 4.5;                 // Ustawia prędkość piłki na domyślną - 4.5
+        originalBall.speed = ballSpeed;           // Ustawia prędkość piłki na domyślną - ze stałej
         originalBall.dir.x = 0.25;               // Ustawia kierunek X piłki na 0.25
         originalBall.dir.y = -1;                // Ustawia kierunek Y piłki na -1
         originalBall.lastTouchedObj = null;    // Ustawia ostatnio dotknięty obiekt na null
@@ -520,7 +524,7 @@ class Ball {
                 if (enemyBall)
                         this.parent = enemyParent; // Rodzic fireballa
 
-                this.speed = 4.5; // Szybkość
+                this.speed = ballSpeed; // Szybkość
                 if (enemyBall)
                         this.speed = 9; // Fireball jest szybszy
 

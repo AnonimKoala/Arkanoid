@@ -1,5 +1,5 @@
 // =======================[ Należy zmienić w zależoności od wydajności sprzętu ]======================= //
-const ballSpeed = 4.5 // Prędkość piłki (domyślnie 4.5) - im większa wartość tym szybciej piłka porusza się po ekranie
+let ballSpeed = 4.5 // Prędkość piłki (domyślnie 4.5) - im większa wartość tym szybciej piłka porusza się po ekranie
 // ==================================================================================================== //
 
 // ========================================[ Ustawia pole gry ]======================================== //
@@ -175,6 +175,7 @@ function resetToDefault() {
 // ====================================[ Uruchami kolejny poziom ]===================================== //
 function nextLevel() {
         playerLevel++           // Zwiększa poziom gracza o 1
+        ballSpeed += 0.1       // Zwiększa prędkość piłki o 0.1
 
         if (playerLevel == 33)  // Jeżeli poziom gracza jest równy 33
                 summonDOH();   // Uruchamia poziom z DOH'em
@@ -512,7 +513,7 @@ canvas.addEventListener("mousedown", e => {
 class Ball {
         static list = []; // Lista wszystkich piłek
         static ballPower = 0; // Moc wszystkich piłek związana z upgradem mocy. Liczba wskazuje na ilość razy w których piłka może swobodnie usunąć cegłe bez jej odbicia
-        static ballSpeedIncrease = 0.012; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
+        static ballSpeedIncrease = (ballSpeed / 1000) * 3; //Wartość dodawana do predkości piłki przy kazdym uderzeniu
 
         constructor(pos, dir, radius, enemyBall = false, enemyParent) {
                 this.pos = pos; // Przechowuje pozycje piłki

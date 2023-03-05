@@ -1,4 +1,5 @@
-canvas {
+/* -----------------------------[ Pole gry ]----------------------------- */
+canvas { 
     border: 1px solid black;
     height: 100%;
     width: 100%;
@@ -22,7 +23,9 @@ canvas {
     position: relative;
 
 }
+/* ---------------------------------------------------------------------- */ 
 
+/* -------------------------------[ Body ]------------------------------- */
 body {
     width: 100vw;
     overflow-x: hidden;
@@ -33,7 +36,10 @@ body {
     display: grid;
     place-items: center;
 }
+/* ---------------------------------------------------------------------- */
 
+
+/* --------------------------[ Ekran startowy ]-------------------------- */
 #introScreen {
     position: relative;
     top: -100%;
@@ -48,6 +54,7 @@ body {
     place-items: center;
 }
 
+/* Zawiera wszystkie przyciski */
 #buttons {
     display: grid;
     grid-template-columns: 1fr;
@@ -58,6 +65,7 @@ body {
 
 }
 
+/* Przyciski */
 #buttons>button {
     width: 100%;
     height: 100%;
@@ -70,6 +78,7 @@ body {
     position: relative;
 }
 
+/* Cienie dla przycisków */
 #buttons>button::before {
     content: "";
     position: absolute;
@@ -83,21 +92,27 @@ body {
     filter: blur(15px);
 }
 
+/* Podświetlenie przez kontrast */
 #buttons>button:hover {
     filter: contrast(1.2);
 }
 
+/* Cienie dla podświetlenia */
 #buttons>button:hover::before {
     background-color: rgba(97, 122, 219, 0.612);
     filter: blur(16px);
 }
+/* ---------------------------------------------------------------------- */
 
+/* -------------------------------[ Logo ]------------------------------- */
+/* Logo */
 #logo {
     padding: 20px;
     position: absolute;
     top: 12%;
 }
 
+/* Cienie dla logo */
 #logo::before {
     content: "";
     position: absolute;
@@ -109,8 +124,10 @@ body {
     z-index: -1;
     filter: blur(40px);
 }
+/* ---------------------------------------------------------------------- */
 
-
+/* ----------------------[ Ekrany pojawiające się ]---------------------- */
+/* Ekran pomocy i zwycięstwa */
 #helpScreen, #victory{
     position: absolute;
     top: 0%;
@@ -121,18 +138,21 @@ body {
     z-index: 3;
     display: none;
 }
+/* Grafika */
 :is(#helpScreen, #victory) > img{
     width: 100%;
     height: 100%;
     object-fit: contain;
 }
+/* Widoczność ekranu zwycięstwa */
 #victory{
     z-index: 4;    
 }
+/* ---------------------------------------------------------------------- */
 
 
 /* ====================================================================== */
-/* Responsywność */
+/* Responsywność na ekrany HD */
 /* ====================================================================== */
 @media only screen and (max-width: 1000px) or (max-height: 850px) {
     #div {
@@ -213,3 +233,4 @@ body {
         transform: scale(0.4);
     }
 }
+/* ====================================================================== */

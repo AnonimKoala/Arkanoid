@@ -1,0 +1,26 @@
+Arkanoid ~ Suscy koderzy
+
+Aplikacja webowa oparta o język JS.
+
+Wymaga do uruchomienia serwera - VS Code Live Server / XAMPP / itp.
+
+Korzysta z localStorage.
+Należy upewnić się, że przed uruchomieniem został on wyczyszczony.
+W przeciwnym wypadku może to zakłócić działanie aplikacji.
+
+Należy wtedy użyć w consoli (F12) polecenia:
+localStorage.clear();
+oraz odświeżyć przeglądarkę.
+
+Aplikacja jest uzależniona od wydajności sprzętu, na którym jest testowana.
+Ma to istotny wpływ na prędkość piłki.
+Wraz ze spadkiem mocy, spada jej prędkość.
+Działa to również w przeciwną stronę.
+
+Jeśli jest ona niezadowalająca należy: 
+1. Zmienić w pliku script.js linij 2 wartość zmiennej 'ballSpeed':
+   - im większa tym szybciej porusza się piłka.
+2. Uruchomić grę ponownie
+
+W przypadku wystąpienia nieopisanych powyżej nieprawidłowości rozwiązaniem
+jest odświeżenie okna przeglądarki.

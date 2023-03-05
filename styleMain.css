@@ -25,11 +25,11 @@ canvas {
 
 body {
     width: 100vw;
-    overflow: hidden;
+    overflow-x: hidden;
     background: rgb(84, 73, 255);
     background: linear-gradient(315deg, rgba(84, 73, 255, 1) 0%, rgba(191, 177, 255, 1) 54%, rgba(73, 132, 255, 1) 100%);
     background-size: 200%;
-    height: 100vh;
+    min-height: 100vh;
     display: grid;
     place-items: center;
 }
@@ -134,7 +134,7 @@ body {
 /* ====================================================================== */
 /* Responsywność */
 /* ====================================================================== */
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1000px) or (max-height: 850px) {
     #div {
         width: 95vw;
         height: 95vw;
@@ -148,7 +148,7 @@ body {
 
 
 }
-@media only screen and (max-width: 890px) {
+@media only screen and ((max-width: 890px) or (max-height: 890px)) {
     #buttons {
         transform: scale(0.9);
     }
@@ -157,12 +157,13 @@ body {
         transform: scale(0.8);
     }
 }
-@media only screen and (max-width: 760px) {
+@media only screen and ((max-width: 760px)or (max-height: 830px)) {
     #buttons {
+        top: 34%;
         transform: scale(0.7);
     }
 }
-@media only screen and (max-width: 700px) {
+@media only screen and ((max-width: 700px) or (max-height: 740px)) {
     #buttons {
         top: 30%;
         transform: scale(0.7);
@@ -172,7 +173,7 @@ body {
         transform: scale(0.7);
     }
 }
-@media only screen and (max-width: 600px) {
+@media only screen and ((max-width: 600px) or (max-height: 680px)) {
     #buttons {
         top: 25%;
         transform: scale(0.6);
@@ -180,5 +181,35 @@ body {
     #logo {
         top: 5%;
         transform: scale(0.6);
+    }
+}
+@media only screen and ((max-height: 570px)) {
+    #buttons {
+        top: 20%;
+        transform: scale(0.5);
+    }
+    #logo {
+        top: 5%;
+        transform: scale(0.56);
+    }
+}
+@media only screen and ((max-height: 500px)) {
+    #buttons {
+        top: 10%;
+        transform: scale(0.4);
+    }
+    #logo {
+        top: 2%;
+        transform: scale(0.48);
+    }
+}
+@media only screen and ((max-height: 420px)) {
+    #buttons {
+        top: 2%;
+        transform: scale(0.3);
+    }
+    #logo {
+        top: 2%;
+        transform: scale(0.4);
     }
 }

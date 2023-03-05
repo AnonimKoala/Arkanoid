@@ -8,7 +8,7 @@ body {
   background: rgb(84, 73, 255);
   background: linear-gradient(315deg, rgba(84, 73, 255, 1) 0%, rgba(191, 177, 255, 1) 54%, rgba(73, 132, 255, 1) 100%);
   background-size: 200%;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 /* ========================================================================================================= */
@@ -225,7 +225,7 @@ button {
     "play play"
     "bottomButtons bottomButtons";
   grid-template-rows: 2% 10% 10% 45% 10% 10%;
-
+max-height: 95vh;
 }
 
 /* ========================================================================================================= */
@@ -611,7 +611,31 @@ section.buttonTheme:hover {
 }
 
 /* ===================================================== */
+@media only screen and (max-height: 550px) {
+  body{
+    min-height: 550px;
+  }
+
+  .column-50-50-buttons > button{
+
+    transform: scale(0.8);
+  }
+}
+@media only screen and (max-height: 440px) {
+ .column-50-50-buttons > button{
+  margin-top: 10px;
+    transform: scale(0.7);
+  }
+  #savingDiv{
+    margin-top: 10px;
+  }
+}
 @media only screen and (max-width: 1400px) {
+
+#chooseToEdit,
+#levelName{
+  font-size: 1rem;
+}
   #exit {
     width: 80px;
     height: 80px;
@@ -653,4 +677,45 @@ section.buttonTheme:hover {
     
   }
 
+}
+@media only screen and (max-height: 780px) {
+  body>* {
+    transform: scale(0.8);
+  }
+
+  body {
+    min-height: 700px;
+  }
+
+  #help {
+    width: 95vw;
+    scale: 0.6;
+    transform: translate(-85%, -100%);
+    
+  }
+
+}
+@media only screen and (max-height: 700px){
+  #help {
+    width: 95vw;
+    scale: 0.5;
+    transform: translate(-100%, -120%);
+    
+  }
+}
+@media only screen and (max-height: 600px){
+  #help {
+    width: 95vw;
+    scale: 0.4;
+    transform: translate(-110%, -170%);
+    
+  }
+}
+@media only screen and (max-height: 500px){
+  #help {
+    width: 95vw;
+    scale: 0.3;
+    transform: translate(-152%, -220%);
+    
+  }
 }

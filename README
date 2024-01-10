@@ -1,26 +1,27 @@
 Arkanoid ~ Suscy koderzy
 
-Aplikacja webowa oparta o język JS.
+Web application based on JS.
 
-Wymaga do uruchomienia serwera - VS Code Live Server / XAMPP / itp.
+Requires a server to run properly - VS Code Live Server / XAMPP / etc.
 
-Korzysta z localStorage.
-Należy upewnić się, że przed uruchomieniem został on wyczyszczony.
-W przeciwnym wypadku może to zakłócić działanie aplikacji.
+Utilizes localStorage.
+Make sure it's cleared before running.
+Otherwise, it may disrupt the application's functionality.
 
-Należy wtedy użyć w consoli (F12) polecenia:
+In that case, use the following command in the console (F12):
 localStorage.clear();
-oraz odświeżyć przeglądarkę.
+and refresh the browser.
 
-Aplikacja jest uzależniona od wydajności sprzętu, na którym jest testowana.
-Ma to istotny wpływ na prędkość piłki.
-Wraz ze spadkiem mocy, spada jej prędkość.
-Działa to również w przeciwną stronę.
+The application's performance depends on the hardware it's tested on.
+This significantly affects the ball's speed.
+As power decreases, so does its speed.
+This also works in the opposite direction.
 
-Jeśli jest ona niezadowalająca należy: 
-1. Zmienić w pliku script.js linij 2 wartość zmiennej 'ballSpeed':
-   - im większa tym szybciej porusza się piłka.
-2. Uruchomić grę ponownie
+If the performance is unsatisfactory:
 
+Change the value of the 'ballSpeed' variable on line 2 in the script.js file:
+the higher the value, the faster the ball moves.
+Restart the game.
+If any issues not described above occur, a solution is to refresh the browser window
 W przypadku wystąpienia nieopisanych powyżej nieprawidłowości rozwiązaniem
 jest odświeżenie okna przeglądarki.
